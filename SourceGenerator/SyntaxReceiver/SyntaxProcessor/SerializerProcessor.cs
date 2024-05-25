@@ -59,7 +59,6 @@ namespace SourceGenerator.SyntaxReceiver.SyntaxProcessor
             int parametersCount = parameters.Count;
             Debugg.Log("Parameter count is  " + parametersCount);
 
-
             foreach (AttributeData item in results)
             {
                 //ServerRpc.

@@ -13,9 +13,14 @@ internal static class ISymbolExtensions
     public static string GetFullName(this ISymbol symbol)
     {
         if (symbol == null) return string.Empty;
+
         SymbolDisplayFormat symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
-        return symbol.ToDisplayString(symbolDisplayFormat);
+        if (symbol.ContainingType == null)
+            return symbol.ToDisplayString(symbolDisplayFormat);
+        else
+            return $"{symbol.ContainingType.ToDisplayString(symbolDisplayFormat)}.{symbol.Name}";
     }
+
     /// <summary>
     /// Returns the short name of a symbol which includes the namespace.
     /// </summary>
