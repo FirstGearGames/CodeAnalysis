@@ -1,6 +1,7 @@
 ﻿using FishNet.CodeAnalysis.Extensions;
 using FishNet.Connection;
 using FishNet.Object;
+using FishNet.Serializing;
 using FishNet.Transporting;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,19 +18,14 @@ namespace SourceGenerator.SyntaxReceiver.SyntaxProcessor
 
         public List<MethodDeclarationSyntax> Methods = new();
 
-        private string ServerRpcAttribute_FullName => typeof(ServerRpcAttribute).FullName;
-        private string TargetRpcAttribute_FullName => typeof(TargetRpcAttribute).FullName;
-        private string ObserversRpcAttribute_FullName => typeof(ObserversRpcAttribute).FullName;
-        private string Channel_FullName => typeof(Channel).FullName;
-        private string NetworkConnection_FullName => typeof(NetworkConnection).FullName;
-        //public void Process(CompilationUnitSyntax root, SyntaxNode syntaxNode)
-        //{
-        //    //if (syntaxNode is ClassDeclarationSyntax classDeclaration)
-        //        //FindClassSerializables(root, classDeclaration);
-        //    //else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
-        //    //    FindMethodSerializables(root, methodDeclaration);
+        public static string Writer_FullName => typeof(Writer).FullName;
+        public static string ServerRpcAttribute_FullName => typeof(ServerRpcAttribute).FullName;
+        public static string TargetRpcAttribute_FullName => typeof(TargetRpcAttribute).FullName;
+        public static string ObserversRpcAttribute_FullName => typeof(ObserversRpcAttribute).FullName;
+        public static string Channel_FullName => typeof(Channel).FullName;
+        public static string NetworkConnection_FullName => typeof(NetworkConnection).FullName;
 
-        //}
+        public ClassDeclarationSyntax? GeneratedWriter_Class;
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
@@ -44,16 +40,19 @@ namespace SourceGenerator.SyntaxReceiver.SyntaxProcessor
 
         private void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclarationSyntax)
         {
+            //ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+            //if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
+            //string fullName = namedTypeSymbol.GetFullName();
+            //if (fullName == typeof(FishNet.Serializing.GeneratedWriters).FullName)
+            //    GeneratedWriter_Class = classDeclarationSyntax;
         }
 
         private void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
             if (symbol is not IMethodSymbol methodSymbol) return;
-
-            if (!symbol.HasAttributes<ServerRpcAttribute, ObserversRpcAttribute, TargetRpcAttribute>(out List<AttributeData> results))
-                return;
+            if (!symbol.HasAttributes<ServerRpcAttribute, ObserversRpcAttribute, TargetRpcAttribute>(out List<AttributeData> results)) return;
 
             List<IParameterSymbol> parameters = methodSymbol.Parameters.ToList();
             int parametersCount = parameters.Count;
@@ -113,7 +112,7 @@ namespace SourceGenerator.SyntaxReceiver.SyntaxProcessor
             //Anything left in parameters is serializable.
             foreach (IParameterSymbol parameter in parameters)
                 SerializableTypes.Add(parameter.Type.GetFullName());
-       }
+        }
 
         //private void FindMethodSerializables(CompilationUnitSyntax root, MethodDeclarationSyntax methodDeclaration)
         //{

@@ -11,11 +11,11 @@ namespace ClientAssembly
 
         [ServerRpc]
         private void MyRpc(int value, Channel c = Channel.Unreliable) { }
-        //static void Main(string[] args)
-        //{
+        static void Main(string[] args)
+        {
         //    Console.WriteLine("Started.");
         //    //HelloFrom("Generated Code");
-        //}
+        }
   //      		<PackageReference Include = "Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
 		//<PackageReference Include = "Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
        // static partial void HelloFrom(string name);
