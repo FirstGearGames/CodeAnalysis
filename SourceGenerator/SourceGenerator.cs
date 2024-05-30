@@ -32,8 +32,6 @@ namespace SourceGenerating
         private RootSyntaxReceiver _rootReceiver = new();
         private Dictionary<string, WriteMethod> _writeMethods = new();
 
-        private INamedTypeSymbol _generatedWriters_Symbol;
-
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => _rootReceiver);
@@ -73,7 +71,7 @@ namespace SourceGenerating
 
             StringBuilder sb = new();
 
-            sb.AppendLine("namespace FishNet.Serializing");
+            sb.AppendLine($"namespace GenerateTest");
             sb.AppendLine("{");
             sb.Append('\t').AppendLine("public static class GeneratedWriters");
             sb.Append('\t').AppendLine("{");
@@ -84,8 +82,11 @@ namespace SourceGenerating
                 //MethodDeclarationSyntax method = GetMethodDeclarationSyntax(typeof(void).FullName, i2.Key, new string[] { i2.Value.TypeFullName }, new string[] { $"p{i2.Value.TypeFullName}" });
                 Debugg.Log($" ---Key '{i2.Key}'.  MethodName '{value.MethodFullName}'");
 
+                //string methodSignature = $"public static void Write_Blah()";
+
                 string methodSignature = $"public static void Write_" +
-                    $"{value.TypeFullName}(this {SerializerProcessor.Writer_FullName} writer, {value.TypeFullName} value)";
+                    $"{value.TypeFullName.RemovePeriods()}(this {SerializerProcessor.Writer_FullName} writer, {value.TypeFullName} value)";
+
                 sb.Append("\t\t").AppendLine(methodSignature);
                 sb.Append("\t\t").AppendLine("{");
                 sb.Append("\t\t\t").AppendLine("// Write System.Int32 ");
@@ -108,7 +109,7 @@ namespace SourceGenerating
             //if (fullName == typeof(FishNet.Serializing.GeneratedWriters).FullName)
             //    GeneratedWriter_Class = classDeclarationSyntax;
 
-            Debugg.Log("- WriteStubSerializers End. ");
+            Debugg.Log("- WriteStubSerializers End.");
         }
 
         private void FindFishNetDependencies(GeneratorExecutionContext context)

@@ -10,13 +10,8 @@ namespace RoslynLearning.Helpers
 
     internal static class Debugg
     {
-        private const int PORT_NO = 5005;
-        private const string SERVER_IP = "127.0.0.1";
-
-
         private static List<string> _msgs = new();
 
-        private static StreamWriter? _writer;
         /// <summary>
         /// Writes text over a TcpClient.
         /// </summary>

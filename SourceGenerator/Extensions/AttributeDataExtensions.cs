@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -63,3 +64,4 @@ internal static class AttributeDataExtensions
 		return default;
 	}
 }
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

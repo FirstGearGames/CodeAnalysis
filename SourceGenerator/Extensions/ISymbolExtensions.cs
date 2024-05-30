@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
@@ -33,22 +34,22 @@ internal static class ISymbolExtensions
     /// <summary>
     /// Returns if a symbol has an attribute, and outputs it if so.
     /// </summary>
-    public static bool HasAttribute<T>(this ISymbol symbol, out AttributeData? data)
+    public static bool HasAttribute<T>(this ISymbol symbol, out AttributeData data)
     {
         return symbol.HasAttribute(typeof(T).FullName, out data);
     }
     /// <summary>
     /// Returns if a symbol has an attribute, and outputs it if so.
     /// </summary>
-    public static bool HasAttributes<T1, T2>(this ISymbol symbol, out List<AttributeData>? datas)
+    public static bool HasAttributes<T1, T2>(this ISymbol symbol, out List<AttributeData> datas)
     {
         datas = new();
-        AttributeData? ad;
+        AttributeData ad;
 
         if (symbol.HasAttribute<T1>(out ad))
-            datas.Add(ad!);
+            datas.Add(ad);
         if (symbol.HasAttribute<T2>(out ad))
-            datas.Add(ad!);
+            datas.Add(ad);
 
         return (datas.Count > 0);
     }
@@ -58,21 +59,21 @@ internal static class ISymbolExtensions
     public static bool HasAttributes<T1, T2, T3>(this ISymbol symbol, out List<AttributeData> datas)
     {
         datas = new();
-        AttributeData? ad;
+        AttributeData ad;
 
         if (symbol.HasAttribute<T1>(out ad))
-            datas.Add(ad!);
+            datas.Add(ad);
         if (symbol.HasAttribute<T2>(out ad))
-            datas.Add(ad!);
+            datas.Add(ad);
         if (symbol.HasAttribute<T3>(out ad))
-            datas.Add(ad!);
+            datas.Add(ad);
 
         return (datas.Count > 0);
     }
     /// <summary>
     /// Returns if a symbol has an attribute, and outputs it if so.
     /// </summary>
-    public static bool HasAttribute(this ISymbol symbol, string attributeFullName, out AttributeData? data)
+    public static bool HasAttribute(this ISymbol symbol, string attributeFullName, out AttributeData data)
     {
         foreach (AttributeData item in symbol.GetAttributes())
         {
@@ -87,7 +88,9 @@ internal static class ISymbolExtensions
         }
 
         //Fall through, not found.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         data = default;
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         return false;
     }
 
@@ -166,3 +169,4 @@ internal static class ISymbolExtensions
         return attributes.ToImmutable();
     }
 }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.

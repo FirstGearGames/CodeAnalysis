@@ -10,7 +10,7 @@ namespace SourceGenerating.SyntaxReceivers
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
-            SerializerProcessor.OnVisitSyntaxNode(context);
+            //SerializerProcessor.OnVisitSyntaxNode(context);
         }
     }
 }

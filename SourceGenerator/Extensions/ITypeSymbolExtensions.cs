@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -37,3 +38,4 @@ internal static class ITypeSymbolExtensions
 		return false;
 	}
 }
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

@@ -1,7 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+using Microsoft.CodeAnalysis;
 
 namespace RoslynLearning.Extensions
 {
@@ -10,7 +9,9 @@ namespace RoslynLearning.Extensions
         public static bool TryGetParentSyntax<T>(this SyntaxNode syntaxNode, out T result) where T : SyntaxNode
         {
             // set defaults
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             result = null;
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
             if (syntaxNode == null)
             {
@@ -41,3 +42,5 @@ namespace RoslynLearning.Extensions
         }
     }
 }
+#pragma warning restore CS8601 // Possible null reference assignment.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
