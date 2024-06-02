@@ -21,37 +21,30 @@ namespace RoslynLearning.Helpers
             //_writer = new StreamWriter(@"D:/Output.txt", false);
 
             //_writer.WriteLine(txt);
-            _msgs.Add(txt);
+        //    _msgs.Add(txt);
         }
 
         public static string Quoted(this string s) => $"\"{s}\"";
 
         public static void Send()
         {
-            string path = @"D:/Output.txt";
-            try
-            {
-                DateTime startTime = DateTime.Now;
-                File.Delete(path);
-                while (File.Exists(path))
-                {
-                    Thread.Sleep(100);
-                    if ((DateTime.Now - startTime).TotalSeconds > 3)
-                        break;
-                }
-            }
-            catch { }
+            //string path = @"D:/Output.txt";
+            //try
+            //{
+            //    DateTime startTime = DateTime.Now;
+            //    File.Delete(path);
+            //    while (File.Exists(path))
+            //    {
+            //        Thread.Sleep(100);
+            //        if ((DateTime.Now - startTime).TotalSeconds > 3)
+            //            break;
+            //    }
+            //}
+            //catch { }
 
-            File.WriteAllLines(path, _msgs);
-            _msgs.Clear();
-            System.Diagnostics.Process.Start(path);
-
-       
-            //if (_writer == null)
-            //    return;
-            //_writer.Flush();
-            //_writer.Close();
-            //_writer = null;       
+            //File.WriteAllLines(path, _msgs);
+            //_msgs.Clear();
+            //System.Diagnostics.Process.Start(path);
         }
 
     }

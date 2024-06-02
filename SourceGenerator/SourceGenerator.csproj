@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\FishNet\FishNet\FishNet.csproj" PrivateAssets="all" />
-      <ProjectReference Include="..\SteakNet\SteakNet.csproj" />
     </ItemGroup>
 
 </Project>

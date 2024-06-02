@@ -1,17 +1,17 @@
-﻿// using FishNet.Object;
-// using FishNet.Serializing;
-// using FishNet.Transporting;
+﻿ using FishNet.Object;
+ using FishNet.Serializing;
+ using FishNet.Transporting;
 // using GenerateTest;
 namespace ClientAssembly
 {
 
-    public class Player /*: NetworkBehaviour*/
+    public class Player : NetworkBehaviour
     {
         //public SyncVar<int> Count;
         //public SyncVar<Health> HealthInformation;
 
-        // [ServerRpc]
-        // private void MyRpc(int value, Channel c = Channel.Unreliable) { }
+        [ServerRpc]
+        private void MyRpc(int value, Channel c = Channel.Unreliable) { }
         public void DoThing()
         {
             // Writer w = new();
@@ -19,8 +19,8 @@ namespace ClientAssembly
         //static void Main(string[] args)
         //{
         //    Writer w = new();
-            
-           
+
+
         ////    Console.WriteLine("Started.");
         ////    //HelloFrom("Generated Code");
         //}
@@ -29,8 +29,8 @@ namespace ClientAssembly
         // static partial void HelloFrom(string name);
 
     }
-     
-     
+
+
     //public struct Health
     //{
     //    public int Value;
@@ -47,6 +47,6 @@ namespace ClientAssembly
     //}
 
     //public class SyncVar<T> { }
-    
+
 
 }

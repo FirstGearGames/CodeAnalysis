@@ -13,7 +13,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using FishNet.Serializing;
-using SteakNet;
 
 namespace SourceGenerating
 {
@@ -33,7 +32,7 @@ namespace SourceGenerating
         }
 
         // private RootSyntaxReceiver _rootReceiver = new();
-        // private Dictionary<string, WriteMethod> _writeMethods = new();
+         private Dictionary<string, WriteMethod> _writeMethods = new();
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -148,12 +147,8 @@ namespace SourceGenerating
             void FindWriterMethods()
             {
                 // string writerFullName = typeof(Kar).FullName;
-                // string writerFullName = Writer.FullName;
-                //string writerFullName = "FishNet.Serializing." + nameof(Writer);
-                //INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(writerFullName);
-                // INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(fishnetSymbol.TypeNames.First(typeName => typeName == "Writer"));
-
-                INamedTypeSymbol? writerSymbol = fishnetSymbol.GetForwardedTypes().FirstOrDefault(type => type.Name == nameof(Writer));
+                 string writerFullName = Writer.FullName;
+                INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(writerFullName);
                 
                 if (writerSymbol == null)
                 {
