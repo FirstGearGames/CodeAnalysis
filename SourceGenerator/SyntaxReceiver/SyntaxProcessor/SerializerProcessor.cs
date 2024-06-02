@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace SourceGenerator.SyntaxReceiver.SyntaxProcessor
 {
-    internal class SerializerProcessor
+    public class SerializerProcessor
     {
         public HashSet<string> SerializableTypes = new();
 

@@ -1,5 +1,5 @@
 ﻿using FishNet.CodeAnalysis.Extensions;
-using FishNet.Serializing;
+//using FishNet.Serializing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,10 +7,13 @@ using RoslynLearning.Helpers;
 using SourceGenerating.SyntaxReceivers;
 using SourceGenerator.Extensions;
 using SourceGenerator.SyntaxReceiver.SyntaxProcessor;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using FishNet.Serializing;
+using SteakNet;
 
 namespace SourceGenerating
 {
@@ -29,20 +32,25 @@ namespace SourceGenerating
             }
         }
 
-        private RootSyntaxReceiver _rootReceiver = new();
-        private Dictionary<string, WriteMethod> _writeMethods = new();
+        // private RootSyntaxReceiver _rootReceiver = new();
+        // private Dictionary<string, WriteMethod> _writeMethods = new();
 
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => _rootReceiver);
+            //context.RegisterForSyntaxNotifications(() => _rootReceiver);
+            context.RegisterForSyntaxNotifications(() => new RootSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            Debugg.Log($"- Execute Start.");
+            if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
+
+            Dictionary<string, WriteMethod> _writeMethods = new Dictionary<string, WriteMethod>();
+            
+            Debugg.Log($"- Execute Start. ");
             FindFishNetDependencies(context);
 
-            foreach (string item in _rootReceiver.SerializerProcessor.SerializableTypes)
+            foreach (string item in rootSyntaxReceiver.SerializerProcessor.SerializableTypes)
             {
                 string writeMethodFullName = string.Empty;
                 if (_writeMethods.TryGetValue(item, out WriteMethod writeMethod))
@@ -55,6 +63,7 @@ namespace SourceGenerating
                     foreach (KeyValuePair<string, WriteMethod> i2 in _writeMethods)
                         Debugg.Log($" --- Key '{i2.Key}'. MethodName '{i2.Value.MethodFullName}'");
                 }
+
                 Debugg.Log($"SerializableType: '{item}'. WriteMethod '{writeMethodFullName}'");
             }
 
@@ -64,7 +73,7 @@ namespace SourceGenerating
             Debugg.Send();
         }
 
-        private void WriteStubSerializers(GeneratorExecutionContext context)
+        private void WriteStubSerializers(in GeneratorExecutionContext context)
         {
             Debugg.Log("- WriteStubSerializers Start.");
 
@@ -85,7 +94,7 @@ namespace SourceGenerating
                 //string methodSignature = $"public static void Write_Blah()";
 
                 string methodSignature = $"public static void Write_" +
-                    $"{value.TypeFullName.RemovePeriods()}(this {SerializerProcessor.Writer_FullName} writer, {value.TypeFullName} value)";
+                                         $"{value.TypeFullName.RemovePeriods()}(this {SerializerProcessor.Writer_FullName} writer, {value.TypeFullName} value)";
 
                 sb.Append("\t\t").AppendLine(methodSignature);
                 sb.Append("\t\t").AppendLine("{");
@@ -114,19 +123,18 @@ namespace SourceGenerating
 
         private void FindFishNetDependencies(GeneratorExecutionContext context)
         {
-            if (context.Compilation == null || context.Compilation.SourceModule == null || context.Compilation.SourceModule.ReferencedAssemblySymbols == null)
+            if (context.Compilation == null || context.Compilation.SourceModule == null ||
+                context.Compilation.SourceModule.ReferencedAssemblySymbols == null)
                 return;
 
-            ImmutableArray<IAssemblySymbol> assemblySymbols = context.Compilation.SourceModule.ReferencedAssemblySymbols;
+            ImmutableArray<IAssemblySymbol>
+                assemblySymbols = context.Compilation.SourceModule.ReferencedAssemblySymbols;
 
             IAssemblySymbol? fishnetSymbol = null;
             foreach (IAssemblySymbol item in assemblySymbols)
             {
-                if (item.Name == "FishNet.Runtime")
-                {
+                if (item.Name == "FishNet")
                     fishnetSymbol = item;
-                    break;
-                }
             }
 
             if (fishnetSymbol == null)
@@ -139,30 +147,36 @@ namespace SourceGenerating
 
             void FindWriterMethods()
             {
-                string writerFullName = typeof(Writer).FullName;
-                INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(writerFullName);
+                // string writerFullName = typeof(Kar).FullName;
+                // string writerFullName = Writer.FullName;
+                //string writerFullName = "FishNet.Serializing." + nameof(Writer);
+                //INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(writerFullName);
+                // INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(fishnetSymbol.TypeNames.First(typeName => typeName == "Writer"));
+
+                INamedTypeSymbol? writerSymbol = fishnetSymbol.GetForwardedTypes().FirstOrDefault(type => type.Name == nameof(Writer));
+                
                 if (writerSymbol == null)
                 {
-                    Debugg.Log($"Could not find writer. FullName checked is {writerFullName}.");
+                    Debugg.Log($"Could not find writer. FullName checked is Writer.");
                     return;
                 }
-
-                Debugg.Log($"Writer found. FullName checked is  {writerFullName}");
+                
+                Debugg.Log($"Writer found. FullName checked is  ");
                 foreach (IMethodSymbol methodSymbol in writerSymbol.GetMembers().OfType<IMethodSymbol>())
                 {
                     //Writers will always have at least 1 parameter.
                     if (methodSymbol.Parameters.Length == 0) continue;
                     //Does not have writer attribute.
                     if (!methodSymbol.HasAttribute<WriterAttribute>(out _)) continue;
-
+                
                     //Type will always be the first parameter.
                     string typeFullName = methodSymbol.Parameters.First().Type.GetFullName();
-
+                
                     if (_writeMethods.TryGetValue(typeFullName, out _))
                         Debugg.Log($"__ERROR__ Type {typeFullName} already added.");
                     else
                         _writeMethods.Add(typeFullName, new WriteMethod(methodSymbol.GetFullName(), typeFullName));
-
+                    
                     Debugg.Log($"Write Method Name: {methodSymbol.GetFullName()}. Par ameters are: {typeFullName}");
                 }
             }
