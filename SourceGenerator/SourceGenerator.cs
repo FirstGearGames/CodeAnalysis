@@ -1,28 +1,25 @@
 ﻿using FishNet.CodeAnalysis.Extensions;
-//using FishNet.Serializing;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynLearning.Helpers;
 using SourceGenerating.SyntaxReceivers;
 using SourceGenerator.Extensions;
-using SourceGenerator.SyntaxReceiver.SyntaxProcessor;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
-using FishNet.Serializing;
 
 namespace SourceGenerating
 {
     [Generator]
-    public class SourceGenerator : ISourceGenerator
+    public sealed class SourceGenerator : ISourceGenerator
     {
-        private struct WriteMethod
+        #region Types.
+
+        private readonly struct WriteMethod
         {
-            public string MethodFullName;
-            public string TypeFullName;
+            public readonly string MethodFullName;
+            public readonly string TypeFullName;
 
             public WriteMethod(string methodFullName, string typeFullName)
             {
@@ -31,12 +28,18 @@ namespace SourceGenerating
             }
         }
 
-        // private RootSyntaxReceiver _rootReceiver = new();
-         private Dictionary<string, WriteMethod> _writeMethods = new();
+        #endregion
+
+        private const string FishNetAssemblyName = "FishNet";
+
+        private const string WriterFullName = "FishNet.Serializing.Writer";
+
+        private const string WriterAttributeFullName = "FishNet.Serializing.WriterAttribute";
+
+        private readonly Dictionary<string, WriteMethod> _fishNetWriteMethods = new();
 
         public void Initialize(GeneratorInitializationContext context)
         {
-            //context.RegisterForSyntaxNotifications(() => _rootReceiver);
             context.RegisterForSyntaxNotifications(() => new RootSyntaxReceiver());
         }
 
@@ -44,99 +47,123 @@ namespace SourceGenerating
         {
             if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
 
-            Dictionary<string, WriteMethod> _writeMethods = new Dictionary<string, WriteMethod>();
-            
             Debugg.Log($"- Execute Start. ");
+
             FindFishNetDependencies(context);
-
-            foreach (string item in rootSyntaxReceiver.SerializerProcessor.SerializableTypes)
-            {
-                string writeMethodFullName = string.Empty;
-                if (_writeMethods.TryGetValue(item, out WriteMethod writeMethod))
-                {
-                    writeMethodFullName = writeMethod.MethodFullName;
-                }
-                else
-                {
-                    Debugg.Log($"-- Write method not found. Here are all... ");
-                    foreach (KeyValuePair<string, WriteMethod> i2 in _writeMethods)
-                        Debugg.Log($" --- Key '{i2.Key}'. MethodName '{i2.Value.MethodFullName}'");
-                }
-
-                Debugg.Log($"SerializableType: '{item}'. WriteMethod '{writeMethodFullName}'");
-            }
 
             WriteStubSerializers(context);
 
             Debugg.Log($"- Execute End.");
+
             Debugg.Send();
         }
 
-        private void WriteStubSerializers(in GeneratorExecutionContext context)
+        private struct DeltaWriterMethod
+        {
+            public DeltaWriterMethod(string fullName, string header, string footer)
+            {
+                FullName = fullName;
+                Header = header;
+                Footer = footer;
+            }
+
+            public string FullName;
+            public string Header;
+            public string Footer;
+        }
+
+        private void WriteStubSerializers(GeneratorExecutionContext context)
         {
             Debugg.Log("- WriteStubSerializers Start.");
 
+            StringBuilder classSb = new();
+            StringBuilder tmpSb = new();
 
-            StringBuilder sb = new();
+            classSb.AppendLine("namespace GenerateTest");
+            classSb.AppendLine("{");
+            classSb.Indent().AppendLine("public static class GeneratedWriters");
+            classSb.Indent().AppendLine("{");
 
-            sb.AppendLine($"namespace GenerateTest");
-            sb.AppendLine("{");
-            sb.Append('\t').AppendLine("public static class GeneratedWriters");
-            sb.Append('\t').AppendLine("{");
+            Dictionary<string, DeltaWriterMethod> writeDeltaMethods = new();
 
-            foreach (KeyValuePair<string, WriteMethod> i2 in _writeMethods)
+            //First generate all the delta writer stubs.
+            foreach (KeyValuePair<string, WriteMethod> entry in _fishNetWriteMethods)
             {
-                WriteMethod value = i2.Value;
-                //MethodDeclarationSyntax method = GetMethodDeclarationSyntax(typeof(void).FullName, i2.Key, new string[] { i2.Value.TypeFullName }, new string[] { $"p{i2.Value.TypeFullName}" });
-                Debugg.Log($" ---Key '{i2.Key}'.  MethodName '{value.MethodFullName}'");
-
-                //string methodSignature = $"public static void Write_Blah()";
-
-                string methodSignature = $"public static void Write_" +
-                                         $"{value.TypeFullName.RemovePeriods()}(this {SerializerProcessor.Writer_FullName} writer, {value.TypeFullName} value)";
-
-                sb.Append("\t\t").AppendLine(methodSignature);
-                sb.Append("\t\t").AppendLine("{");
-                sb.Append("\t\t\t").AppendLine("// Write System.Int32 ");
-                sb.Append("\t\t").AppendLine("}");
+                WriteMethod writeMethod = entry.Value;
+                CreateEmptyDeltaWriter(entry.Key);
             }
 
-            sb.Append('\t').AppendLine("}");
+            void CreateEmptyDeltaWriter(string typeFullName)
+            {
+                if (writeDeltaMethods.ContainsKey(typeFullName)) return;
+                
+                string header = GetMethodHeader();
+                string footer = GetMethodFooter();
 
-            sb.AppendLine("}");
+                INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(typeFullName);
+                if (namedTypeSymbol == null || (!namedTypeSymbol.IsUserDefinedStruct() &&
+                    !namedTypeSymbol.IsUserDefinedClass()))
+                    return;
 
-            context.AddSource("GeneratedWriters.g.cs", sb.ToString());
+                foreach (ISymbol item in namedTypeSymbol.GetMembers())
+                {
+                    if (item is IFieldSymbol fieldSymbol)
+                    {
+                        ITypeSymbol typeSymbol = fieldSymbol.Type;
+                        CreateEmptyDeltaWriter(typeSymbol.GetFullTypeName());
+                        //classSb.Indent(3)
+                        //.AppendLine($"//MemberX fullName is {typeSymbol.GetFullTypeName()}, {item.Name}");
+                    }
+                }
+                
+                //Add to deltaWriters.
+                writeDeltaMethods.Add(typeFullName, new DeltaWriterMethod(typeFullName, header, footer));
+                
+                string GetMethodHeader()
+                {
+                    tmpSb.Clear();
+                    tmpSb.Indent(2).AppendLine($"public static void WriteDelta_" +
+                                               $"{typeFullName.RemovePeriods("_")}(this {WriterFullName} writer," +
+                                               $" {typeFullName} valueA,  {typeFullName} valueB)");
+                    tmpSb.Indent(2).AppendLine("{");
 
-            Debugg.Log(sb.ToString());
+                    return tmpSb.ToString();
+                }
 
+                string GetMethodFooter()
+                {
+                    tmpSb.Clear();
+                    tmpSb.Indent(2).AppendLine("}");
 
-            //ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-            //if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
+                    return tmpSb.ToString();
+                }
+            }
 
-            //string fullName = namedTypeSymbol.GetFullName();
-            //if (fullName == typeof(FishNet.Serializing.GeneratedWriters).FullName)
-            //    GeneratedWriter_Class = classDeclarationSyntax;
+            
+            //Add all generated delta writers.
+            foreach (var VARIABLE in writeDeltaMethods)
+            {
+                classSb.AppendLine(VARIABLE.Value.Header);
+                classSb.AppendLine(VARIABLE.Value.Footer);
+            }
+            
+            classSb.Indent().AppendLine("}");
+            classSb.AppendLine("}");
 
+            context.AddSource("GeneratedWriters.g.cs", classSb.ToString());
+
+            Debugg.Log(classSb.ToString());
             Debugg.Log("- WriteStubSerializers End.");
         }
 
-        private void FindFishNetDependencies(GeneratorExecutionContext context)
+        private void FindFishNetDependencies(in GeneratorExecutionContext context)
         {
-            if (context.Compilation == null || context.Compilation.SourceModule == null ||
-                context.Compilation.SourceModule.ReferencedAssemblySymbols == null)
-                return;
-
             ImmutableArray<IAssemblySymbol>
                 assemblySymbols = context.Compilation.SourceModule.ReferencedAssemblySymbols;
+            IAssemblySymbol? fishNetSymbol =
+                assemblySymbols.FirstOrDefault(assemblySymbols => assemblySymbols.Name == FishNetAssemblyName);
 
-            IAssemblySymbol? fishnetSymbol = null;
-            foreach (IAssemblySymbol item in assemblySymbols)
-            {
-                if (item.Name == "FishNet")
-                    fishnetSymbol = item;
-            }
-
-            if (fishnetSymbol == null)
+            if (fishNetSymbol == null)
             {
                 Debugg.Log($"Could not find FishNet assembly .");
                 return;
@@ -146,33 +173,29 @@ namespace SourceGenerating
 
             void FindWriterMethods()
             {
-                // string writerFullName = typeof(Kar).FullName;
-                 string writerFullName = Writer.FullName;
-                INamedTypeSymbol? writerSymbol = fishnetSymbol.GetTypeByMetadataName(writerFullName);
-                
-                if (writerSymbol == null)
+                if (fishNetSymbol.GetTypeByMetadataName(WriterFullName) is not INamedTypeSymbol writerTypeSymbol)
                 {
-                    Debugg.Log($"Could not find writer. FullName checked is Writer.");
+                    Debugg.Log($"Could not find writer.");
                     return;
                 }
-                
-                Debugg.Log($"Writer found. FullName checked is  ");
-                foreach (IMethodSymbol methodSymbol in writerSymbol.GetMembers().OfType<IMethodSymbol>())
+
+                foreach (IMethodSymbol methodSymbol in writerTypeSymbol.GetMembers().OfType<IMethodSymbol>())
                 {
-                    //Writers will always have at least 1 parameter.
+                    // Writers will always have at least 1 parameter.
                     if (methodSymbol.Parameters.Length == 0) continue;
-                    //Does not have writer attribute.
-                    if (!methodSymbol.HasAttribute<WriterAttribute>(out _)) continue;
-                
+                    // Does not have writer attribute.
+                    if (!methodSymbol.HasAttribute(WriterAttributeFullName, out _)) continue;
+
                     //Type will always be the first parameter.
-                    string typeFullName = methodSymbol.Parameters.First().Type.GetFullName();
-                
-                    if (_writeMethods.TryGetValue(typeFullName, out _))
+                    string typeFullName = methodSymbol.Parameters.First().Type.GetFullTypeName();
+
+                    if (_fishNetWriteMethods.ContainsKey(typeFullName))
                         Debugg.Log($"__ERROR__ Type {typeFullName} already added.");
                     else
-                        _writeMethods.Add(typeFullName, new WriteMethod(methodSymbol.GetFullName(), typeFullName));
-                    
-                    Debugg.Log($"Write Method Name: {methodSymbol.GetFullName()}. Par ameters are: {typeFullName}");
+                        _fishNetWriteMethods.Add(typeFullName,
+                            new WriteMethod(methodSymbol.GetFullName(), typeFullName));
+
+                    Debugg.Log($"Write Method Name: {methodSymbol.GetFullName()}. Parameters are: {typeFullName}");
                 }
             }
         }

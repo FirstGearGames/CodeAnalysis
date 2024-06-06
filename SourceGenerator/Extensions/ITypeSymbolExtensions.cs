@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
+using SourceGenerator.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -7,7 +8,31 @@ namespace FishNet.CodeAnalysis.Extensions;
 
 internal static class ITypeSymbolExtensions
 {
-	public static IEnumerable<ITypeSymbol> EnumerateTypeHierarchy(this ITypeSymbol thisTypeSymbol)
+	
+    public static string GetFullTypeName(this ITypeSymbol typeSymbol)
+    {
+        string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
+		containingNamespace = containingNamespace.RemoveGlobalAlias();
+
+        string fullyQualifiedName = string.Empty;
+        for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
+            fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
+
+        fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
+        return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
+    }
+    public static bool IsUserDefinedStruct(this ITypeSymbol thisTypeSymbol)
+    {
+        return thisTypeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
+    }
+
+    public static bool IsUserDefinedClass(this ITypeSymbol thisTypeSymbol)
+    {
+        return thisTypeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
+    }
+
+
+    public static IEnumerable<ITypeSymbol> EnumerateTypeHierarchy(this ITypeSymbol thisTypeSymbol)
 	{
 		for (ITypeSymbol typeSymbol = thisTypeSymbol; typeSymbol != null; typeSymbol = typeSymbol.BaseType) yield return typeSymbol;
 	}

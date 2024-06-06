@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SourceGenerator.Extensions
+﻿namespace SourceGenerator.Extensions
 {
     internal static class StringExtensions
     {
-        public static string RemovePeriods(this string value) => value.Replace(".", "");
+        public static string RemovePeriods(this string value, string newValue = "") => value.Replace(".", newValue);
+         
+        public static string RemoveGlobalAlias(this string value)
+        {
+            if (value.StartsWith("global::")) value = value.Substring(8);
+            else if (value.StartsWith("<global namespace>")) value = value.Substring(18);
+            return value;
+        }
     }
 }

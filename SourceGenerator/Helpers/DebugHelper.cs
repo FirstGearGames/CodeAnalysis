@@ -1,51 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
+﻿using System.Collections.Generic;
 
 namespace RoslynLearning.Helpers
 {
+	internal static class Debugg
+	{
+		private static List<string> _msgs = new();
 
-    internal static class Debugg
-    {
-        private static List<string> _msgs = new();
+		/// <summary>
+		/// Writes text over a TcpClient.
+		/// </summary>
+		public static void Log(string txt)
+		{
+			  //_msgs.Add(txt);
+		}
 
-        /// <summary>
-        /// Writes text over a TcpClient.
-        /// </summary>
-        public static void Log(string txt)
-        {
-            //if (_writer == null)
-            //_writer = new StreamWriter(@"D:/Output.txt", false);
+		public static string Quoted(this string s) => $"\"{s}\"";
 
-            //_writer.WriteLine(txt);
-        //    _msgs.Add(txt);
-        }
+		public static void Send()
+		{
+			//string path = @"D:/Output.txt";
+			//try
+			//{
+			//	DateTime startTime = DateTime.Now;
+			//	File.Delete(path);
+			//	while (File.Exists(path))
+			//	{
+			//		Thread.Sleep(100);
+			//		if ((DateTime.Now - startTime).TotalSeconds > 3)
+			//			break;
+			//	}
+			//}
+			//catch { }
 
-        public static string Quoted(this string s) => $"\"{s}\"";
-
-        public static void Send()
-        {
-            //string path = @"D:/Output.txt";
-            //try
-            //{
-            //    DateTime startTime = DateTime.Now;
-            //    File.Delete(path);
-            //    while (File.Exists(path))
-            //    {
-            //        Thread.Sleep(100);
-            //        if ((DateTime.Now - startTime).TotalSeconds > 3)
-            //            break;
-            //    }
-            //}
-            //catch { }
-
-            //File.WriteAllLines(path, _msgs);
-            //_msgs.Clear();
-            //System.Diagnostics.Process.Start(path);
-        }
-
-    }
+			//File.WriteAllLines(path, _msgs);
+			//_msgs.Clear();
+			//System.Diagnostics.Process.Start(path);
+		}
+	}
 }

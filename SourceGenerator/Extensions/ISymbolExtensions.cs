@@ -1,5 +1,7 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceGenerator.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
@@ -11,15 +13,27 @@ internal static class ISymbolExtensions
     /// <summary>
     /// Returns the full name of a symbol which includes the namespace.
     /// </summary>
+    public static string GetNamespace(this ISymbol symbol)
+    {
+        return symbol?.ContainingNamespace?.Name ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Returns the full name of a symbol which includes the namespace.
+    /// </summary>
     public static string GetFullName(this ISymbol symbol)
     {
         if (symbol == null) return string.Empty;
 
-        SymbolDisplayFormat symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
-        if (symbol.ContainingType == null)
-            return symbol.ToDisplayString(symbolDisplayFormat);
-        else
-            return $"{symbol.ContainingType.ToDisplayString(symbolDisplayFormat)}.{symbol.Name}";
+        string containingNamespace = symbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
+        containingNamespace = containingNamespace.RemoveGlobalAlias();
+
+        string fullyQualifiedName = string.Empty;
+        for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
+            fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
+
+        fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
+        return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
     }
 
     /// <summary>
@@ -31,46 +45,7 @@ internal static class ISymbolExtensions
         return symbol.Name;
     }
 
-    /// <summary>
-    /// Returns if a symbol has an attribute, and outputs it if so.
-    /// </summary>
-    public static bool HasAttribute<T>(this ISymbol symbol, out AttributeData data)
-    {
-        return symbol.HasAttribute(typeof(T).FullName, out data);
-    }
-    /// <summary>
-    /// Returns if a symbol has an attribute, and outputs it if so.
-    /// </summary>
-    public static bool HasAttributes<T1, T2>(this ISymbol symbol, out List<AttributeData> datas)
-    {
-        datas = new();
-        AttributeData ad;
-
-        if (symbol.HasAttribute<T1>(out ad))
-            datas.Add(ad);
-        if (symbol.HasAttribute<T2>(out ad))
-            datas.Add(ad);
-
-        return (datas.Count > 0);
-    }
-    /// <summary>
-    /// Returns if a symbol has an attribute, and outputs it if so.
-    /// </summary>
-    public static bool HasAttributes<T1, T2, T3>(this ISymbol symbol, out List<AttributeData> datas)
-    {
-        datas = new();
-        AttributeData ad;
-
-        if (symbol.HasAttribute<T1>(out ad))
-            datas.Add(ad);
-        if (symbol.HasAttribute<T2>(out ad))
-            datas.Add(ad);
-        if (symbol.HasAttribute<T3>(out ad))
-            datas.Add(ad);
-
-        return (datas.Count > 0);
-    }
-    /// <summary>
+     /// <summary>
     /// Returns if a symbol has an attribute, and outputs it if so.
     /// </summary>
     public static bool HasAttribute(this ISymbol symbol, string attributeFullName, out AttributeData data)
