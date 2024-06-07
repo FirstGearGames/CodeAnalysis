@@ -11,17 +11,22 @@ public static class CodeBuilder
     public const string PooledWriter_FullName = $"{FishNet_Serializing_Namespace}.PooledWriter";
     private const string WriterPool_Retrieve_Name = $"{FishNet_Serializing_Namespace}.WriterPool.Retrieve()";
 
+    private const string Writer_WriteBytes_Name = "WriteBytes";
+    private const string Writer_GetBuffer_Name = "GetBuffer";
+    private const string Writer_Length_Name = "Length";
+
+
     private static StringBuilder _stringBuilder = new();
-    
+
     /// <summary>
     /// Calls WriterPool to return a pooled writer.
     /// </summary>
     /// <param name="writerVariableName">Variable name result of </param>
-    public static string GetPooledWriter(out string writerVariableName, int indentCount = 0,  string variablePrefix = "")
+    public static string GetPooledWriter(out string writerVariableName, int indentCount = 0, string variablePrefix = "")
     {
         _stringBuilder.Clear();
         _stringBuilder.Indent(indentCount);
-        
+
         writerVariableName = $"{variablePrefix}pooledWriter";
         return $"{_stringBuilder.ToString()}{PooledWriter_FullName} {writerVariableName} = {WriterPool_Retrieve_Name};";
     }
@@ -29,7 +34,8 @@ public static class CodeBuilder
     /// <summary>
     /// Calls a method taking optional arguments.
     /// </summary>
-    public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true, params string[] variableNames)
+    public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true,
+        params string[] variableNames)
     {
         if (callingVariable.Length > 0)
             callingVariable += ".";
@@ -46,6 +52,7 @@ public static class CodeBuilder
 
             _stringBuilder.Append(variableNames[i]);
         }
+
         //End call.
         _stringBuilder.Append(')');
         if (closeCall)
@@ -60,7 +67,7 @@ public static class CodeBuilder
     public static string SingleLineIf(string text)
     {
         _stringBuilder.Clear();
-        _stringBuilder.AppendLine($"if ({text})");
+        _stringBuilder.Append($"if ({text})");
         return _stringBuilder.ToString();
     }
 
@@ -76,4 +83,15 @@ public static class CodeBuilder
         return _stringBuilder.ToString();
     }
 
+    public static string CallWriteBytes(string writerName, string otherWriterA)
+    {
+        _stringBuilder.Clear();
+        string byteArrayVariable = $"({otherWriterA}.{Writer_GetBuffer_Name}()";
+
+        //public void WriteBytes(byte[] value, int offset, int count)
+        _stringBuilder.Append($"{writerName}.{Writer_WriteBytes_Name}(" +
+                              $"{byteArrayVariable}, 0, {otherWriterA}.{Writer_Length_Name}))");
+
+        return _stringBuilder.ToString();
+    }
 }

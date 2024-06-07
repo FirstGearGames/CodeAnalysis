@@ -1,4 +1,5 @@
-﻿using FishNet.CodeAnalysis.Extensions;
+﻿using System;
+using FishNet.CodeAnalysis.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynLearning.Helpers;
@@ -36,6 +37,7 @@ namespace SourceGenerating
 
         private const string FishNetAssembly_Name = "FishNet.Runtime";
         private const string Writer_FullName = "FishNet.Serializing.Writer";
+        private const string Writer_WritePackedWhole_Name = "WritePackedWhole";
         private const string WriterAttribute_FullName = "FishNet.Serializing.WriterAttribute";
         private const string DeltaWriterAttribute_FullName = "FishNet.Serializing.DeltaWriterAttribute";
         private static readonly string UInt64_FullName = "System.UInt64";
@@ -131,6 +133,10 @@ namespace SourceGenerating
                     classSb.AppendLine($"   // Type {typeFullName} is supported.");
                 }
 
+                if (namedTypeSymbol.MemberNames.Count() >= 63)
+                    throw new Exception(
+                        $"Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of 63 field members. Reduce the amount of field members or encapsulate members.");
+                
                 foreach (ISymbol item in namedTypeSymbol.GetMembers())
                 {
                     if (item is IFieldSymbol fieldSymbol)
@@ -154,7 +160,7 @@ namespace SourceGenerating
                     tmpSb.Indent(2).AppendLine($"public static void {mName}" +
                                                $"(this {Writer_FullName} {WriteDelta_WriterParameter_FullName}," +
                                                $" {typeFullName} {WriteDelta_ParameterA_Name},  {typeFullName} {WriteDelta_ParameterB_Name})");
-                    tmpSb.Indent(2).AppendLine("{");
+                    tmpSb.Indent(2).Append('{');
 
                     return tmpSb.ToString();
                 }
@@ -167,7 +173,7 @@ namespace SourceGenerating
                     return tmpSb.ToString();
                 }
             }
-
+            
             foreach (KeyValuePair<string, DeltaWriterMethod> item in writeDeltaMethods)
             {
                 classSb.AppendLine(item.Value.Header);
@@ -178,6 +184,7 @@ namespace SourceGenerating
 
                 string totalFlagsName = "totalFlags";
                 classSb.AppendLine(3, CodeBuilder.CreateLocalVariable(UInt64_FullName, totalFlagsName, "0"));
+                classSb.AppendLine(3, CodeBuilder.GetPooledWriter(out string tmpWriter));
 
                 foreach (ISymbol symbol in item.Value.NamedTypeSymbol.GetMembers())
                 {
@@ -193,12 +200,11 @@ namespace SourceGenerating
                         continue;
                     }
 
-                    classSb.AppendLine(3, CodeBuilder.GetPooledWriter(out string tmpWriter));
-
                     classSb.AppendLine(3, CodeBuilder.SingleLineIf(
                         CodeBuilder.CallMethod(writeMethodName, tmpWriter, false,
                             $"{WriteDelta_ParameterA_Name}.{fieldSymbol.Name}",
                             $"{WriteDelta_ParameterB_Name}.{fieldSymbol.Name}")));
+                    classSb.AppendLine(4, $"{totalFlagsName} += {fieldFlag};");
 
                     // );
                     // classSb.AppendLine(3, CodeBuilder.CallMethod(writeMethodName, tmpWriter,
@@ -208,6 +214,12 @@ namespace SourceGenerating
                     fieldFlag *= 2;
                 }
 
+                //Write the changed flags.
+                classSb.AppendLine(3,
+                    CodeBuilder.CallMethod(Writer_WritePackedWhole_Name, WriteDelta_WriterParameter_FullName, true,
+                        totalFlagsName));
+                //Write tmpWriter.
+                classSb.AppendLine(3, CodeBuilder.CallWriteBytes(WriteDelta_WriterParameter_FullName, tmpWriter));
 
                 classSb.AppendLine(item.Value.Footer);
             }

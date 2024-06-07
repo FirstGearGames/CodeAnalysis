@@ -1,8 +1,8 @@
-﻿
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
+
 namespace FishNet.Serializing
 {
-    public  struct  TestStruct
+    public struct TestStruct
     {
         public string A;
         public bool B;
@@ -18,13 +18,28 @@ namespace FishNet.Serializing
 
     public partial class Writer
     {
+        [Writer]
+        public void WriteInt32(int value)
+        {
+        }
 
         [Writer]
-        public void WriteInt32(int value) { }
+        public void WriteString(string value)
+        {
+        }
+
         [Writer]
-        public void WriteString(string value) { }
-        [Writer]
-        public void WriteBoolean(bool value) { }
+        public void WriteBoolean(bool value)
+        {
+        }
+
+        public void WriteBytes(byte[] value, int offset, int count)
+        {
+        }
+
+        public void WritePackedWhole(ulong value)
+        {
+        }
 
         [DeltaWriter]
         public bool WriteDeltaInt32(int valueA, int valueB)
@@ -41,4 +56,7 @@ namespace FishNet.Serializing
         // public void WriteTestClass(TestClass value) { }
     }
 }
-public class NoNameSpaceA { }
+
+public class NoNameSpaceA
+{
+}

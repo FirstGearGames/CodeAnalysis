@@ -7,7 +7,9 @@ namespace ClientAssembly
 {
 	public struct MyStruct
 	{
-		public int IntValue;
+		public int IntValueA;
+		public int IntValueB;
+		public int IntValueC;
 	}
 
 	public class Player : NetworkBehaviour
