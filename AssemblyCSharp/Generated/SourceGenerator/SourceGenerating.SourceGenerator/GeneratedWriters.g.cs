@@ -24,8 +24,10 @@
 			//WriteMethodName is empty for ClientAssembly.MyStructB
 			bool changed = (totalFlags != 0) || rootWriter;
 			if (changed)
+			{
 				writer.WritePackedWhole(totalFlags);
-			writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+				writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+			}
 			pooledWriter.Store();
 
 			return changed;
@@ -49,8 +51,10 @@
 				totalFlags += 4;
 			bool changed = (totalFlags != 0) || rootWriter;
 			if (changed)
+			{
 				writer.WritePackedWhole(totalFlags);
-			writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+				writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+			}
 			pooledWriter.Store();
 
 			return changed;

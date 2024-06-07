@@ -234,12 +234,14 @@ namespace SourceGenerating
                 classSb.AppendLine(3, $"bool {changedVariable} = ({totalFlagsVariable} != 0) || rootWriter;");
 
                 classSb.AppendLine(3, CodeBuilder.SingleLineIf(changedVariable));
+                classSb.AppendLine(3, "{");
                 classSb.AppendLine(4,
                     CodeBuilder.CallMethod(Writer_WritePackedWhole_Name, WriteDelta_WriterParameter_FullName, true,
                         totalFlagsVariable));
                 //Write tmpWriter.
-                classSb.AppendLine(3,
+                classSb.AppendLine(4,
                     CodeBuilder.CallWriteBytes(WriteDelta_WriterParameter_FullName, tmpWriterVariable));
+                classSb.AppendLine(3, "}");
                 //store tmpWriter.
                 classSb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + "\r\n");
                 /* Struct/class writers must always return true. This is so if they are being encapsulated
