@@ -2,15 +2,15 @@
 {
 	public static class GeneratedWriters
 	{
-	//fn WriterCount 5
-		public static void WriteDelta_FishNet_Serializing_TestStruct(this FishNet.Serializing.Writer writer, FishNet.Serializing.TestStruct valueA,  FishNet.Serializing.TestStruct valueB)
+// Creating DeltaWriter for ClientAssembly.MyStruct
+   // Type ClientAssembly.MyStruct is supported.
+   // Already created System.Int32
+       //Member fullName is System.Int32, Value
+		public static void WriteDelta_ClientAssembly_MyStruct(this FishNet.Serializing.Writer writer, ClientAssembly.MyStruct valueA,  ClientAssembly.MyStruct valueB)
 		{
 
-		}
-
-		public static void WriteDelta_FishNet_Serializing_TestClass(this FishNet.Serializing.Writer writer, FishNet.Serializing.TestClass valueA,  FishNet.Serializing.TestClass valueB)
-		{
-
+           //Member fullName is System.Int32, ClientAssembly.MyStruct
+          writer.WriteDeltaInt32(valueA, valueB);
 		}
 
 	}

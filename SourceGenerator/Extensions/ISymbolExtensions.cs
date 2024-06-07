@@ -21,7 +21,7 @@ internal static class ISymbolExtensions
     /// <summary>
     /// Returns the full name of a symbol which includes the namespace.
     /// </summary>
-    public static string GetFullName(this ISymbol symbol)
+    public static string GetSymbolFullName(this ISymbol symbol)
     {
         if (symbol == null) return string.Empty;
 
@@ -39,7 +39,7 @@ internal static class ISymbolExtensions
     /// <summary>
     /// Returns the short name of a symbol which includes the namespace.
     /// </summary>
-    public static string GetName(this ISymbol symbol)
+    public static string GetSymbolName(this ISymbol symbol)
     {
         if (symbol == null) return string.Empty;
         return symbol.Name;
@@ -55,7 +55,7 @@ internal static class ISymbolExtensions
             INamedTypeSymbol? typeSymbol = item.AttributeClass;
             if (typeSymbol == null) continue;
 
-            if (typeSymbol.GetFullName() == attributeFullName)
+            if (typeSymbol.GetSymbolFullName() == attributeFullName)
             {
                 data = item;
                 return true;

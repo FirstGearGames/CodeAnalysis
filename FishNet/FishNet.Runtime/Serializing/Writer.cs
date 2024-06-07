@@ -25,10 +25,13 @@ namespace FishNet.Serializing
         public void WriteString(string value) { }
         [Writer]
         public void WriteBoolean(bool value) { }
-        [Writer]
-        public void WriteTestStruct(TestStruct value) { }
-        [Writer]
-        public void WriteTestClass(TestClass value) { }
+
+        [DeltaWriter]
+        public void WriteDeltaInt32(int valueA, int valueB) { }
+        // [Writer]
+        // public void WriteTestStruct(TestStruct value) { }
+        // [Writer]
+        // public void WriteTestClass(TestClass value) { }
     }
 }
 public class NoNameSpaceA { }

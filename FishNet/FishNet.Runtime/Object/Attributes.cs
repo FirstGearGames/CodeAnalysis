@@ -134,11 +134,13 @@ namespace FishNet.Serializing
 {
 
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class WriterAttribute : Attribute 
-    {
-        public const string FullName = $"FishNet.Runtime.Serializing.{nameof(WriterAttribute)}";
-    }
+    public class WriterAttribute : Attribute { }
+    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    public class DeltaWriterAttribute : Attribute { }
+
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class ReaderAttribute : Attribute { }
+    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    public class DeltaReaderAttribute : Attribute { }
 
 }

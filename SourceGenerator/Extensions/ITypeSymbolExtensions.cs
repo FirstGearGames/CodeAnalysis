@@ -9,7 +9,7 @@ namespace FishNet.CodeAnalysis.Extensions;
 internal static class ITypeSymbolExtensions
 {
 	
-    public static string GetFullTypeName(this ITypeSymbol typeSymbol)
+    public static string GetTypeFullName(this ITypeSymbol typeSymbol)
     {
         string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
 		containingNamespace = containingNamespace.RemoveGlobalAlias();
