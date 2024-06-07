@@ -1,6 +1,6 @@
 ﻿//#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-//using FishNet.CodeAnalysis.Extensions;
-//using FishNet.Object;
+//using FishNet.Runtime.CodeAnalysis.Extensions;
+//using FishNet.Runtime.Object;
 //using Microsoft.CodeAnalysis;
 //using System.Collections.Generic;
 

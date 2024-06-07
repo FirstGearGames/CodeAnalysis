@@ -136,7 +136,7 @@ namespace FishNet.Serializing
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class WriterAttribute : Attribute 
     {
-        public const string FullName = $"FishNet.Serializing.{nameof(WriterAttribute)}";
+        public const string FullName = $"FishNet.Runtime.Serializing.{nameof(WriterAttribute)}";
     }
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class ReaderAttribute : Attribute { }

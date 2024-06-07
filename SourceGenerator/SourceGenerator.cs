@@ -30,10 +30,8 @@ namespace SourceGenerating
 
         #endregion
 
-        private const string FishNetAssemblyName = "FishNet";
-
+        private const string FishNetAssemblyName = "FishNet.Runtime";
         private const string WriterFullName = "FishNet.Serializing.Writer";
-
         private const string WriterAttributeFullName = "FishNet.Serializing.WriterAttribute";
 
         private readonly Dictionary<string, WriteMethod> _fishNetWriteMethods = new();
@@ -60,16 +58,19 @@ namespace SourceGenerating
 
         private struct DeltaWriterMethod
         {
-            public DeltaWriterMethod(string fullName, string header, string footer)
+            public string FullName;
+            public string MethodFullName;
+            public string Header;
+            public string Footer;
+            
+            public DeltaWriterMethod(string fullName, string methodFullName, string header, string footer)
             {
                 FullName = fullName;
+                MethodFullName = methodFullName;
                 Header = header;
                 Footer = footer;
             }
 
-            public string FullName;
-            public string Header;
-            public string Footer;
         }
 
         private void WriteStubSerializers(GeneratorExecutionContext context)
@@ -83,7 +84,7 @@ namespace SourceGenerating
             classSb.AppendLine("{");
             classSb.Indent().AppendLine("public static class GeneratedWriters");
             classSb.Indent().AppendLine("{");
-
+            
             Dictionary<string, DeltaWriterMethod> writeDeltaMethods = new();
 
             //First generate all the delta writer stubs.
@@ -97,7 +98,7 @@ namespace SourceGenerating
             {
                 if (writeDeltaMethods.ContainsKey(typeFullName)) return;
                 
-                string header = GetMethodHeader();
+                string header = GetMethodHeader(out string methodFullName);
                 string footer = GetMethodFooter();
 
                 INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(typeFullName);
@@ -117,13 +118,15 @@ namespace SourceGenerating
                 }
                 
                 //Add to deltaWriters.
-                writeDeltaMethods.Add(typeFullName, new DeltaWriterMethod(typeFullName, header, footer));
+                writeDeltaMethods.Add(typeFullName, new DeltaWriterMethod(typeFullName, methodFullName, header, footer));
                 
-                string GetMethodHeader()
+                string GetMethodHeader(out string mFullName)
                 {
                     tmpSb.Clear();
-                    tmpSb.Indent(2).AppendLine($"public static void WriteDelta_" +
-                                               $"{typeFullName.RemovePeriods("_")}(this {WriterFullName} writer," +
+                    mFullName = $"WriteDelta_{typeFullName.RemovePeriods("_")}";
+                    
+                    tmpSb.Indent(2).AppendLine($"public static void {mFullName}" +
+                                               $"(this {WriterFullName} writer," +
                                                $" {typeFullName} valueA,  {typeFullName} valueB)");
                     tmpSb.Indent(2).AppendLine("{");
 
@@ -140,11 +143,36 @@ namespace SourceGenerating
             }
 
             
-            //Add all generated delta writers.
-            foreach (var VARIABLE in writeDeltaMethods)
+            
+            foreach (KeyValuePair<string, DeltaWriterMethod> item in writeDeltaMethods)
             {
-                classSb.AppendLine(VARIABLE.Value.Header);
-                classSb.AppendLine(VARIABLE.Value.Footer);
+                classSb.AppendLine(item.Value.Header);
+                string writeMethodName = GetWriteDeltaMethod(item.Key);
+
+                if (writeMethodName == string.Empty)
+                {
+                    classSb.AppendLine($"//WriteMethodName is empty for {item.Key}");
+                    continue;
+                }
+                else
+                {
+                    
+                    
+                }
+                
+                
+                classSb.AppendLine(item.Value.Footer);
+            }
+            
+            string GetWriteDeltaMethod(string typeFullName)
+            {
+                if (_fishNetWriteMethods.TryGetValue(typeFullName, out WriteMethod wm))
+                    return wm.MethodFullName;
+                if (writeDeltaMethods.TryGetValue(typeFullName, out DeltaWriterMethod dwm))
+                    return dwm.MethodFullName;
+                
+                //Fallthrough/failure.
+                return string.Empty;
             }
             
             classSb.Indent().AppendLine("}");
@@ -165,7 +193,7 @@ namespace SourceGenerating
 
             if (fishNetSymbol == null)
             {
-                Debugg.Log($"Could not find FishNet assembly .");
+                Debugg.Log($"Could not find FishNet.Runtime assembly .");
                 return;
             }
 

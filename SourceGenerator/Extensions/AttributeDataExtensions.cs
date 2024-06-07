@@ -12,14 +12,14 @@ internal static class AttributeDataExtensions
     public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
     {
         // Collect pertinent syntax trees from these attributes
-        var acceptedTrees = new HashSet<SyntaxTree>();
-        foreach (var attribute in attributes.Attributes)
+        HashSet<SyntaxTree> acceptedTrees = new HashSet<SyntaxTree>();
+        foreach (AttributeSyntax attribute in attributes.Attributes)
             acceptedTrees.Add(attribute.SyntaxTree);
 
-        var parentSymbol = attributes.Parent!.GetDeclaredSymbol(compilation)!;
-        var parentAttributes = parentSymbol.GetAttributes();
-        var ret = new List<AttributeData>();
-        foreach (var attribute in parentAttributes)
+        ISymbol parentSymbol = attributes.Parent!.GetDeclaredSymbol(compilation)!;
+        ImmutableArray<AttributeData> parentAttributes = parentSymbol.GetAttributes();
+        List<AttributeData> ret = new List<AttributeData>();
+        foreach (AttributeData? attribute in parentAttributes)
         {
             if (acceptedTrees.Contains(attribute.ApplicationSyntaxReference!.SyntaxTree))
                 ret.Add(attribute);
@@ -30,7 +30,7 @@ internal static class AttributeDataExtensions
 
     public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
     {
-        var model = compilation.GetSemanticModel(node.SyntaxTree);
+        SemanticModel model = compilation.GetSemanticModel(node.SyntaxTree);
         return model.GetDeclaredSymbol(node);
     }
     

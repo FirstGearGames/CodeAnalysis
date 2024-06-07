@@ -2,6 +2,7 @@
 {
 	public static class GeneratedWriters
 	{
+	//fn WriterCount 5
 		public static void WriteDelta_FishNet_Serializing_TestStruct(this FishNet.Serializing.Writer writer, FishNet.Serializing.TestStruct valueA,  FishNet.Serializing.TestStruct valueB)
 		{
 
