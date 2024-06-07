@@ -33,11 +33,12 @@ namespace SourceGenerating
         private const string WriteDelta_WriterParameter_FullName = "writer";
         private const string WriteDelta_ParameterA_Name = "valueA";
         private const string WriteDelta_ParameterB_Name = "valueB";
-        
+
         private const string FishNetAssembly_Name = "FishNet.Runtime";
         private const string Writer_FullName = "FishNet.Serializing.Writer";
         private const string WriterAttribute_FullName = "FishNet.Serializing.WriterAttribute";
         private const string DeltaWriterAttribute_FullName = "FishNet.Serializing.DeltaWriterAttribute";
+        private static readonly string UInt64_FullName = "System.UInt64";
 
         private readonly Dictionary<string, WriteMethod> _fishNetDeltaWriteMethods = new();
 
@@ -171,28 +172,42 @@ namespace SourceGenerating
             {
                 classSb.AppendLine(item.Value.Header);
 
+                //Starting flag for each modified field.
+                ulong fieldFlag = 2;
+                ulong totalFlags = 0;
+
+                string totalFlagsName = "totalFlags";
+                classSb.AppendLine(3, CodeBuilder.CreateLocalVariable(UInt64_FullName, totalFlagsName, "0"));
+
                 foreach (ISymbol symbol in item.Value.NamedTypeSymbol.GetMembers())
                 {
                     if (symbol is not IFieldSymbol fieldSymbol) continue;
-                    ;
+
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
                     string typeFullName = typeSymbol.GetTypeFullName();
                     string writeMethodName = GetWriteDeltaMethodName(typeFullName);
 
                     if (writeMethodName == string.Empty)
                     {
-                        classSb.AppendLine($"           //WriteMethodName is empty for {item.Key}");
+                        classSb.AppendLine(3, $"//WriteMethodName is empty for {item.Key}");
                         continue;
                     }
-                    
-                    classSb.AppendLine($"           //Member fullName is {typeFullName}, {item.Key}");
-                    string callMethodText = $"          {WriteDelta_WriterParameter_FullName}.{writeMethodName}(" +
-                                            $"{WriteDelta_ParameterA_Name}, {WriteDelta_ParameterB_Name});";
-                    classSb.AppendLine(callMethodText);
+
+                    classSb.AppendLine(3, CodeBuilder.GetPooledWriter(out string tmpWriter));
+
+                    classSb.AppendLine(3, CodeBuilder.SingleLineIf(
+                        CodeBuilder.CallMethod(writeMethodName, tmpWriter, false,
+                            $"{WriteDelta_ParameterA_Name}.{fieldSymbol.Name}",
+                            $"{WriteDelta_ParameterB_Name}.{fieldSymbol.Name}")));
+
+                    // );
+                    // classSb.AppendLine(3, CodeBuilder.CallMethod(writeMethodName, tmpWriter,
+                    //     $"{WriteDelta_ParameterA_Name}.{fieldSymbol.Name}",
+                    //     $"{WriteDelta_ParameterB_Name}.{fieldSymbol.Name}"));
+
+                    fieldFlag *= 2;
                 }
 
-
-          
 
                 classSb.AppendLine(item.Value.Footer);
             }

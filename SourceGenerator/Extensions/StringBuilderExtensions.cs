@@ -12,10 +12,16 @@ internal static class StringBuilderExtensions
 		return count switch
 		{
 			0 => stringBuilder,
-
 			1 => stringBuilder.Append('\t'),
-
 			_ => stringBuilder.Append('\t', count)
 		};
 	}
+
+	public static void AppendLine(this StringBuilder sb, int indentCount, string text)
+	{
+		sb.Indent(indentCount).AppendLine(text);
+	}
+
+	
+
 }

@@ -27,7 +27,14 @@ namespace FishNet.Serializing
         public void WriteBoolean(bool value) { }
 
         [DeltaWriter]
-        public void WriteDeltaInt32(int valueA, int valueB) { }
+        public bool WriteDeltaInt32(int valueA, int valueB)
+        {
+            int next = (valueB - valueA);
+            if (next != 0)
+                WriteInt32(next);
+
+            return (next != 0);
+        }
         // [Writer]
         // public void WriteTestStruct(TestStruct value) { }
         // [Writer]
