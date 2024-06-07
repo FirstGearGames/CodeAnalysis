@@ -21,17 +21,21 @@ internal static class ITypeSymbolExtensions
         fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
         return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
     }
-    public static bool IsUserDefinedStruct(this ITypeSymbol thisTypeSymbol)
+    public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
     {
-        return thisTypeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
+        return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
     }
 
-    public static bool IsUserDefinedClass(this ITypeSymbol thisTypeSymbol)
+    public static bool IsUserDefinedClass(this ITypeSymbol typeSymbol)
     {
-        return thisTypeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
+        return typeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
     }
 
-
+    public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
+    {
+        return (typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct());
+    }
+    
     public static IEnumerable<ITypeSymbol> EnumerateTypeHierarchy(this ITypeSymbol thisTypeSymbol)
 	{
 		for (ITypeSymbol typeSymbol = thisTypeSymbol; typeSymbol != null; typeSymbol = typeSymbol.BaseType) yield return typeSymbol;

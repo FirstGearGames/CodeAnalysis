@@ -5,18 +5,24 @@ using GenerateTest;
 
 namespace ClientAssembly
 {
-	public struct MyStruct
+	public struct MyStructA
 	{
 		public int IntValueA;
-		public int IntValueB;
-		public int IntValueC;
+		public float FloatValueA;
+		public MyStructB StructB;
 	}
 
+	public struct MyStructB
+	{
+		public bool BoolValueA;
+	}
+
+	
 	public class Player : NetworkBehaviour
 	{
 
 		[ServerRpc]
-		private void MyRpcTwo(MyStruct ms)
+		private void MyRpcTwo(MyStructA ms)
 		{
 		}
 

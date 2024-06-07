@@ -136,7 +136,7 @@ namespace SourceGenerating
                 if (namedTypeSymbol.MemberNames.Count() >= 63)
                     throw new Exception(
                         $"Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of 63 field members. Reduce the amount of field members or encapsulate members.");
-                
+
                 foreach (ISymbol item in namedTypeSymbol.GetMembers())
                 {
                     if (item is IFieldSymbol fieldSymbol)
@@ -157,9 +157,10 @@ namespace SourceGenerating
                     tmpSb.Clear();
                     mName = $"WriteDelta_{typeFullName.RemovePeriods("_")}";
 
-                    tmpSb.Indent(2).AppendLine($"public static void {mName}" +
+                    tmpSb.Indent(2).AppendLine($"public static bool {mName}" +
                                                $"(this {Writer_FullName} {WriteDelta_WriterParameter_FullName}," +
-                                               $" {typeFullName} {WriteDelta_ParameterA_Name},  {typeFullName} {WriteDelta_ParameterB_Name})");
+                                               $" in {typeFullName} {WriteDelta_ParameterA_Name}, in {typeFullName} {WriteDelta_ParameterB_Name}" +
+                                               $", bool writeFull = false, bool rootWriter = true)");
                     tmpSb.Indent(2).Append('{');
 
                     return tmpSb.ToString();
@@ -173,18 +174,25 @@ namespace SourceGenerating
                     return tmpSb.ToString();
                 }
             }
-            
+
             foreach (KeyValuePair<string, DeltaWriterMethod> item in writeDeltaMethods)
             {
                 classSb.AppendLine(item.Value.Header);
-
+                
+                //If to write full then call Write on type and exit.
+                classSb.AppendLine(3, "if (writeFull)");
+                classSb.AppendLine(3, "{");
+                classSb.AppendLine(4, $"{WriteDelta_WriterParameter_FullName}.Write({WriteDelta_ParameterB_Name});");
+                classSb.AppendLine(4, "return true;");
+                classSb.AppendLine(3, "}\r\n");
+                
                 //Starting flag for each modified field.
                 ulong fieldFlag = 2;
                 ulong totalFlags = 0;
 
-                string totalFlagsName = "totalFlags";
-                classSb.AppendLine(3, CodeBuilder.CreateLocalVariable(UInt64_FullName, totalFlagsName, "0"));
-                classSb.AppendLine(3, CodeBuilder.GetPooledWriter(out string tmpWriter));
+                string totalFlagsVariable = "totalFlags";
+                classSb.AppendLine(3, CodeBuilder.CreateLocalVariable(UInt64_FullName, totalFlagsVariable, "0"));
+                classSb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + "\r\n");
 
                 foreach (ISymbol symbol in item.Value.NamedTypeSymbol.GetMembers())
                 {
@@ -200,11 +208,18 @@ namespace SourceGenerating
                         continue;
                     }
 
+                    //Check if symbol is a user struct/class.
+                    string inText;
+                    if (typeSymbol.IsUserDefinedClassOrStruct())
+                        inText = "in ";
+                    else
+                        inText = string.Empty;
+                    
                     classSb.AppendLine(3, CodeBuilder.SingleLineIf(
-                        CodeBuilder.CallMethod(writeMethodName, tmpWriter, false,
-                            $"{WriteDelta_ParameterA_Name}.{fieldSymbol.Name}",
-                            $"{WriteDelta_ParameterB_Name}.{fieldSymbol.Name}")));
-                    classSb.AppendLine(4, $"{totalFlagsName} += {fieldFlag};");
+                        CodeBuilder.CallMethod(writeMethodName, tmpWriterVariable, false,
+                            $"{inText}{WriteDelta_ParameterA_Name}.{fieldSymbol.Name}",
+                            $"{inText}{WriteDelta_ParameterB_Name}.{fieldSymbol.Name}")));
+                    classSb.AppendLine(4, $"{totalFlagsVariable} += {fieldFlag};");
 
                     // );
                     // classSb.AppendLine(3, CodeBuilder.CallMethod(writeMethodName, tmpWriter,
@@ -215,11 +230,21 @@ namespace SourceGenerating
                 }
 
                 //Write the changed flags.
-                classSb.AppendLine(3,
+                string changedVariable = "changed";
+                classSb.AppendLine(3, $"bool {changedVariable} = ({totalFlagsVariable} != 0) || rootWriter;");
+
+                classSb.AppendLine(3, CodeBuilder.SingleLineIf(changedVariable));
+                classSb.AppendLine(4,
                     CodeBuilder.CallMethod(Writer_WritePackedWhole_Name, WriteDelta_WriterParameter_FullName, true,
-                        totalFlagsName));
+                        totalFlagsVariable));
                 //Write tmpWriter.
-                classSb.AppendLine(3, CodeBuilder.CallWriteBytes(WriteDelta_WriterParameter_FullName, tmpWriter));
+                classSb.AppendLine(3,
+                    CodeBuilder.CallWriteBytes(WriteDelta_WriterParameter_FullName, tmpWriterVariable));
+                //store tmpWriter.
+                classSb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + "\r\n");
+                /* Struct/class writers must always return true. This is so if they are being encapsulated
+                 * the flags written will be read, even if that flag is 0. */
+                classSb.AppendLine(3, $"return {changedVariable};");
 
                 classSb.AppendLine(item.Value.Footer);
             }

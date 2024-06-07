@@ -18,6 +18,10 @@ namespace FishNet.Serializing
 
     public partial class Writer
     {
+        public int Length;
+
+        public byte[] GetBuffer() => default;
+
         [Writer]
         public void WriteInt32(int value)
         {
@@ -33,11 +37,20 @@ namespace FishNet.Serializing
         {
         }
 
+        [Writer]
+        public void WriteFloat(float value)
+        {
+            
+        }
         public void WriteBytes(byte[] value, int offset, int count)
         {
         }
 
         public void WritePackedWhole(ulong value)
+        {
+        }
+
+        public void Write<T>(T value)
         {
         }
 
