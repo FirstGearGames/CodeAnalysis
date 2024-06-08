@@ -45,7 +45,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             foreach (string item in rootSyntaxReceiver.SerializableTypes)
                 CreateEmptyDeltaWriterMethod(context, item);
         }
-        
+
         /// <summary>
         /// Creates bodies for generated delta serializers.
         /// </summary>
@@ -72,7 +72,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
             //Not a supported type. Must be a user defined struct or class.
             if (namedTypeSymbol == null || !namedTypeSymbol.IsUserDefinedClassOrStruct())
             {
-                Debugg.Log($"- NamedSymbol is null or not user defined.");
+                bool isNull = (namedTypeSymbol == null);
+                Debugg.Log($"- NamedSymbol is null: {isNull}, or not user defined.");
                 return;
             }
 
@@ -84,27 +85,27 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 return;
             }
 
-            Debugg.Log($"- Recursive call here is breaking things.");
-            // //Create empty writers for any nested types which would need to be serialized.
-            // foreach (ISymbol item in namedTypeSymbol.GetMembers())
-            // {
-            //     if (!CanGenerateSerializer(item, out IFieldSymbol? fieldSymbol))
-            //     {
-            //         Debugg.Log($"- Cannot generate serializer for field {fieldSymbol.Type.GetTypeFullName()}");
-            //         continue;
-            //     }
-            //
-            //     ITypeSymbol typeSymbol = fieldSymbol!.Type;
-            //     CreateEmptyDeltaWriterMethod(context, typeSymbol.GetTypeFullName());
-            // } 
-            
+            //Create empty writers for any nested types which would need to be serialized.
+            foreach (ISymbol item in namedTypeSymbol.GetMembers())
+            {
+                if (!CanGenerateSerializer(item, out IFieldSymbol? fieldSymbol))
+                {
+                    Debugg.Log($"- Cannot generate serializer for field {item.GetSymbolFullName()}");
+                    continue;
+                }
+
+                ITypeSymbol typeSymbol = fieldSymbol!.Type;
+                CreateEmptyDeltaWriterMethod(context, typeSymbol.GetTypeFullName());
+            }
+
             Debugg.Log("- Creating header and footer.");
             string header = GetMethodHeader(out string methodName);
             string footer = GetMethodFooter();
             //Add to writers.
-            
+
             _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, typeFullName, methodName, header, footer, ""), AddSerializerType.Delta);
             Debugg.Log($"- Added for type {typeFullName}.");
+
             string GetMethodHeader(out string mName)
             {
                 mName = $"{Generated_WriteDelta_Method_Prefix}{typeFullName.RemovePeriods("_")}";
@@ -146,6 +147,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 {
                     Debugg.Log($"- Creating body for {gsm.TypeFullName}");
                 }
+
                 sb.Clear();
 
                 //Write full block.
