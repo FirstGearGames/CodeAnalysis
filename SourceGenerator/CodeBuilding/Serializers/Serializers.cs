@@ -8,66 +8,10 @@ using SourceGenerator.Extensions;
 
 namespace SourceGenerator.CodeBuilding.Serializers
 {
-    // internal readonly struct SerializerMethod
-    // {
-    //     /// <summary>
-    //     /// Name of the method.
-    //     /// </summary>
-    //     public readonly string MethodName;
-    //
-    //     /// <summary>
-    //     /// Full name of the type the serializer is for.
-    //     /// </summary>
-    //     public readonly string TypeFullName;
-    //
-    //     public SerializerMethod(string methodFullName, string typeFullName)
-    //     {
-    //         MethodName = methodFullName;
-    //         TypeFullName = typeFullName;
-    //     }
-    // }
-
-    internal struct SerializerMethod
-    {
-        /// <summary>
-        /// NamedTypeSymbol of the method.
-        /// </summary>
-        public readonly INamedTypeSymbol? NamedTypeSymbol;
-
-        /// <summary>
-        /// Full name of the type the serializer is for.
-        /// </summary>
-        public readonly string TypeFullName;
-
-        /// <summary>
-        /// Name of the generated method.
-        /// </summary>
-        public readonly string MethodName;
-
-        /// <summary>
-        /// True if this serializer was generated.
-        /// </summary>
-        public readonly bool Generated;
-
-        public SerializerMethod(string typeFullName, string methodName, bool generated)
-        {
-            TypeFullName = typeFullName;
-            MethodName = methodName;
-        }
-
-        public SerializerMethod(INamedTypeSymbol namedTypeSymbol, string typeFullName, string methodName, bool generated) : this(typeFullName, methodName, generated)
-        {
-            NamedTypeSymbol = namedTypeSymbol;
-        }
-
-        public bool IsValid() => (TypeFullName != string.Empty);
-    }
-
     internal class Serializers
     {
         //Writers.
         private readonly Dictionary<string, SerializerMethod> _writeMethods = new();
-
         private readonly Dictionary<string, SerializerMethod> _writeDeltaMethods = new();
 
         //Readers
@@ -107,13 +51,18 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// <summary>
         /// Returns a delta writer.
         /// </summary>
-        public SerializerMethod GetDeltaWriter(string typeFullName)
+        public DeltaSerializerMethod GetDeltaWriter(string typeFullName)
         {
             if (_writeDeltaMethods.TryGetValue(typeFullName, out SerializerMethod result))
-                return result;
+                if (result is DeltaSerializerMethod dsm) return dsm;
 
             return default;
         }
+
+        /// <summary>
+        /// Returns the collection containing all delta writers.
+        /// </summary>
+        public IReadOnlyDictionary<string, SerializerMethod> GetDeltaWriteMethods() => _writeDeltaMethods;
 
         /// <summary>
         /// Returns a delta reader.
@@ -121,10 +70,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
         public SerializerMethod GetDeltaReader(string typeFullName)
         {
             if (_readDeltaMethods.TryGetValue(typeFullName, out SerializerMethod result))
-                return result;
+                if (result is DeltaSerializerMethod dsm) return dsm;
 
             return default;
         }
+
+        /// <summary>
+        /// Returns the collection containing all delta readers.
+        /// </summary>
+        public IReadOnlyDictionary<string, SerializerMethod> GeDeltaReadMethods() => _writeDeltaMethods;
 
         #endregion
 
@@ -164,6 +118,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
         }
 
         /// <summary>
+        /// Returns the collection containing all non-delta writers.
+        /// </summary>
+        public IReadOnlyDictionary<string, SerializerMethod> GetWriteMethods() => _writeMethods;
+
+        /// <summary>
         /// Returns a delta reader.
         /// </summary>
         public SerializerMethod GetReader(string typeFullName)
@@ -173,6 +132,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
             return default;
         }
+
+        /// <summary>
+        /// Returns the collection containing all non-delta readers.
+        /// </summary>
+        public IReadOnlyDictionary<string, SerializerMethod> GetReadMethods() => _readMethods;
 
         #endregion
 
@@ -191,7 +155,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //Type will always be the first parameter.
                 string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-                AddWriter(new SerializerMethod(methodSymbol.Name, typeFullName, false));
+                AddWriter(new SerializerMethod(methodSymbol.Name, typeFullName));
             }
         }
 
@@ -210,7 +174,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //Type will always be the first parameter.
                 string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-                AddDeltaWriter(new SerializerMethod(methodSymbol.Name, typeFullName, false));
+                AddDeltaWriter(new DeltaSerializerMethod(methodSymbol.Name, typeFullName));
             }
         }
     }

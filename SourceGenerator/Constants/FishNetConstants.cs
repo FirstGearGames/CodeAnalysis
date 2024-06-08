@@ -6,6 +6,13 @@
         public const string Serializing_Namespace = "FishNet.Serializing";  
         //Assemblies.
         public const string Runtime_Assembly_Name = "FishNet.Runtime";
+        //Attributes.
+        public const string ExcludeSerializationAttribute_FullName = "FishNet.CodeGenerating.ExcludeSerializationAttribute";
+        
+        //RPCs
+        public const string TargetRpcAttribute_FullName = "FishNet.Object.TargetRpcAttribute";
+        public const string ServerRpcAttribute_FullName = "FishNet.Object.ServerRpcAttribute";
+        public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";        
 
         //Writer.
         public const string Writer_WriteBytes_Name = "WriteBytes";

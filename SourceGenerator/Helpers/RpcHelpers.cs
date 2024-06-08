@@ -1,6 +1,7 @@
 ﻿using FishNet.CodeAnalysis.Extensions;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using SourceGenerating.Constants;
 
 namespace RoslynLearning.Helpers
 {
@@ -27,16 +28,13 @@ namespace RoslynLearning.Helpers
 
     internal static class RpcHelpers
     {
-        public const string TargetRpcAttribute_FullName = "FishNet.Object.TargetRpcAttribute";
-        public const string ServerRpcAttribute_FullName = "FishNet.Object.ServerRpcAttribute";
-        public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";
         public static RPCType GetRpcType(string attributeFullName)
         {
-            if (attributeFullName == TargetRpcAttribute_FullName)
+            if (attributeFullName == FishNetConstants.TargetRpcAttribute_FullName)
                 return RPCType.Target;
-            else if (attributeFullName == ServerRpcAttribute_FullName)
+            else if (attributeFullName == FishNetConstants.ServerRpcAttribute_FullName)
                 return RPCType.Server;
-            else if (attributeFullName == ObserversRpcAttribute_FullName)
+            else if (attributeFullName == FishNetConstants.ObserversRpcAttribute_FullName)
                 return RPCType.Observers;
             else
                 return RPCType.Unset;
@@ -48,11 +46,11 @@ namespace RoslynLearning.Helpers
         public static bool HasRpcAttributes(this ISymbol symbol, out List<RpcAttributeData> results)
         {
             results = new List<RpcAttributeData>();
-            if (symbol.HasAttribute(TargetRpcAttribute_FullName, out AttributeData a0))
+            if (symbol.HasAttribute(FishNetConstants.TargetRpcAttribute_FullName, out AttributeData a0))
                 results.Add(new RpcAttributeData(a0, RPCType.Target));
-            if (symbol.HasAttribute(ServerRpcAttribute_FullName, out AttributeData a1))
+            if (symbol.HasAttribute(FishNetConstants.ServerRpcAttribute_FullName, out AttributeData a1))
                 results.Add(new RpcAttributeData(a1, RPCType.Server));
-            if (symbol.HasAttribute(ObserversRpcAttribute_FullName, out AttributeData a2))
+            if (symbol.HasAttribute(FishNetConstants.ObserversRpcAttribute_FullName, out AttributeData a2))
                 results.Add(new RpcAttributeData(a2, RPCType.Observers));
 
             return (results.Count > 0);

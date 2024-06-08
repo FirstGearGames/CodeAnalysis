@@ -1,15 +1,8 @@
-﻿using System;
-using FishNet.CodeAnalysis.Extensions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
 using RoslynLearning.Helpers;
 using SourceGenerating.SyntaxReceivers;
-using SourceGenerator.Extensions;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using RoslynLearning.CodeBuilding;
 using SourceGenerating.Constants;
 using SourceGenerator.CodeBuilding.Serializers;
 
@@ -26,7 +19,7 @@ namespace SourceGenerating
         public void Execute(GeneratorExecutionContext context)
         {
             if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
-            Debugg.Log($"- Execute Start. ");
+            Debugg.Log($"- Execute Start.");
 
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
             if (fishnetRuntimeAssemblySymbol == null)
@@ -38,12 +31,11 @@ namespace SourceGenerating
             /* All objects which might be referenced need to be found
              first. The serialization generation process will rely on
              default serializers for types native to fishnet. */
-            Serializers serializerses = new();
-            serializerses.Initialize(fishnetRuntimeAssemblySymbol);
+            Serializers serializers = new();
+            serializers.Initialize(fishnetRuntimeAssemblySymbol);
 
-            DeltaSerializer deltaSerializer = new();
-            deltaSerializer.Initialize(rootSyntaxReceiver);
-            WriteStubSerializers(context, rootSyntaxReceiver);
+            DeltaSerializers deltaSerializer = new();
+            deltaSerializer.Initialize(context, rootSyntaxReceiver, serializers);
 
             Debugg.Log($"- Execute End.");
 
