@@ -20,34 +20,19 @@ namespace SourceGenerator.CodeBuilding.Serializers
         public void Initialize(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
         {
             _serializers = serializers;
-            StringBuilder classContentSb = WriteStubSerializers(rootSyntaxReceiver);
 
-            CreateGeneratedDeltaSerializersClass(context, classContentSb);
+            StringBuilder generatedWritersSb = CreateDeltaWriters(context, rootSyntaxReceiver);
+            CreateGeneratedDeltaSerializersClass(context, generatedWritersSb);
         }
 
-        /// <summary>
-        /// Creates a class containing generated delta writers.
-        /// </summary>
-        private void CreateGeneratedDeltaSerializersClass(GeneratorExecutionContext context, StringBuilder content)
-        {
-            StringBuilder classSb = new();
-
-            string clsText = CodeBuilder.CreatePublicStaticClass(GeneratedClass_Name, out string footer, FishNetConstants.Serializing_Namespace);
-            classSb.AppendLine(clsText);
-            classSb.AppendLine(content.ToString());
-            classSb.AppendLine(footer);
-
-            context.AddSource($"{FishNetConstants.Serializing_Namespace}_{GeneratedClass_Name}.g.cs", classSb.ToString());
-        }
 
         /// <summary>
         /// Creates delta writers for container types.
         /// </summary>
-        private void CreateDeltaWriters(RootSyntaxReceiver rootSyntaxReceiver)
+        private StringBuilder CreateDeltaWriters(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
         {
             StringBuilder sb = new();
-            Dictionary<string, DeltaWriterMethod> createdMethods = new();
-            
+
             foreach (string item in rootSyntaxReceiver.SerializableTypes)
                 CreateEmptyDeltaWriter(item);
 
@@ -81,9 +66,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     }
                 }
 
-                //Add to deltaWriters.
-                createdMethods.Add(typeFullName,
-                    new DeltaWriterMethod(namedTypeSymbol, typeFullName, methodName, header, footer));
+                //Add to writers.
+                _serializers.AddDeltaWriter(new SerializerMethod(namedTypeSymbol, typeFullName, methodName, true));
 
                 string GetMethodHeader(out string mName)
                 {
@@ -183,6 +167,22 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 sb.AppendLine(item.Value.Footer);
             }
+        }
+        
+        
+        /// <summary>
+        /// Creates a class containing generated delta writers.
+        /// </summary>
+        private void CreateGeneratedDeltaSerializersClass(GeneratorExecutionContext context, StringBuilder content)
+        {
+            StringBuilder classSb = new();
+
+            string clsText = CodeBuilder.CreatePublicStaticClass(GeneratedClass_Name, out string footer, FishNetConstants.Serializing_Namespace);
+            classSb.AppendLine(clsText);
+            classSb.AppendLine(content.ToString());
+            classSb.AppendLine(footer);
+
+            context.AddSource($"{FishNetConstants.Serializing_Namespace}_{GeneratedClass_Name}.g.cs", classSb.ToString());
         }
     }
 }

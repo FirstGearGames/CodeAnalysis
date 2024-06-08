@@ -76,8 +76,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
         public void Initialize(IAssemblySymbol runtimeAssemblySymbol)
         {
-            SetWriterMethods(runtimeAssemblySymbol);
-            SetDeltaWriterMethods(runtimeAssemblySymbol);
+            AddDefaultWriterMethods(runtimeAssemblySymbol);
+            AddDefaultDeltaWriterMethods(runtimeAssemblySymbol);
         }
 
         #region Add/get delta serializers
@@ -87,7 +87,10 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// </summary>
         public void AddDeltaWriter(SerializerMethod sm)
         {
-            _writeDeltaMethods.Add(sm.TypeFullName, sm);
+            if (_writeDeltaMethods.ContainsKey(sm.TypeFullName))
+                Debugg.Log($"A delta writer has already exists for {sm.TypeFullName}.");
+            else
+                _writeDeltaMethods[sm.TypeFullName] = sm;
         }
 
         /// <summary>
@@ -95,7 +98,10 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// </summary>
         public void AddDeltaReader(SerializerMethod sm)
         {
-            _readDeltaMethods.Add(sm.TypeFullName, sm);
+            if (_readDeltaMethods.ContainsKey(sm.TypeFullName))
+                Debugg.Log($"A delta reader has already exists for {sm.TypeFullName}.");
+            else
+                _readDeltaMethods[sm.TypeFullName] = sm;
         }
 
         /// <summary>
@@ -108,6 +114,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
             return default;
         }
+
         /// <summary>
         /// Returns a delta reader.
         /// </summary>
@@ -118,13 +125,61 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
             return default;
         }
+
         #endregion
 
+        #region Add/get normal serializers
 
         /// <summary>
-        /// Sets default writer references.
+        /// Adds to delta writers.
         /// </summary>
-        private void SetWriterMethods(IAssemblySymbol runtimeAssemblySymbol)
+        public void AddWriter(SerializerMethod sm)
+        {
+            if (_writeDeltaMethods.ContainsKey(sm.TypeFullName))
+                Debugg.Log($"A writer has already exists for {sm.TypeFullName}.");
+            else
+                _writeMethods[sm.TypeFullName] = sm;
+        }
+
+        /// <summary>
+        /// Adds to delta readers.
+        /// </summary>
+        public void AddReader(SerializerMethod sm)
+        {
+            if (_readMethods.ContainsKey(sm.TypeFullName))
+                Debugg.Log($"A reader has already exists for {sm.TypeFullName}.");
+            else
+                _readMethods[sm.TypeFullName] = sm;
+        }
+
+        /// <summary>
+        /// Returns a delta writer.
+        /// </summary>
+        public SerializerMethod GetWriter(string typeFullName)
+        {
+            if (_writeMethods.TryGetValue(typeFullName, out SerializerMethod result))
+                return result;
+
+            return default;
+        }
+
+        /// <summary>
+        /// Returns a delta reader.
+        /// </summary>
+        public SerializerMethod GetReader(string typeFullName)
+        {
+            if (_readMethods.TryGetValue(typeFullName, out SerializerMethod result))
+                return result;
+
+            return default;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Adds default normal writers.
+        /// </summary>
+        private void AddDefaultWriterMethods(IAssemblySymbol runtimeAssemblySymbol)
         {
             if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol))
                 return;
@@ -136,18 +191,14 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //Type will always be the first parameter.
                 string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-
-                if (_writeMethods.ContainsKey(typeFullName))
-                    Debugg.Log($"A writer has already been found for {typeFullName}.");
-                else
-                    _writeMethods.Add(typeFullName, new SerializerMethod(methodSymbol.Name, typeFullName));
+                AddWriter(new SerializerMethod(methodSymbol.Name, typeFullName, false));
             }
         }
 
         /// <summary>
-        /// Sets default writer references.
+        /// Adds default delta writers.
         /// </summary>
-        public void SetDeltaWriterMethods(IAssemblySymbol runtimeAssemblySymbol)
+        private void AddDefaultDeltaWriterMethods(IAssemblySymbol runtimeAssemblySymbol)
         {
             if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol))
                 return;
@@ -159,11 +210,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //Type will always be the first parameter.
                 string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-
-                if (_writeDeltaMethods.ContainsKey(typeFullName))
-                    Debugg.Log($"A delta writer has already been found for {typeFullName}.");
-                else
-                    _writeDeltaMethods.Add(typeFullName, new SerializerMethod(methodSymbol.Name, typeFullName));
+                AddDeltaWriter(new SerializerMethod(methodSymbol.Name, typeFullName, false));
             }
         }
     }
