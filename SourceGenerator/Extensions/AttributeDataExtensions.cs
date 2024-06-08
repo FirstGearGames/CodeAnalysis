@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 
-namespace FishNet.CodeAnalysis.Extensions;
-
-internal static class AttributeDataExtensions
+namespace FishNet.CodeAnalysis.Extensions
 {
-    public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
+	internal static class AttributeDataExtensions
+	{
+		public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
     {
         // Collect pertinent syntax trees from these attributes
         HashSet<SyntaxTree> acceptedTrees = new HashSet<SyntaxTree>();
@@ -28,14 +28,14 @@ internal static class AttributeDataExtensions
         return ret;
     }
 
-    public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
+		public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
     {
         SemanticModel model = compilation.GetSemanticModel(node.SyntaxTree);
         return model.GetDeclaredSymbol(node);
     }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static T? GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T? GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
 	{
 		ImmutableArray<TypedConstant> constructorArguments = thisAttributeData.ConstructorArguments;
 
@@ -44,8 +44,8 @@ internal static class AttributeDataExtensions
 		return default;
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
 	{
 		ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments = thisAttributeData.NamedArguments;
 
@@ -54,7 +54,7 @@ internal static class AttributeDataExtensions
 		return default;
 	}
 
-	public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName)
+		public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName)
 	{
 		foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
 		{
@@ -63,5 +63,6 @@ internal static class AttributeDataExtensions
 
 		return default;
 	}
-}
+	}
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+}
