@@ -52,7 +52,7 @@ namespace RoslynLearning.CodeBuilding
             _stringBuilder.Clear();
             writerVariableName = $"{variablePrefix}pooledWriter";
             _stringBuilder.Append(
-                $"{_stringBuilder.ToString()}{FishNetConstants.PooledWriter_FullName} {writerVariableName} = {FishNetConstants.WriterPool_Retrieve_Name}");
+                $"{_stringBuilder.ToString()}{FishNetConstants.PooledWriter_FullName} {writerVariableName} = {FishNetConstants.WriterPool_Retrieve_Name}()");
             if (closeCall)
                 _stringBuilder.Append(';');
 

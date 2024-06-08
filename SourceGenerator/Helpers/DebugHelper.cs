@@ -37,7 +37,7 @@ namespace RoslynLearning.Helpers
 
 			File.WriteAllLines(path, _msgs);
 			_msgs.Clear();
-			System.Diagnostics.Process.Start(path);
+			//System.Diagnostics.Process.Start(path);
 		}
 	}
 }

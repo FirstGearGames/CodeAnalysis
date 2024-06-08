@@ -26,11 +26,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             _serializers = serializers;
 
-            //Create all stub(empty) methods first for readers and writers.
+            //Create all stub(empty) delta methods, for readers and writers.
             CreateEmptySerializerMethods(context, rootSyntaxReceiver);
 
-            //Create bodies for the delta writers.
-            CreateDeltaWriterBodies(context, rootSyntaxReceiver);
+            //Create all bodies for delta methods, for readers and writers.
+            CreateSerializerBodies(context, rootSyntaxReceiver);
 
             //Create delta serializers class adding generated delta readers and writers.
             CreateGeneratedDeltaSerializersClass(context);
@@ -45,15 +45,24 @@ namespace SourceGenerator.CodeBuilding.Serializers
             foreach (string item in rootSyntaxReceiver.SerializableTypes)
                 CreateEmptyDeltaWriterMethod(context, item);
         }
+        
+        /// <summary>
+        /// Creates bodies for generated delta serializers.
+        /// </summary>
+        private void CreateSerializerBodies(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
+        {
+            CreateDeltaWriterBodies(context, rootSyntaxReceiver);
+        }
+
 
         /// <summary>
         /// Creates an empty delta writer method for a type.
         /// </summary>
         private void CreateEmptyDeltaWriterMethod(GeneratorExecutionContext context, string typeFullName)
         {
-            Debugg.Log($"Trying to create for {typeFullName}. Current count is {_serializers.GetWriteMethods().Count}");
+            Debugg.Log($"Trying to create for {typeFullName}.");
             //Already exist either in FishNet or already created.
-            if (_serializers.GetDeltaWriter(typeFullName).IsValid())
+            if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.FavorDelta).IsValid())
             {
                 Debugg.Log($"- Writer already exists.");
                 return;
@@ -87,15 +96,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
             //
             //     ITypeSymbol typeSymbol = fieldSymbol!.Type;
             //     CreateEmptyDeltaWriterMethod(context, typeSymbol.GetTypeFullName());
-            // }
-
+            // } 
+            
             Debugg.Log("- Creating header and footer.");
             string header = GetMethodHeader(out string methodName);
             string footer = GetMethodFooter();
             //Add to writers.
             
-            _serializers.AddDeltaWriter(new GeneratedDeltaSerializerMethod(namedTypeSymbol, typeFullName, methodName, header, footer, ""));
-            Debugg.Log($"- Added for type {typeFullName}. New count is {_serializers.GetWriteMethods().Count}");
+            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, typeFullName, methodName, header, footer, ""), AddSerializerType.Delta);
+            Debugg.Log($"- Added for type {typeFullName}.");
             string GetMethodHeader(out string mName)
             {
                 mName = $"{Generated_WriteDelta_Method_Prefix}{typeFullName.RemovePeriods("_")}";
@@ -126,28 +135,35 @@ namespace SourceGenerator.CodeBuilding.Serializers
             StringBuilder sb = new();
 
             //Iterate all serializers and if they are generated delta writers then complete them.
-            foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteMethods())
+            foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
+                {
+                    Debugg.Log($"Skipping {item.Key} because it's type is {item.Value.GetType()}");
                     continue;
-
+                }
+                else
+                {
+                    Debugg.Log($"- Creating body for {gsm.TypeFullName}");
+                }
                 sb.Clear();
 
                 //Write full block.
-                SerializerMethod fullSerializerMethod = _serializers.GetWriter(item.Key);
+                SerializerMethod fullSerializerMethod = _serializers.GetWriteMethod(item.Key, GetSerializerType.Full);
                 if (!fullSerializerMethod.IsValid())
                 {
-                    Debugg.Log($"Writer could not be found for type {item.Key}.");
-                    continue;
+                    Debugg.Log($"Full Writer could not be found for type {item.Key}. This is normal until added. Continuing...");
+                    //continue;
+                    fullSerializerMethod = new SerializerMethod(item.Key, $"Write");
                 }
 
                 //Write full block.
                 sb.AppendLine(3, "if (writeFull)");
                 sb.AppendLine(3, "{");
                 //writer.WriteXYZ(value1);
-                sb.AppendLine(4, $"{Generated_WriteDelta_WriterParameter_Name}.{fullSerializerMethod.MethodName}({GetGeneratedWriteDeltaParameterName(1)}");
+                sb.AppendLine(4, $"{Generated_WriteDelta_WriterParameter_Name}.{fullSerializerMethod.MethodName}({GetGeneratedWriteDeltaParameterName(1)});");
                 sb.AppendLine(4, "return true;");
-                sb.AppendLine(3, "}\r\n");
+                sb.AppendLine(3, "}" + NativeConstants.LineFeed);
 
                 //Starting flag for each modified field.
                 ulong fieldFlag = 2;
@@ -155,7 +171,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 //totalFlags and pooledWriter local variables.
                 string totalFlagsVariable = "totalFlags";
                 sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, "0"));
-                sb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + "\r\n");
+                sb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
 
                 //Call write for all members.
                 foreach (ISymbol symbol in gsm.NamedTypeSymbol.GetMembers())
@@ -166,7 +182,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     string typeFullName = typeSymbol.GetTypeFullName();
 
                     //Get delta writer method for the field.
-                    DeltaSerializerMethod dsm = _serializers.GetDeltaWriter(typeFullName);
+                    DeltaSerializerMethod? dsm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
                     if (!dsm.IsValid())
                     {
                         Debugg.Log($"Delta writer could not be found for type {typeFullName}.");
@@ -178,7 +194,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     /* if (writer.WriteDeltaXYZ(p0, p1))
                         totalFlags += x */
                     sb.AppendLine(3, CodeBuilder.SingleLineIf(
-                        CodeBuilder.CallMethod(dsm.MethodName, tmpWriterVariable, false,
+                        CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
                             $"{inText}{GetGeneratedWriteDeltaParameterName(0)}.{fieldSymbol.Name}",
                             $"{inText}{GetGeneratedWriteDeltaParameterName(1)}.{fieldSymbol.Name}")));
                     sb.AppendLine(4, $"{totalFlagsVariable} += {fieldFlag};");
@@ -187,6 +203,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 }
 
                 string changedVariable = "changed";
+                sb.AppendLine(""); //simple line feed for formatting.
                 //bool changed = (totalFlags != 0) || rootWriter;
                 sb.AppendLine(3, $"bool {changedVariable} = ({totalFlagsVariable} != 0) || {Generated_WriteDelta_RootWriteParameter_Name};");
 
@@ -204,7 +221,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     CodeBuilder.CallWriteBytes(Generated_WriteDelta_WriterParameter_Name, tmpWriterVariable));
                 sb.AppendLine(3, "}");
                 //store tmpWriter.
-                sb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + "\r\n");
+                sb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + NativeConstants.LineFeed);
                 /* Struct/class writers must always return true. This is so if they are being encapsulated
                  * the flags written will be read, even if that flag is 0. */
                 sb.AppendLine(3, $"return {changedVariable};");
@@ -243,7 +260,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             //Delta writers.
-            foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetDeltaWriteMethods())
+            foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 

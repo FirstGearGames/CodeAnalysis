@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using FishNet.CodeAnalysis.Extensions;
@@ -8,6 +9,21 @@ using SourceGenerator.Extensions;
 
 namespace SourceGenerator.CodeBuilding.Serializers
 {
+    internal enum AddSerializerType
+    {
+        Unset,
+        Full,
+        Delta,
+    }
+
+    internal enum GetSerializerType
+    {
+        Full,
+        Delta,
+        FavorFull,
+        FavorDelta,
+    }
+
     internal class Serializers
     {
         //Writers.
@@ -20,162 +36,144 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
         public void Initialize(IAssemblySymbol runtimeAssemblySymbol)
         {
-            AddDefaultWriterMethods(runtimeAssemblySymbol);
-            AddDefaultDeltaWriterMethods(runtimeAssemblySymbol);
+            AddDefaultWriteMethods(runtimeAssemblySymbol);
         }
 
-        #region Add/get delta serializers
+        #region Add/get serializers
 
         /// <summary>
-        /// Adds to delta writers.
+        /// Adds to writers.
         /// </summary>
-        public void AddDeltaWriter(SerializerMethod sm)
+        public void AddWriteMethod(SerializerMethod sm, AddSerializerType addType)
         {
-            if (_writeDeltaMethods.ContainsKey(sm.TypeFullName))
-                Debugg.Log($"A delta writer has already exists for {sm.TypeFullName}.");
+            Dictionary<string, SerializerMethod> dict = (addType == AddSerializerType.Full) ? _writeMethods : _writeDeltaMethods;
+            if (dict.ContainsKey(sm.TypeFullName))
+                Debugg.Log($"{addType} writer has already exists for {sm.TypeFullName}.");
             else
-                _writeDeltaMethods[sm.TypeFullName] = sm;
+            {
+                dict[sm.TypeFullName] = sm;
+                Debugg.Log($"-- Added {sm.TypeFullName} to writer {addType}. New Count is {dict.Count}.");
+            }
         }
 
         /// <summary>
-        /// Adds to delta readers.
+        /// Adds to readers.
         /// </summary>
-        public void AddDeltaReader(SerializerMethod sm)
+        public void AddReadMethod(SerializerMethod sm, AddSerializerType addType)
         {
-            if (_readDeltaMethods.ContainsKey(sm.TypeFullName))
-                Debugg.Log($"A delta reader has already exists for {sm.TypeFullName}.");
+            Dictionary<string, SerializerMethod> dict = (addType == AddSerializerType.Full) ? _readMethods : _readDeltaMethods;
+            if (dict.ContainsKey(sm.TypeFullName))
+                Debugg.Log($"{addType} reader has already exists for {sm.TypeFullName}.");
             else
-                _readDeltaMethods[sm.TypeFullName] = sm;
+                dict[sm.TypeFullName] = sm;
         }
 
         /// <summary>
-        /// Returns a delta writer.
+        /// Returns a writer.
         /// </summary>
-        public DeltaSerializerMethod GetDeltaWriter(string typeFullName)
-        {
-            if (_writeDeltaMethods.TryGetValue(typeFullName, out SerializerMethod result))
-                if (result is DeltaSerializerMethod dsm) return dsm;
+        public SerializerMethod GetWriteMethod(string typeFullName, GetSerializerType getType) => GetSerializerMethod(typeFullName, getType, true);
 
-            return default;
+        /// <summary>
+        /// Returns a reader.
+        /// </summary>
+        public SerializerMethod GetReadMethod(string typeFullName, GetSerializerType getType) => GetSerializerMethod(typeFullName, getType, false);
+
+        /// <summary>
+        /// Returns a reader or writer.
+        /// </summary>
+        private SerializerMethod GetSerializerMethod(string typeFullName, GetSerializerType getType, bool writer)
+        {
+            SerializerMethod result;
+            if (getType == GetSerializerType.Full)
+            {
+                Dictionary<string, SerializerMethod> dict = (writer) ? _writeMethods : _readMethods;
+                dict.TryGetValue(typeFullName, out result);
+            }
+            else if (getType == GetSerializerType.Delta)
+            {
+                Dictionary<string, SerializerMethod> dict = (writer) ? _writeDeltaMethods : _readDeltaMethods;
+                dict.TryGetValue(typeFullName, out result);
+            }
+            else if (getType == GetSerializerType.FavorFull || getType == GetSerializerType.FavorDelta)
+            {
+                Dictionary<string, SerializerMethod> dictA;
+                Dictionary<string, SerializerMethod> dictB;
+                if (getType == GetSerializerType.FavorFull)
+                {
+                    dictA = (writer) ? _writeMethods : _readMethods;
+                    dictB = (writer) ? _writeDeltaMethods : _readDeltaMethods;
+                }
+                else
+                {
+                    dictA = (writer) ? _writeDeltaMethods : _readDeltaMethods;
+                    dictB = (writer) ? _writeMethods : _readMethods;
+                }
+
+                //Try A first, then B.
+                if (!dictA.TryGetValue(typeFullName, out result))
+                    dictB.TryGetValue(typeFullName, out result);
+            }
+            else
+            {
+                Debugg.Log($"SerializerType {getType} is unhandled.");
+                result = null;
+            }
+
+            return result;
         }
 
         /// <summary>
         /// Returns the collection containing all delta writers.
         /// </summary>
-        public IReadOnlyDictionary<string, SerializerMethod> GetDeltaWriteMethods() => _writeDeltaMethods;
+        public IReadOnlyDictionary<string, SerializerMethod> GetWriteMethods() => _writeMethods;
 
         /// <summary>
-        /// Returns a delta reader.
+        /// Returns the collection containing all delta writers.
         /// </summary>
-        public SerializerMethod GetDeltaReader(string typeFullName)
-        {
-            if (_readDeltaMethods.TryGetValue(typeFullName, out SerializerMethod result))
-                if (result is DeltaSerializerMethod dsm) return dsm;
-
-            return default;
-        }
+        public IReadOnlyDictionary<string, SerializerMethod> GetWriteDeltaMethods() => _writeDeltaMethods;
 
         /// <summary>
         /// Returns the collection containing all delta readers.
         /// </summary>
-        public IReadOnlyDictionary<string, SerializerMethod> GeDeltaReadMethods() => _writeDeltaMethods;
+        public IReadOnlyDictionary<string, SerializerMethod> GeReadMethods() => _readMethods;
+
+        /// <summary>
+        /// Returns the collection containing all delta readers.
+        /// </summary>
+        public IReadOnlyDictionary<string, SerializerMethod> GeReadDeltaMethods() => _readDeltaMethods;
 
         #endregion
 
-        #region Add/get normal serializers
-
-        /// <summary>
-        /// Adds to delta writers.
-        /// </summary>
-        public void AddWriter(SerializerMethod sm)
-        {
-            if (_writeDeltaMethods.ContainsKey(sm.TypeFullName))
-                Debugg.Log($"A writer has already exists for {sm.TypeFullName}.");
-            else
-                _writeMethods[sm.TypeFullName] = sm;
-        }
-
-        /// <summary>
-        /// Adds to delta readers.
-        /// </summary>
-        public void AddReader(SerializerMethod sm)
-        {
-            if (_readMethods.ContainsKey(sm.TypeFullName))
-                Debugg.Log($"A reader has already exists for {sm.TypeFullName}.");
-            else
-                _readMethods[sm.TypeFullName] = sm;
-        }
-
-        /// <summary>
-        /// Returns a delta writer.
-        /// </summary>
-        public SerializerMethod GetWriter(string typeFullName)
-        {
-            if (_writeMethods.TryGetValue(typeFullName, out SerializerMethod result))
-                return result;
-
-            return default;
-        }
-
-        /// <summary>
-        /// Returns the collection containing all non-delta writers.
-        /// </summary>
-        public IReadOnlyDictionary<string, SerializerMethod> GetWriteMethods() => _writeMethods;
-
-        /// <summary>
-        /// Returns a delta reader.
-        /// </summary>
-        public SerializerMethod GetReader(string typeFullName)
-        {
-            if (_readMethods.TryGetValue(typeFullName, out SerializerMethod result))
-                return result;
-
-            return default;
-        }
-
-        /// <summary>
-        /// Returns the collection containing all non-delta readers.
-        /// </summary>
-        public IReadOnlyDictionary<string, SerializerMethod> GetReadMethods() => _readMethods;
-
-        #endregion
 
         /// <summary>
         /// Adds default normal writers.
         /// </summary>
-        private void AddDefaultWriterMethods(IAssemblySymbol runtimeAssemblySymbol)
+        private void AddDefaultWriteMethods(IAssemblySymbol runtimeAssemblySymbol)
         {
             if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol))
                 return;
 
             foreach (IMethodSymbol methodSymbol in nameTypeSymbol!.GetMembers().OfType<IMethodSymbol>())
             {
-                // Does not have writer attribute.
-                if (!methodSymbol.HasAttribute(FishNetConstants.WriterAttribute_FullName, out _)) continue;
+                AddSerializerType addType = AddSerializerType.Unset;
+                string typeFullName = string.Empty;
+                //Full write.
+                if (methodSymbol.HasAttribute(FishNetConstants.WriterAttribute_FullName, out _))
+                {
+                    typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
+                    addType = AddSerializerType.Full;
+                }
+                //Delta write.
+                else if (methodSymbol.HasAttribute(FishNetConstants.DeltaWriterAttribute_FullName, out _))
+                {
+                    typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
+                    addType = AddSerializerType.Delta;
+                }
 
-                //Type will always be the first parameter.
-                string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-                AddWriter(new SerializerMethod(methodSymbol.Name, typeFullName));
+                if (addType != AddSerializerType.Unset)
+                    AddWriteMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
             }
         }
 
-        /// <summary>
-        /// Adds default delta writers.
-        /// </summary>
-        private void AddDefaultDeltaWriterMethods(IAssemblySymbol runtimeAssemblySymbol)
-        {
-            if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol))
-                return;
-
-            foreach (IMethodSymbol methodSymbol in nameTypeSymbol!.GetMembers().OfType<IMethodSymbol>())
-            {
-                // Does not have writer attribute.
-                if (!methodSymbol.HasAttribute(FishNetConstants.DeltaWriterAttribute_FullName, out _)) continue;
-
-                //Type will always be the first parameter.
-                string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-                AddDeltaWriter(new DeltaSerializerMethod(methodSymbol.Name, typeFullName));
-            }
-        }
     }
 }
