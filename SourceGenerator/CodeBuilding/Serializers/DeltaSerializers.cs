@@ -62,7 +62,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             Debugg.Log($"Trying to create for {typeFullName}.");
             //Already exist either in FishNet or already created.
-            if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.FavorDelta).IsValid())
+            if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta).IsValid())
             {
                 Debugg.Log($"- Writer already exists.");
                 return;
@@ -76,7 +76,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 Debugg.Log($"- NamedSymbol is null: {isNull}, or not user defined.");
                 return;
             }
-
+            
             //Too many parameters to process as a delta writer due to not enough flags.
             if (namedTypeSymbol.MemberNames.Count() >= 63)
             {
@@ -88,7 +88,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             //Create empty writers for any nested types which would need to be serialized.
             foreach (ISymbol item in namedTypeSymbol.GetMembers())
             {
-                if (!CanGenerateSerializer(item, out IFieldSymbol? fieldSymbol))
+                if (!CanGenerateFieldSerializer(item, out IFieldSymbol? fieldSymbol))
                 {
                     Debugg.Log($"- Cannot generate serializer for field {item.GetSymbolFullName()}");
                     continue;
@@ -154,7 +154,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 SerializerMethod fullSerializerMethod = _serializers.GetWriteMethod(item.Key, GetSerializerType.Full);
                 if (!fullSerializerMethod.IsValid())
                 {
-                    Debugg.Log($"Full Writer could not be found for type {item.Key}. This is normal until added. Continuing...");
+                    sb.AppendThrowLine(3, $"Full Writer could not be found for type {item.Key}. This is normal until added. Continuing...");
                     //continue;
                     fullSerializerMethod = new SerializerMethod(item.Key, $"Write");
                 }
@@ -178,7 +178,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 //Call write for all members.
                 foreach (ISymbol symbol in gsm.NamedTypeSymbol.GetMembers())
                 {
-                    if (!CanGenerateSerializer(symbol, out IFieldSymbol? fieldSymbol)) continue;
+                    if (!CanGenerateFieldSerializer(symbol, out IFieldSymbol? fieldSymbol)) continue;
 
                     ITypeSymbol typeSymbol = fieldSymbol!.Type;
                     string typeFullName = typeSymbol.GetTypeFullName();
@@ -187,7 +187,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     DeltaSerializerMethod? dsm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
                     if (!dsm.IsValid())
                     {
-                        Debugg.Log($"Delta writer could not be found for type {typeFullName}.");
+                        sb.AppendThrowLine(3, $"Delta writer could not be found for type {typeFullName}.");
                         continue;
                     }
 
@@ -236,13 +236,12 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// <summary>
         /// Returns if a serializer can be generated for a symbol.
         /// </summary>
-        private bool CanGenerateSerializer(ISymbol symbol, out IFieldSymbol? fieldSymbol)
+        private bool CanGenerateFieldSerializer(ISymbol symbol, out IFieldSymbol? fieldSymbol)
         {
-            fieldSymbol = null;
-            if (symbol is not IFieldSymbol fSymbol) return false;
-            if (fSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
-
-            fieldSymbol = fSymbol;
+            fieldSymbol = symbol as IFieldSymbol;
+            if (fieldSymbol == null) return false;
+            if (fieldSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+            
             return true;
         }
 

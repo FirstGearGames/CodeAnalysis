@@ -22,6 +22,11 @@ namespace SourceGenerator.Extensions
 			sb.Indent(indentCount).AppendLine(text);
 		}
 
+		public static void AppendThrowLine(this StringBuilder sb, int indentCount, string text)
+		{
+			sb.Indent(indentCount).AppendLine($"throw new Exception(\"{text}\");");
+		}
+
 	
 
 	}
