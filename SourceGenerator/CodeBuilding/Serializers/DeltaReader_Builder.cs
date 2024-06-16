@@ -28,8 +28,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
             //Create all stub(empty) delta methods.
             CreateEmptySerializerMethods(context, rootSyntaxReceiver);
             
-            // //Create all bodies for delta methods.
-            // CreateSerializerBodies(context, rootSyntaxReceiver);
+            //Create all bodies for delta methods.
+            CreateSerializerBodies(context, rootSyntaxReceiver);
 
             //Create delta serializers class adding generated serializers.
             CreateGeneratedDeltaSerializersClass(context);
@@ -157,74 +157,73 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     fullSerializerMethod = new SerializerMethod(item.Key, $"Read");
                 }
 
-                //Write full block.
-                sb.AppendLine(3, $"if ({Generated_ReadFullParameter_Name})");
-                sb.AppendLine(3, "{");
-                //writer.WriteXYZ(value1);
-                sb.AppendLine(4, $"{Generated_ReaderParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
-                sb.AppendLine(4, "return true;");
-                sb.AppendLine(3, "}" + NativeConstants.LineFeed);
-
-                //Starting flag for each modified field.
-                ulong fieldFlag = 2;
-
-                //totalFlags and pooledWriter local variables.
-                string totalFlagsVariable = "totalFlags";
-                sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, "0"));
-                sb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
-
-                //Call write for all members.
-                foreach (ISymbol symbol in gsm.NamedTypeSymbol.GetMembers())
+                CreateReadFullIf();
+                void CreateReadFullIf()
                 {
-                    if (!_serializers.CanGenerateFieldSerializer(symbol, out IFieldSymbol? fieldSymbol)) continue;
-
-                    ITypeSymbol typeSymbol = fieldSymbol!.Type;
-                    string typeFullName = typeSymbol.GetTypeFullName();
-
-                    //Get delta writer method for the field.
-                    DeltaSerializerMethod? dsm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
-                    if (!dsm.IsValid())
-                    {
-                        sb.AppendThrowLine(3, $"Delta reader could not be found for type {typeFullName}.");
-                        continue;
-                    }
-
-                    //If a user defined struct then use the in keyword.
-                    string inText = typeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                    /* if (writer.WriteDeltaXYZ(p0, p1))
-                        totalFlags += x */
-                    sb.AppendLine(3, CodeBuilder.SingleLineIf(
-                        CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
-                            $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
-                            $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}")));
-                    sb.AppendLine(4, $"{totalFlagsVariable} += {fieldFlag};");
-
-                    fieldFlag *= 2;
+                    sb.AppendLine(3, CodeBuilder.CreateSingleLineIf($"{Generated_ReadFullParameter_Name}"));
+                    sb.AppendLine(4, $"return {Generated_ReaderParameter_Name}.{fullSerializerMethod.MethodName}<{item.Key}>();");
                 }
-
-                string changedVariable = "changed";
-                sb.AppendLine(""); //simple line feed for formatting.
-                //bool changed = (totalFlags != 0) || rootWriter;
-                sb.AppendLine(3, $"bool {changedVariable} = ({totalFlagsVariable} != 0) || {Generated_RootCallParameter_Name};");
-
-                /* if (changed)
-                 {
-                    writer.WritePackedWhole(totalFlags); */
-                sb.AppendLine(3, CodeBuilder.SingleLineIf(changedVariable));
-                sb.AppendLine(3, "{");
-                sb.AppendLine(4,
-                    CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_ReaderParameter_Name,
-                        true, totalFlagsVariable));
-                /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
-                 } */
-                sb.AppendLine(4,
-                    CodeBuilder.CallWriteBytes(Generated_ReaderParameter_Name, tmpWriterVariable));
-                sb.AppendLine(3, "}");
-                //store tmpWriter.
-                sb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + NativeConstants.LineFeed);
-                /* Struct/class writers must always return true. This is so if they are being encapsulated
-                 * the flags written will be read, even if that flag is 0. */
-                sb.AppendLine(3, $"return {changedVariable};");
+                //
+                // //Starting flag for each modified field.
+                // ulong fieldFlag = 2;
+                //
+                // //totalFlags and pooledWriter local variables.
+                // string totalFlagsVariable = "totalFlags";
+                // sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, "0"));
+                // sb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
+                //
+                // //Call write for all members.
+                // foreach (ISymbol symbol in gsm.NamedTypeSymbol.GetMembers())
+                // {
+                //     if (!_serializers.CanGenerateFieldSerializer(symbol, out IFieldSymbol? fieldSymbol)) continue;
+                //
+                //     ITypeSymbol typeSymbol = fieldSymbol!.Type;
+                //     string typeFullName = typeSymbol.GetTypeFullName();
+                //
+                //     //Get delta writer method for the field.
+                //     DeltaSerializerMethod? dsm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
+                //     if (!dsm.IsValid())
+                //     {
+                //         sb.AppendThrowLine(3, $"Delta reader could not be found for type {typeFullName}.");
+                //         continue;
+                //     }
+                //
+                //     //If a user defined struct then use the in keyword.
+                //     string inText = typeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
+                //     /* if (writer.WriteDeltaXYZ(p0, p1))
+                //         totalFlags += x */
+                //     sb.AppendLine(3, CodeBuilder.CreateSingleLineIf(
+                //         CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
+                //             $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
+                //             $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}")));
+                //     sb.AppendLine(4, $"{totalFlagsVariable} += {fieldFlag};");
+                //
+                //     fieldFlag *= 2;
+                // }
+                //
+                // string changedVariable = "changed";
+                // sb.AppendLine(""); //simple line feed for formatting.
+                // //bool changed = (totalFlags != 0) || rootWriter;
+                // sb.AppendLine(3, $"bool {changedVariable} = ({totalFlagsVariable} != 0) || {Generated_RootCallParameter_Name};");
+                //
+                // /* if (changed)
+                //  {
+                //     writer.WritePackedWhole(totalFlags); */
+                // sb.AppendLine(3, CodeBuilder.CreateSingleLineIf(changedVariable));
+                // sb.AppendLine(3, "{");
+                // sb.AppendLine(4,
+                //     CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_ReaderParameter_Name,
+                //         true, totalFlagsVariable));
+                // /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+                //  } */
+                // sb.AppendLine(4,
+                //     CodeBuilder.CallWriteBytes(Generated_ReaderParameter_Name, tmpWriterVariable));
+                // sb.AppendLine(3, "}");
+                // //store tmpWriter.
+                // sb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + NativeConstants.LineFeed);
+                // /* Struct/class writers must always return true. This is so if they are being encapsulated
+                //  * the flags written will be read, even if that flag is 0. */
+                // sb.AppendLine(3, $"return {changedVariable};");
 
                 gsm.Body = sb.ToString();
             }

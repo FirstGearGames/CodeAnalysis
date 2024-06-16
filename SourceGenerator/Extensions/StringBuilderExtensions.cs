@@ -17,6 +17,11 @@ namespace SourceGenerator.Extensions
 			};
 		}
 
+		public static void Append(this StringBuilder sb, int indentCount, string text)
+		{
+			sb.Indent(indentCount).Append(text);
+		}
+		
 		public static void AppendLine(this StringBuilder sb, int indentCount, string text)
 		{
 			sb.Indent(indentCount).AppendLine(text);

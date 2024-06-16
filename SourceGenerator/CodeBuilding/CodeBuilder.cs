@@ -6,8 +6,6 @@ namespace RoslynLearning.CodeBuilding
 {
     public static class CodeBuilder
     {
-
-
         private static StringBuilder _stringBuilder = new();
 
         /// <summary>
@@ -25,11 +23,12 @@ namespace RoslynLearning.CodeBuilding
                 _stringBuilder.AppendLine("{");
                 indent++;
             }
+
             _stringBuilder.AppendLine(indent, $"public static class {className}");
             _stringBuilder.AppendLine(indent, "{");
 
             StringBuilder footerSb = new();
-            
+
             if (hasNamespace)
             {
                 footerSb.AppendLine(indent, "}");
@@ -102,12 +101,35 @@ namespace RoslynLearning.CodeBuilding
         }
 
         /// <summary>
-        /// Wrapps text around a single line if statement.
+        /// Creates a single line if statement conditional.
         /// </summary>
-        public static string SingleLineIf(string conditionaltext)
+        public static string CreateSingleLineIf(string conditionaltext)
         {
             _stringBuilder.Clear();
             _stringBuilder.Append($"if ({conditionaltext})");
+            return _stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Creates a multiline if statement conditional.
+        /// </summary>
+        public static string CreateMultiLineIf(int indent, string conditionaltext, string line)
+        {
+            StringBuilder sb = new();
+            sb.Append(indent + 1, line);
+            return CreateMultiLineIf(indent, conditionaltext, sb);
+        }
+
+        /// <summary>
+        /// Creates a multiline if statement conditional.
+        /// </summary>
+        public static string CreateMultiLineIf(int indent, string conditionaltext, StringBuilder lines)
+        {
+            _stringBuilder.Clear();
+            _stringBuilder.AppendLine(indent, $"if ({conditionaltext})");
+            _stringBuilder.AppendLine(indent, "{");
+            _stringBuilder.AppendLine(lines.ToString());
+            _stringBuilder.AppendLine(indent, "}");
             return _stringBuilder.ToString();
         }
 

@@ -157,14 +157,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     fullSerializerMethod = new SerializerMethod(item.Key, $"Write");
                 }
 
-                //Write full block.
-                sb.AppendLine(3, $"if ({Generated_WriteFullParameter_Name})");
-                sb.AppendLine(3, "{");
-                //writer.WriteXYZ(value1);
-                sb.AppendLine(4, $"{Generated_WriterParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
-                sb.AppendLine(4, "return true;");
-                sb.AppendLine(3, "}" + NativeConstants.LineFeed);
-
+                CreateWriteFullIf();
+                void CreateWriteFullIf()
+                {
+                    StringBuilder ifBody = new();
+                    ifBody.AppendLine(4, $"{Generated_WriterParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
+                    ifBody.Append(4, "return true;");
+                    sb.AppendLine(CodeBuilder.CreateMultiLineIf(3, $"{Generated_WriteFullParameter_Name}", ifBody));
+                }
+                
                 //Starting flag for each modified field.
                 ulong fieldFlag = 2;
 
@@ -193,7 +194,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     string inText = typeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
                     /* if (writer.WriteDeltaXYZ(p0, p1))
                         totalFlags += x */
-                    sb.AppendLine(3, CodeBuilder.SingleLineIf(
+                    sb.AppendLine(3, CodeBuilder.CreateSingleLineIf(
                         CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
                             $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
                             $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}")));
@@ -210,7 +211,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 /* if (changed)
                  {
                     writer.WritePackedWhole(totalFlags); */
-                sb.AppendLine(3, CodeBuilder.SingleLineIf(changedVariable));
+                sb.AppendLine(3, CodeBuilder.CreateSingleLineIf(changedVariable));
                 sb.AppendLine(3, "{");
                 sb.AppendLine(4,
                     CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name,
