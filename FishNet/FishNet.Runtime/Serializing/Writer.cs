@@ -2,20 +2,6 @@
 
 namespace FishNet.Serializing
 {
-    public struct TestStruct
-    {
-        public string A;
-        public bool B;
-        public int C;
-    }
-
-    public class TestClass
-    {
-        public string A;
-        public bool B;
-        public int C;
-    }
-
     public partial class Writer
     {
         public int Length;
@@ -37,23 +23,40 @@ namespace FishNet.Serializing
         {
         }
 
-        [Writer]
-        public void WriteFloat(float value)
-        {
-            
-        }
+
         public void WriteBytes(byte[] value, int offset, int count)
         {
         }
 
-        public void WritePackedWhole(ulong value)
+        /// <summary>
+        /// ZigZag encodes a signed integer and maps it to a unsigned integer.
+        /// </summary>
+
+        public ulong ZigZagEncode(ulong value) => 0;
+
+        public void WriteSignedPackedWhole(long value)
+        {
+            WriteUnsignedPackedWhole(ZigZagEncode((ulong)value));
+        }
+        public void WriteUnsignedPackedWhole(ulong value)
         {
         }
 
+        [Writer]
+        public void WriteSingle(float value)
+        {
+        }
+
+  
         public void Write<T>(T value)
         {
         }
 
+        [DeltaWriter]
+        public bool WriteDeltaBoolean(bool valueA, bool valueB)
+        {
+            return true;
+        }
         [DeltaWriter]
         public bool WriteDeltaInt32(int valueA, int valueB)
         {
@@ -63,13 +66,20 @@ namespace FishNet.Serializing
 
             return (next != 0);
         }
+        
+        
+        [DeltaWriter]
+        public bool WriteDeltaSingle(float valueA, float valueB)
+        {
+            float next = (valueB - valueA);
+            if (next != 0f)
+                WriteSingle(next);
+
+            return (next != 0);
+        }
         // [Writer]
         // public void WriteTestStruct(TestStruct value) { }
         // [Writer]
         // public void WriteTestClass(TestClass value) { }
     }
-}
-
-public class NoNameSpaceA
-{
 }

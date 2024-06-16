@@ -7,14 +7,25 @@ namespace ClientAssembly
 {
 	public struct MyStructA
 	{
-		public int IntValueA;
-		public float FloatValueA;
-		public MyStructB StructB;
+		public float Horizontal;
+		public float Vertical;
+		public bool Running;
+		public bool Firing;
+		public bool Jumping;
+
 	}
 
 	public struct MyStructB
 	{
-		public bool BoolValueA;
+		public float PositionX;
+		public float PositionY;
+		public float PositionZ;
+
+		public bool Hits;
+		public float Stamina;
+		public float VelocityX;
+		public float VelocityY;
+		public float VelocityZ;
 	}
 
 	
@@ -22,7 +33,12 @@ namespace ClientAssembly
 	{
 
 		[ServerRpc]
-		private void MyRpcTwo(MyStructA ms)
+		private void MyRpcOne(MyStructA ms)
+		{
+		}
+		
+		[ServerRpc]
+		private void MyRpcTwo(MyStructB ms)
 		{
 		}
 

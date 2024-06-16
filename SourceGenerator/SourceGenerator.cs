@@ -34,9 +34,11 @@ namespace SourceGenerating
             Serializers serializers = new();
             serializers.Initialize(fishnetRuntimeAssemblySymbol);
 
-            DeltaSerializers deltaSerializer = new();
-            deltaSerializer.Initialize(context, rootSyntaxReceiver, serializers);
-
+            DeltaWriter_Builder deltaWriterBuilder = new();
+            deltaWriterBuilder.Initialize(context, rootSyntaxReceiver, serializers);
+            DeltaReader_Builder deltaReaderBuilder = new();
+            deltaReaderBuilder.Initialize(context, rootSyntaxReceiver, serializers);
+            
             Debugg.Log($"- Execute End.");
 
             Debugg.Send();

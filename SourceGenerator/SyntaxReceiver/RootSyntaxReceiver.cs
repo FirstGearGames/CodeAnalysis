@@ -45,7 +45,7 @@ namespace SourceGenerating.SyntaxReceivers
                 //ServerRpc.
                 if (item.RPCType == RPCType.Server)
                 {
-                    RemoveTrailinggNetworkConnection();
+                    RemoveTrailingNetworkConnection();
                     RemoveTrailingChannel();
                 }
                 //TargetRpc.
@@ -71,7 +71,7 @@ namespace SourceGenerating.SyntaxReceivers
                 }
 
                 //Removes networkConnection if the last parameter.
-                void RemoveTrailinggNetworkConnection()
+                void RemoveTrailingNetworkConnection()
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.

@@ -34,6 +34,9 @@ namespace SourceGenerator.CodeBuilding.Serializers
         private readonly Dictionary<string, SerializerMethod> _readMethods = new();
         private readonly Dictionary<string, SerializerMethod> _readDeltaMethods = new();
 
+        //Consts.
+        public const string Generated_ValueParameter_Prefix = "value";
+        
         public void Initialize(IAssemblySymbol runtimeAssemblySymbol)
         {
             AddDefaultWriteMethods(runtimeAssemblySymbol);
@@ -140,7 +143,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// <summary>
         /// Returns the collection containing all delta readers.
         /// </summary>
-        public IReadOnlyDictionary<string, SerializerMethod> GeReadDeltaMethods() => _readDeltaMethods;
+        public IReadOnlyDictionary<string, SerializerMethod> GetReadDeltaMethods() => _readDeltaMethods;
 
         #endregion
 
@@ -174,6 +177,23 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     AddWriteMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
             }
         }
+        
+        /// <summary>
+        /// Returns if a serializer can be generated for a symbol.
+        /// </summary>
+        public bool CanGenerateFieldSerializer(ISymbol symbol, out IFieldSymbol? fieldSymbol)
+        {
+            fieldSymbol = symbol as IFieldSymbol;
+            if (fieldSymbol == null) return false;
+            if (fieldSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the parameter name used for values within a generated delta writer.
+        /// </summary>
+        public string GetValueParameterName(int parameterIndex) => $"{Generated_ValueParameter_Prefix}{parameterIndex}";
 
     }
 }
