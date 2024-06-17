@@ -41,16 +41,20 @@
         #endregion
 
         #region Writer.
-        /// <summary>
-        /// Writer.WriteBytes method.
-        /// </summary>
-        public const string Writer_WriteUInt8Array_Name = "WriteUInt8Array";
+        ///// <summary>
+        ///// Writer.WriteBytes method.
+        ///// </summary>
+        //public const string Writer_WriteUInt8Array_Name = "WriteUInt8Array";
 
         /// <summary>
         /// Writer.GetBuffer() property.
         /// </summary>
         public const string Writer_GetBuffer_Name = "GetBuffer";
 
+        /// <summary>
+        /// Writer.Write() method.
+        /// </summary>
+        public const string Writer_Write_Name = "Write";
         /// <summary>
         /// Writer.WriteArraySegmentAndSize() method.
         /// </summary>
@@ -96,68 +100,43 @@
         public const string Writer_WriteUnsignedPackedWhole_Name = "WriteUnsignedPackedWhole";
 
         /// <summary>
-        /// [Writer] class.
+        /// [DefaultWriter] class.
         /// </summary>
         public const string DefaultWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultWriterAttribute";
 
         /// <summary>
-        /// [DeltaWriter] class.
+        /// [DefaultDeltaWriter] class.
         /// </summary>
         public const string DefaultDeltaWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaWriterAttribute";
         #endregion
-                
+
         #region Reader.
-        // /// <summary>
-        // /// Writer.WriteBytes method.
-        // /// </summary>
-        // public const string Writer_WriteBytes_Name = "WriteBytes";
-        //
-        // /// <summary>
-        // /// Writer.GetBuffer() property.
-        // /// </summary>
-        // public const string Writer_GetBuffer_Name = "GetBuffer";
-        //
-        // /// <summary>
-        // /// Writer.Length property.
-        // /// </summary>
-        // public const string Writer_Length_Name = "Length";
-        //
-        // /// <summary>
-        // /// PooledWriter.Store method.
-        // /// </summary>
-        // public const string PooledWriter_Store_Name = "Store";
-        //
-        // /// <summary>
-        // /// PooledWriter class.
-        // /// </summary>
-        // public const string PooledWriter_FullName = $"{Serializing_Namespace}.PooledWriter";
-        //
-        // /// <summary>
-        // /// WriterPool.Retrieve method.
-        // /// </summary>
-        // public const string WriterPool_Retrieve_Name = $"{Serializing_Namespace}.WriterPool.Retrieve";
-        //
+        /// <summary>
+        /// Writer.Write() method.
+        /// </summary>
+        public const string Reader_Read_Name = "Read";
+
         /// <summary>
         /// Writer class.
         /// </summary>
         public const string Reader_FullName = $"{Serializing_Namespace}.Reader";
-        //
-        // /// <summary>
-        // /// Writer.WriteUnsignedPackedWhole method.
-        // /// </summary>
-        // public const string Writer_WriteUnsignedPackedWhole_Name = "WriteUnsignedPackedWhole";
-        //
-        // /// <summary>
-        // /// [Writer] class.
-        // /// </summary>
-        // public const string WriterAttribute_FullName = $"{Serializing_Namespace}.WriterAttribute";
-        //
-        // /// <summary>
-        // /// [DeltaWriter] class.
-        // /// </summary>
-        // public const string DeltaWriterAttribute_FullName = $"{Serializing_Namespace}.DeltaWriterAttribute";
+        
+        /// <summary>
+        /// Writer.WriteUnsignedPackedWhole method.
+        /// </summary>
+        public const string Reader_ReadUnsignedPackedWhole_Name = "ReadUnsignedPackedWhole";
+
+        /// <summary>
+        /// [DefaultWriter] class.
+        /// </summary>
+        public const string DefaultReaderAttribute_FullName = $"{Serializing_Namespace}.DefaultReaderAttribute";
+
+        /// <summary>
+        /// [DefaultDeltaWriter] class.
+        /// </summary>
+        public const string DefaultDeltaReaderAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaReaderAttribute";
         #endregion
 
-        
+
     }
 }

@@ -15,7 +15,7 @@ namespace FishNet.Serializing
         internal const double DOUBLE_ACCURACY = 1000d;
         internal const decimal DECIMAL_ACCURACY = 1000m;
 
-       // [DefaultDeltaWriter]
+        [DefaultDeltaWriter]
         public bool WriteDeltaBoolean(bool valueA, bool valueB)
         {
             if (valueA == valueB) return false;

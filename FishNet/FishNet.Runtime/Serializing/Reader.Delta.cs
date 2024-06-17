@@ -14,7 +14,6 @@ namespace FishNet.Serializing
         [DefaultDeltaReader]
         public bool ReadDeltaBoolean(bool valueA) => ReadBoolean();
 
-
         #region Whole values.
         /// <summary>
         /// Reads a difference, appending it onto a value.
@@ -88,7 +87,6 @@ namespace FishNet.Serializing
             return (bLargerThanA) ? (valueA + diff) : (valueA - diff);
         }
         #endregion
-
 
         #region Precision values.
         /// <summary>

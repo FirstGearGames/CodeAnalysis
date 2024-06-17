@@ -101,16 +101,6 @@ namespace RoslynLearning.CodeBuilding
         }
 
         /// <summary>
-        /// Creates a single line if statement conditional.
-        /// </summary>
-        public static string CreateSingleLineIf(string conditionaltext)
-        {
-            _stringBuilder.Clear();
-            _stringBuilder.Append($"if ({conditionaltext})");
-            return _stringBuilder.ToString();
-        }
-
-        /// <summary>
         /// Creates a multiline if statement conditional.
         /// </summary>
         public static string CreateMultiLineIf(int indent, string conditionaltext, string line)
@@ -158,6 +148,7 @@ namespace RoslynLearning.CodeBuilding
 
             return _stringBuilder.ToString();
         }
+
         public static string CallWriteArraySegmentAndSize(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
@@ -170,5 +161,6 @@ namespace RoslynLearning.CodeBuilding
 
             return _stringBuilder.ToString();
         }
+
     }
 }

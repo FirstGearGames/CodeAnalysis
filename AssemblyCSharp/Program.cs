@@ -15,24 +15,37 @@ namespace ClientAssembly
 
 	}
 
-	public struct MyStructB
-	{
-		public float PositionX;
-		public float PositionY;
-		public float PositionZ;
+	//public struct MyStructB
+	//{
+	//	public float PositionX;
+	//	public float PositionY;
+	//	public float PositionZ;
 
-		public bool Hits;
-		public float Stamina;
-		public float VelocityX;
-		public float VelocityY;
-		public float VelocityZ;
-	}
+	//	public bool Hits;
+	//	public float Stamina;
+	//	public float VelocityX;
+	//	public float VelocityY;
+	//	public float VelocityZ;
+	//}
 
-	
+
 	public class Player : NetworkBehaviour
 	{
 
-		[ServerRpc]
+        public struct MyStructB
+        {
+            public float PositionX;
+            public float PositionY;
+            public float PositionZ;
+
+            public bool Hits;
+            public float Stamina;
+            public float VelocityX;
+            public float VelocityY;
+            public float VelocityZ;
+        }
+
+        [ServerRpc]
 		private void MyRpcOne(MyStructA ms)
 		{
 		}

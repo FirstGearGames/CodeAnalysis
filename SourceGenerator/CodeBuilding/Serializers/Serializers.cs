@@ -6,6 +6,7 @@ using FishNet.CodeAnalysis.Extensions;
 using RoslynLearning.Helpers;
 using SourceGenerating.Constants;
 using SourceGenerator.Extensions;
+using System;
 
 namespace SourceGenerator.CodeBuilding.Serializers
 {
@@ -36,10 +37,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
         //Consts.
         public const string Generated_ValueParameter_Prefix = "value";
-        
+
         public void Initialize(IAssemblySymbol runtimeAssemblySymbol)
         {
             AddDefaultWriteMethods(runtimeAssemblySymbol);
+            AddDefaultReadMethods(runtimeAssemblySymbol);
         }
 
         #region Add/get serializers
@@ -153,31 +155,61 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// </summary>
         private void AddDefaultWriteMethods(IAssemblySymbol runtimeAssemblySymbol)
         {
-            if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol))
-                return;
+            if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol)) return;
+            if (nameTypeSymbol == null) return;
 
-            foreach (IMethodSymbol methodSymbol in nameTypeSymbol!.GetMembers().OfType<IMethodSymbol>())
+            foreach (IMethodSymbol methodSymbol in nameTypeSymbol.GetMembers().OfType<IMethodSymbol>())
             {
                 AddSerializerType addType = AddSerializerType.Unset;
-                string typeFullName = string.Empty;
                 //Full write.
                 if (methodSymbol.HasAttribute(FishNetConstants.DefaultWriterAttribute_FullName, out _))
-                {
-                    typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
                     addType = AddSerializerType.Full;
-                }
                 //Delta write.
                 else if (methodSymbol.HasAttribute(FishNetConstants.DefaultDeltaWriterAttribute_FullName, out _))
-                {
-                    typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
                     addType = AddSerializerType.Delta;
-                }
 
                 if (addType != AddSerializerType.Unset)
+                {
+                    string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
                     AddWriteMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
+                }
             }
         }
-        
+
+        /// <summary>
+        /// Adds default normal writers.
+        /// </summary>
+        private void AddDefaultReadMethods(IAssemblySymbol runtimeAssemblySymbol)
+        {
+            if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Reader_FullName, out INamedTypeSymbol? nameTypeSymbol)) return;
+            if (nameTypeSymbol == null) return;
+
+            Debugg.Log("Runnnnninggngng");
+
+            foreach (IMethodSymbol methodSymbol in nameTypeSymbol.GetMembers().OfType<IMethodSymbol>())
+            {
+                AddSerializerType addType = AddSerializerType.Unset;
+                //Full read.
+                if (methodSymbol.HasAttribute(FishNetConstants.DefaultReaderAttribute_FullName, out _))
+                    addType = AddSerializerType.Full;
+                //Deltaread.
+                else if (methodSymbol.HasAttribute(FishNetConstants.DefaultDeltaReaderAttribute_FullName, out _))
+                    addType = AddSerializerType.Delta;
+
+                if (addType != AddSerializerType.Unset)
+                {
+                    string typeFullName = methodSymbol.ReturnType.GetTypeFullName();
+                    AddReadMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the parameter name used for values within a generated delta writer.
+        /// </summary>
+        public string GetValueParameterName(int parameterIndex) => $"{Generated_ValueParameter_Prefix}{parameterIndex}";
+
         /// <summary>
         /// Returns if a serializer can be generated for a symbol.
         /// </summary>
@@ -186,14 +218,50 @@ namespace SourceGenerator.CodeBuilding.Serializers
             fieldSymbol = symbol as IFieldSymbol;
             if (fieldSymbol == null) return false;
             if (fieldSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
-            
+
             return true;
         }
 
         /// <summary>
-        /// Returns the parameter name used for values within a generated delta writer.
+        /// Gets fields which can be serialized over the network.
         /// </summary>
-        public string GetValueParameterName(int parameterIndex) => $"{Generated_ValueParameter_Prefix}{parameterIndex}";
+        /// <param name="namedTypeSymbol"></param>
+        /// <returns></returns>
+        public List<IFieldSymbol> GetSerializableFieldSymbols(INamedTypeSymbol? namedTypeSymbol)
+        {
+            List<IFieldSymbol> results = new();
+            if (namedTypeSymbol == null) return results;
 
+            //Call write for all members.
+            foreach (ISymbol symbol in namedTypeSymbol.GetMembers())
+            {
+                if (CanGenerateFieldSerializer(symbol, out IFieldSymbol? fieldSymbol))
+#pragma warning disable CS8604 // Possible null reference argument.
+                    results.Add(fieldSymbol);
+#pragma warning restore CS8604 // Possible null reference argument.
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Returns if a type qualifies for a delta serializer.
+        /// </summary>
+        public bool CanCreateDeltaSerializer(INamedTypeSymbol? namedTypeSymbol, bool throwCritical)
+        {
+            //Not a supported type. Must be a user defined struct or class.
+            if (namedTypeSymbol == null || !namedTypeSymbol.IsUserDefinedClassOrStruct())
+                return false;
+
+            //Too many parameters to process as a delta writer due to not enough flags.
+            if (namedTypeSymbol.MemberNames.Count() >= 63)
+            {
+                if (throwCritical)
+                    throw new Exception($"Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of 63 field members. Reduce the amount of field members or encapsulate members.");
+                return false;
+            }
+
+            return true;
+        }
     }
 }
