@@ -146,14 +146,25 @@ namespace RoslynLearning.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-        public static string CallWriteBytes(string writerName, string otherWriterA, bool closeCall = true)
+        public static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
-            string byteArrayVariable = $"{otherWriterA}.{FishNetConstants.Writer_GetBuffer_Name}()";
 
-            //public void WriteBytes(byte[] value, int offset, int count)
-            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteBytes_Name}(" +
-                                  $"{byteArrayVariable}, 0, {otherWriterA}.{FishNetConstants.Writer_Length_Name})");
+            //writer.WriteArraySegment(otherWriteA.GetArraySegment())
+            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteArraySegment_Name}(" +
+                                  $"{otherWriterA}.{FishNetConstants.Writer_GetArraySegment_Name}())");
+            if (closeCall)
+                _stringBuilder.Append(';');
+
+            return _stringBuilder.ToString();
+        }
+        public static string CallWriteArraySegmentAndSize(string writerName, string otherWriterA, bool closeCall = true)
+        {
+            _stringBuilder.Clear();
+
+            //writer.WriteArraySegment(otherWriteA.GetArraySegmentAndSize())
+            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteArraySegmentAndSize_Name}(" +
+                                  $"{otherWriterA}.{FishNetConstants.Writer_GetArraySegment_Name}())");
             if (closeCall)
                 _stringBuilder.Append(';');
 

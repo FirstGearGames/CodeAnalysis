@@ -20,7 +20,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         private const string Generated_WriterParameter_Name = "writer";
         private const string Generated_WriteFullParameter_Name = "writeFull";
         private const string Generated_RootCallParameter_Name = "rootCall";
-        
+
         public void Initialize(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
         {
             _serializers = serializers;
@@ -74,7 +74,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 Debugg.Log($"- NamedSymbol is null: {isNull}, or not user defined.");
                 return;
             }
-            
+
             //Too many parameters to process as a delta writer due to not enough flags.
             if (namedTypeSymbol.MemberNames.Count() >= 63)
             {
@@ -152,12 +152,13 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 SerializerMethod fullSerializerMethod = _serializers.GetWriteMethod(item.Key, GetSerializerType.Full);
                 if (!fullSerializerMethod.IsValid())
                 {
-                    sb.AppendThrowLine(3, $"Full Writer could not be found for type {item.Key}. This is normal until added. Continuing...");
+                    //sb.AppendThrowLine(3, $"Full Writer could not be found for type {item.Key}. This is normal until added. Continuing...");
                     //continue;
                     fullSerializerMethod = new SerializerMethod(item.Key, $"Write");
                 }
 
                 CreateWriteFullIf();
+
                 void CreateWriteFullIf()
                 {
                     StringBuilder ifBody = new();
@@ -165,7 +166,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     ifBody.Append(4, "return true;");
                     sb.AppendLine(CodeBuilder.CreateMultiLineIf(3, $"{Generated_WriteFullParameter_Name}", ifBody));
                 }
-                
+
                 //Starting flag for each modified field.
                 ulong fieldFlag = 2;
 
@@ -184,21 +185,40 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                     //Get delta writer method for the field.
                     DeltaSerializerMethod? dsm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
+                    //Delta writer not found.
                     if (!dsm.IsValid())
                     {
-                        sb.AppendThrowLine(3, $"Delta writer could not be found for type {typeFullName}.");
-                        continue;
+                        SerializerMethod sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
+                        ;
+                        if (!sm.IsValid())
+                        {
+                            sb.AppendThrowLine(3, $"Full writer could not be found for type {typeFullName}.");
+                            continue;
+                        }
+
+                        sb.AppendLine(3, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
+                        sb.AppendLine(3, CodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
+
+                        AppendIncreaseTotalFlags(3);
+                    }
+                    //Delta writer found.
+                    else
+                    {
+                        //If a user defined struct then use the in keyword.
+                        string inText = typeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
+                        /* if (writer.WriteDeltaXYZ(p0, p1))
+                            totalFlags += x */
+                        sb.AppendLine(3, CodeBuilder.CreateSingleLineIf(
+                            CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
+                                $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
+                                $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}")));
+                        AppendIncreaseTotalFlags(4);
                     }
 
-                    //If a user defined struct then use the in keyword.
-                    string inText = typeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                    /* if (writer.WriteDeltaXYZ(p0, p1))
-                        totalFlags += x */
-                    sb.AppendLine(3, CodeBuilder.CreateSingleLineIf(
-                        CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
-                            $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
-                            $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}")));
-                    sb.AppendLine(4, $"{totalFlagsVariable} += {fieldFlag};");
+                    void AppendIncreaseTotalFlags(int indent)
+                    {
+                        sb.AppendLine(indent, $"{totalFlagsVariable} += {fieldFlag};");
+                    }
 
                     fieldFlag *= 2;
                 }
@@ -219,7 +239,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
                  } */
                 sb.AppendLine(4,
-                    CodeBuilder.CallWriteBytes(Generated_WriterParameter_Name, tmpWriterVariable));
+                    CodeBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariable));
                 sb.AppendLine(3, "}");
                 //store tmpWriter.
                 sb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + NativeConstants.LineFeed);

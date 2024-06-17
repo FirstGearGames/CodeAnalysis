@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FishNet.Runtime", "FishNet\FishNet.Runtime\FishNet.Runtime.csproj", "{B6B25D04-6341-42D7-B1DA-E549D5178026}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FishNet.Runtime", "FishNet\FishNet.Runtime\FishNet.Runtime.csproj", "{C6DC041F-5C0B-4396-8C4F-27800EB9920B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +28,10 @@ Global
 		{EF1660AD-671A-4E00-95DA-F9FE0252BA18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF1660AD-671A-4E00-95DA-F9FE0252BA18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF1660AD-671A-4E00-95DA-F9FE0252BA18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6B25D04-6341-42D7-B1DA-E549D5178026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6B25D04-6341-42D7-B1DA-E549D5178026}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6B25D04-6341-42D7-B1DA-E549D5178026}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6B25D04-6341-42D7-B1DA-E549D5178026}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6DC041F-5C0B-4396-8C4F-27800EB9920B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6DC041F-5C0B-4396-8C4F-27800EB9920B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6DC041F-5C0B-4396-8C4F-27800EB9920B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6DC041F-5C0B-4396-8C4F-27800EB9920B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

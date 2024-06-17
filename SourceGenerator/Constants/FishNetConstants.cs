@@ -44,12 +44,26 @@
         /// <summary>
         /// Writer.WriteBytes method.
         /// </summary>
-        public const string Writer_WriteBytes_Name = "WriteBytes";
+        public const string Writer_WriteUInt8Array_Name = "WriteUInt8Array";
 
         /// <summary>
         /// Writer.GetBuffer() property.
         /// </summary>
         public const string Writer_GetBuffer_Name = "GetBuffer";
+
+        /// <summary>
+        /// Writer.WriteArraySegmentAndSize() method.
+        /// </summary>
+        public const string Writer_WriteArraySegmentAndSize_Name = "WriteArraySegmentAndSize";
+        /// <summary>
+        /// Writer.WriteArraySegment() method.
+        /// </summary>
+        public const string Writer_WriteArraySegment_Name = "WriteArraySegment";
+        /// <summary>
+        /// Writer.GetArraySegment() method.
+        /// </summary>
+        public const string Writer_GetArraySegment_Name = "GetArraySegment";
+
 
         /// <summary>
         /// Writer.Length property.
@@ -84,15 +98,14 @@
         /// <summary>
         /// [Writer] class.
         /// </summary>
-        public const string WriterAttribute_FullName = $"{Serializing_Namespace}.WriterAttribute";
+        public const string DefaultWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultWriterAttribute";
 
         /// <summary>
         /// [DeltaWriter] class.
         /// </summary>
-        public const string DeltaWriterAttribute_FullName = $"{Serializing_Namespace}.DeltaWriterAttribute";
+        public const string DefaultDeltaWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaWriterAttribute";
         #endregion
-        
-        
+                
         #region Reader.
         // /// <summary>
         // /// Writer.WriteBytes method.

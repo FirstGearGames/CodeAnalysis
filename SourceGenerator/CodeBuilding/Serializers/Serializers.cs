@@ -161,13 +161,13 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 AddSerializerType addType = AddSerializerType.Unset;
                 string typeFullName = string.Empty;
                 //Full write.
-                if (methodSymbol.HasAttribute(FishNetConstants.WriterAttribute_FullName, out _))
+                if (methodSymbol.HasAttribute(FishNetConstants.DefaultWriterAttribute_FullName, out _))
                 {
                     typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
                     addType = AddSerializerType.Full;
                 }
                 //Delta write.
-                else if (methodSymbol.HasAttribute(FishNetConstants.DeltaWriterAttribute_FullName, out _))
+                else if (methodSymbol.HasAttribute(FishNetConstants.DefaultDeltaWriterAttribute_FullName, out _))
                 {
                     typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
                     addType = AddSerializerType.Delta;

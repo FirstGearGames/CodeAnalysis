@@ -5,7 +5,6 @@
 
 		public static bool WriteDeltaClientAssembly_MyStructA(this FishNet.Serializing.Writer writer, in ClientAssembly.MyStructA value0, in ClientAssembly.MyStructA value1, bool writeFull = false, bool rootCall = true)
 		{
-			throw new Exception("Full Writer could not be found for type ClientAssembly.MyStructA. This is normal until added. Continuing...");
 			if (writeFull)
 			{
 				writer.Write(value1);
@@ -19,18 +18,21 @@
 				totalFlags += 2;
 			if (pooledWriter.WriteDeltaSingle(value0.Vertical, value1.Vertical))
 				totalFlags += 4;
-			if (pooledWriter.WriteDeltaBoolean(value0.Running, value1.Running))
-				totalFlags += 8;
-			if (pooledWriter.WriteDeltaBoolean(value0.Firing, value1.Firing))
-				totalFlags += 16;
-			if (pooledWriter.WriteDeltaBoolean(value0.Jumping, value1.Jumping))
-				totalFlags += 32;
+			//Delta writer could not be found for type System.Boolean. Please report this note.
+			pooledWriter.WriteBoolean(value1.Running);
+			totalFlags += 8;
+			//Delta writer could not be found for type System.Boolean. Please report this note.
+			pooledWriter.WriteBoolean(value1.Firing);
+			totalFlags += 16;
+			//Delta writer could not be found for type System.Boolean. Please report this note.
+			pooledWriter.WriteBoolean(value1.Jumping);
+			totalFlags += 32;
 
 			bool changed = (totalFlags != 0) || rootCall;
 			if (changed)
 			{
 				writer.WriteUnsignedPackedWhole(totalFlags);
-				writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
 			}
 			pooledWriter.Store();
 
@@ -40,7 +42,6 @@
 
 		public static bool WriteDeltaClientAssembly_MyStructB(this FishNet.Serializing.Writer writer, in ClientAssembly.MyStructB value0, in ClientAssembly.MyStructB value1, bool writeFull = false, bool rootCall = true)
 		{
-			throw new Exception("Full Writer could not be found for type ClientAssembly.MyStructB. This is normal until added. Continuing...");
 			if (writeFull)
 			{
 				writer.Write(value1);
@@ -56,8 +57,9 @@
 				totalFlags += 4;
 			if (pooledWriter.WriteDeltaSingle(value0.PositionZ, value1.PositionZ))
 				totalFlags += 8;
-			if (pooledWriter.WriteDeltaBoolean(value0.Hits, value1.Hits))
-				totalFlags += 16;
+			//Delta writer could not be found for type System.Boolean. Please report this note.
+			pooledWriter.WriteBoolean(value1.Hits);
+			totalFlags += 16;
 			if (pooledWriter.WriteDeltaSingle(value0.Stamina, value1.Stamina))
 				totalFlags += 32;
 			if (pooledWriter.WriteDeltaSingle(value0.VelocityX, value1.VelocityX))
@@ -71,7 +73,7 @@
 			if (changed)
 			{
 				writer.WriteUnsignedPackedWhole(totalFlags);
-				writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
 			}
 			pooledWriter.Store();
 

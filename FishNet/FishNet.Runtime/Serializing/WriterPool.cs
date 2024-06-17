@@ -19,6 +19,6 @@
         /// <summary>
         /// Gets a writer from the pool.
         /// </summary>
-        public static PooledWriter Retrieve() => default;
+        public static PooledWriter Retrieve() => new();
     }
 }

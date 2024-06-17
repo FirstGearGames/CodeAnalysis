@@ -1,6 +1,5 @@
 ﻿
 using FishNet.Managing.Logging;
-using System;
 
 namespace FishNet.Object
 {
@@ -133,14 +132,20 @@ namespace FishNet.Object.Synchronizing
 namespace FishNet.Serializing
 {
 
+    /// <summary>
+    /// Indicates a method is the default writer for a type. The first non-extension parameter indicates the type this writer is for.
+    /// This attribute is primarily for internal use and may change at anytime without notice.
+    /// </summary>
+    public class DefaultWriterAttribute : Attribute { }
+    /// <summary>
+    /// Indicates a method is the default reader for a type. The return type indicates what type the reader is for.
+    /// This attribute is primarily for internal use and may change at anytime without notice.
+    /// </summary>
+    public class DefaultReaderAttribute : Attribute { }
+    
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class WriterAttribute : Attribute { }
+    public class DefaultDeltaWriterAttribute : Attribute { }
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class DeltaWriterAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class ReaderAttribute : Attribute { }
-    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class DeltaReaderAttribute : Attribute { }
+    public class DefaultDeltaReaderAttribute : Attribute { }
 
 }

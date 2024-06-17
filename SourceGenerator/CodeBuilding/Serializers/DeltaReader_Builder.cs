@@ -152,7 +152,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 SerializerMethod fullSerializerMethod = _serializers.GetReadMethod(item.Key, GetSerializerType.Full);
                 if (!fullSerializerMethod.IsValid())
                 {
-                    sb.AppendThrowLine(3, $"Full Reader could not be found for type {item.Key}. This is normal until added. Continuing...");
+                    //sb.AppendThrowLine(3, $"Full Reader could not be found for type {item.Key}. This is normal until added. Continuing...");
                     //continue;
                     fullSerializerMethod = new SerializerMethod(item.Key, $"Read");
                 }
