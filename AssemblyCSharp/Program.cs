@@ -1,4 +1,5 @@
-﻿using FishNet.Object;
+﻿using FishNet.CodeGenerating;
+using FishNet.Object;
 using FishNet.Serializing;
 using FishNet.Transporting;
 
@@ -28,6 +29,16 @@ namespace ClientAssembly
 	//	public float VelocityZ;
 	//}
 
+	[IncludeSerialization]
+	public class MyThingA : MyThingB
+	{
+		public string A;
+	}
+
+	public class MyThingB
+	{
+		public string B;
+	}
 
 	public class Player : NetworkBehaviour
 	{
@@ -45,15 +56,15 @@ namespace ClientAssembly
             public float VelocityZ;
         }
 
-        [ServerRpc]
-		private void MyRpcOne(MyStructA ms)
-		{
-		}
+  //      [ServerRpc]
+		//private void MyRpcOne(MyStructA ms)
+		//{
+		//}
 		
-		[ServerRpc]
-		private void MyRpcTwo(MyStructB ms)
-		{
-		}
+		//[ServerRpc]
+		//private void MyRpcTwo(MyStructB ms)
+		//{
+		//}
 
 		// [ServerRpc]
 		// private void MyRpc(int value, Channel channel = Channel.Unreliable)

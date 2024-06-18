@@ -32,6 +32,20 @@ namespace FishNet.CodeAnalysis.Extensions
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
+        public static string GetTypeMetadataName(this ITypeSymbol typeSymbol)
+        {
+            string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
+            containingNamespace = containingNamespace.RemoveGlobalAlias();
+
+            string fullyQualifiedName = string.Empty;
+            for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
+                fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
+
+            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
+            return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
+        }
+
+
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };

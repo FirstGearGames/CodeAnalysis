@@ -2,22 +2,28 @@
 {
     internal class FishNetConstants
     {
-        #region Misc.
+        #region Namespaces and assemblies.
 
         /// <summary>
         /// FishNet.Serializing namespace.
         /// </summary>
         public const string Serializing_Namespace = "FishNet.Serializing";
-
+        /// <summary>
+        /// FishNet.CodeGenerating namespace.
+        /// </summary>
+        public const string CodeGenerating_Namespace = "FishNet.CodeGenerating";
         /// <summary>
         /// FishNet.Runtime assembly.
         /// </summary>
         public const string Runtime_Assembly_Name = "FishNet.Runtime";
+        #endregion
 
+        #region Codegenerating special.
+        public const string IncludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.IncludeSerializationAttribute";
         /// <summary>
         /// [ExcludeSerialization] class.
         /// </summary>
-        public const string ExcludeSerializationAttribute_FullName = "FishNet.CodeGenerating.ExcludeSerializationAttribute";
+        public const string ExcludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.ExcludeSerializationAttribute";
 
         #endregion
 

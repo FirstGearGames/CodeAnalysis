@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using RoslynLearning.Helpers;
 using SourceGenerator.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -85,41 +86,25 @@ namespace FishNet.CodeAnalysis.Extensions
             return (datas.Count > 0);
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetFullyQualifiedName(this ISymbol thisSymbol)
-        {
-            return thisSymbol.ContainingType is null ? $"global::{thisSymbol.Name}" : $"{thisSymbol.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{thisSymbol.Name}";
-        }
-
-        public static bool HasAttribute(this ISymbol thisSymbol, string fullyQualifiedAttributeName)
+        public static bool HasAttribute(this ISymbol thisSymbol, string attributeFullName)
         {
             foreach (AttributeData attribute in thisSymbol.GetAttributes())
             {
-                if (attribute.AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == fullyQualifiedAttributeName) return true;
+                if (attribute.AttributeClass is not INamedTypeSymbol namedTypeSymbol) continue;
+
+                string symbolFullName = namedTypeSymbol.GetSymbolFullName();
+                if (symbolFullName == attributeFullName) return true;
             }
 
             return false;
         }
 
-        public static bool HasAttribute(this ISymbol thisSymbol, params string[] fullyQualifiedAttributeNames)
+        public static bool HasAttributes(this ISymbol thisSymbol, params string[] attributeFullNames)
         {
-            foreach (string fullyQualifiedAttributeName in fullyQualifiedAttributeNames)
-            {
+            foreach (string fullyQualifiedAttributeName in attributeFullNames)
                 if (thisSymbol.HasAttribute(fullyQualifiedAttributeName)) return true;
-            }
 
             return false;
-        }
-
-        public static bool HasAttributes(this ISymbol thisSymbol, string[] fullyQualifiedAttributeNames)
-        {
-            foreach (string fullyQualifiedAttributeName in fullyQualifiedAttributeNames)
-            {
-                if (!thisSymbol.HasAttribute(fullyQualifiedAttributeName)) return false;
-            }
-
-            return true;
         }
 
         public static AttributeData? GetAttribute(this ISymbol thisSymbol, string fullyQualifiedAttributeName)

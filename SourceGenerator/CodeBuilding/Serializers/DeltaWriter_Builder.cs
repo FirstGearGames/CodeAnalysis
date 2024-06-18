@@ -41,15 +41,16 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
         {
-            foreach (string item in rootSyntaxReceiver.SerializableTypes)
+            foreach (SerializableType item in rootSyntaxReceiver.SerializableTypes)
                 CreateEmptyDeltaSerializerMethod(context, item);
         }
 
         /// <summary>
         /// Creates an empty delta serializer method for a type.
         /// </summary>
-        private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, string typeFullName)
+        private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
         {
+            string typeFullName = serializableType.FullName;
             Debugg.Log($"Trying to create writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta).IsValid())
@@ -78,7 +79,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, typeSymbol.GetTypeFullName());
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.MetadataName));
             }
 
             Debugg.Log("- Creating header and footer.");
