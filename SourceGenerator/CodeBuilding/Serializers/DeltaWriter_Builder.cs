@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FishNet.CodeAnalysis.Extensions;
@@ -14,14 +13,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
 {
     internal class DeltaWriter_Builder
     {
+        private static StringBuilder _stringBuilder = new();
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private Serializers _serializers;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private const string Generated_Class_Name = "Generated_DeltaWriters";
         private const string Generated_Method_Prefix = "WriteDelta";
         private const string Generated_WriterParameter_Name = "writer";
-        private const string Generated_WriteFullParameter_Name = "writeFull";
-        private const string Generated_RootCallParameter_Name = "rootCall";
+        public const string Generated_DeltaSerializerOption_Name = "options";
 
         public void Initialize(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
         {
@@ -98,7 +98,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 sb.Indent(2).AppendLine($"public static bool {mName}" +
                                         $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" +
-                                        $", bool {Generated_WriteFullParameter_Name} = false, bool {Generated_RootCallParameter_Name} = true)");
+                                        $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
                 sb.Indent(2).Append('{');
 
                 return sb.ToString();
@@ -110,6 +110,21 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 sb.AppendLine(2, "}");
                 return sb.ToString();
             }
+        }
+
+        /// <summary>
+        /// Creates and returns a full serialize call.
+        /// </summary>
+        internal string CreateFullSerializeCheck(int indent, string optionsVariableName, string body)
+        {
+            _stringBuilder.Clear();
+
+            _stringBuilder.AppendLine(indent, $"if ({optionsVariableName}.FastContains({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
+            _stringBuilder.AppendLine(indent, "{");
+            _stringBuilder.AppendLine(body);
+            _stringBuilder.AppendLine(indent, "}");
+
+            return _stringBuilder.ToString();
         }
 
         /// <summary>
@@ -128,8 +143,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 sb.Clear();
 
-                /* If (fullWrite)
-                 *      writer.Write(type); */
+                /* If (options.FastContains(DeltaSerializerOption.FullSerialize))
+                 * {
+                 *      writer.Write(type); 
+                 *      return;
+                 * } */
                 CreateWriteFullIf();
                 void CreateWriteFullIf()
                 {
@@ -137,7 +155,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     StringBuilder ifBody = new();
                     ifBody.AppendLine(4, $"{Generated_WriterParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
                     ifBody.Append(4, "return true;");
-                    sb.AppendLine(CodeBuilder.CreateMultiLineIf(3, $"{Generated_WriteFullParameter_Name}", ifBody));
+                    sb.AppendLine(CreateFullSerializeCheck(3, Generated_DeltaSerializerOption_Name, ifBody.ToString()));
+                    //sb.AppendLine(CodeBuilder.CreateMultiLineIf(3, $"{Generated_WriteFullParameter_Name}", ifBody));
                 }
 
                 //Starting flag for each modified field.
@@ -162,7 +181,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     {
                         SerializerMethod sm = GetFullWriter(typeFullName, true, out bool _);
                         sb.AppendLine(3, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
-                        sb.AppendLine(3, CodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));                        
+                        sb.AppendLine(3, CodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
                         AppendIncreaseTotalFlags(3);
                     }
                     //Delta writer found.
@@ -189,8 +208,12 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 }
 
                 string changedVariable = "changed";
-                //bool changed = (totalFlags != 0) || rootWriter;
-                sb.AppendLine(3, $"bool {changedVariable} = ({totalFlagsVariable} != 0) || {Generated_RootCallParameter_Name};");
+                string rootSerializerVariable = "rootSerializer";
+                //System.Boolean rootSerializer = options.FastContains(DeltaSerializerOption.RootSerialize);
+                sb.Append(3, CodeBuilder.CreateLocalVariable(NativeConstants.Boolean_FullName, rootSerializerVariable, string.Empty, false));
+                sb.AppendLine($" = {Generated_DeltaSerializerOption_Name}.FastContains({FishNetConstants.DeltaSerializeOption_RootSerialize_FullName});");
+                //System.Boolean changed = (totalFlags != 0) || rootSerializer;
+                sb.AppendLine(3, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0);");// || {Generated_RootCallParameter_Name};");
 
                 /* if (changed)
                  {

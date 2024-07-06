@@ -33,6 +33,7 @@ namespace ClientAssembly
 	public class MyThingA : MyThingB
 	{
 		public string A;
+		public MyThingB C;
 	}
 
 	public class MyThingB

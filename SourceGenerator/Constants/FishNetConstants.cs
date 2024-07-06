@@ -43,8 +43,35 @@
         /// [ObserversRpc] class.
         /// </summary>
         public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";
-
         #endregion
+
+
+        #region DeltaSerializing.
+        /// <summary>
+        /// DeltaSerializerOption enum.
+        /// </summary>
+        public const string DeltaSerializerOption_FullName = $"{Serializing_Namespace}.{DeltaSerializerOption_Name}";
+
+        /// <summary>
+        /// DeltaSerializerOption enum.
+        /// </summary>
+        public const string DeltaSerializerOption_Name = $"DeltaSerializerOption";
+        /// <summary>
+        /// DeltaSerializerOption.Unset.
+        /// </summary>
+        public const string DeltaSerializerOption_Unset_FullName = $"{DeltaSerializerOption_FullName}.Unset";
+        /// <summary>
+        /// DeltaSerializerOption.FullSerialize.
+        /// </summary>
+
+        public const string DeltaSerializerOption_FullSerialize_FullName = $"{DeltaSerializerOption_FullName}.FullSerialize";
+        /// <summary>
+        /// DeltaSerializerOption.RootSerialize.
+        /// </summary>
+
+        public const string DeltaSerializeOption_RootSerialize_FullName = $"{DeltaSerializerOption_FullName}.RootSerialize";
+        #endregion
+
 
         #region Writer.
         ///// <summary>

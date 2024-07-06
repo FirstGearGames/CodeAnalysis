@@ -124,14 +124,15 @@ namespace RoslynLearning.CodeBuilding
         }
 
 
-        public static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "")
+        public static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "", bool closeLine = true)
         {
             _stringBuilder.Clear();
             _stringBuilder.Append($"{fullTypeName} {variableName}");
+            string lineCloser = (closeLine) ? ";" : string.Empty;
             if (defaultValue.Length > 0)
-                _stringBuilder.Append($" = {defaultValue};");
+                _stringBuilder.Append($" = {defaultValue}{lineCloser}");
             else
-                _stringBuilder.Append(';');
+                _stringBuilder.Append(lineCloser);
 
             return _stringBuilder.ToString();
         }
