@@ -108,7 +108,6 @@ namespace SourceGenerating.SyntaxReceivers
                         parameters.RemoveAt(--parametersCount);
                 }
 
-
                 //Removes channel if the last parameter.
                 void RemoveTrailingChannel()
                 {

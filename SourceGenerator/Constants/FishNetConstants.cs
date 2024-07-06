@@ -175,5 +175,12 @@
         #endregion
 
 
+        #region General.
+        /// <summary>
+        /// FastContains method.
+        /// </summary>
+        public const string FastContains_Name = "FastContains";
+        #endregion
+
     }
 }

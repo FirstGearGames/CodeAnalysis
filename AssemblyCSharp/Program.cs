@@ -16,21 +16,21 @@ namespace ClientAssembly
 
 	}
 
-	//public struct MyStructB
-	//{
-	//	public float PositionX;
-	//	public float PositionY;
-	//	public float PositionZ;
+    //public struct MyStructB
+    //{
+    //	public float PositionX;
+    //	public float PositionY;
+    //	public float PositionZ;
 
-	//	public bool Hits;
-	//	public float Stamina;
-	//	public float VelocityX;
-	//	public float VelocityY;
-	//	public float VelocityZ;
-	//}
+    //	public bool Hits;
+    //	public float Stamina;
+    //	public float VelocityX;
+    //	public float VelocityY;
+    //	public float VelocityZ;
+    //}
 
-	
-	public class MyThingA : MyThingB
+    [IncludeSerialization]
+    public class MyThingA : MyThingB
 	{
 		public string A;
 		public MyThingB C;
@@ -43,35 +43,35 @@ namespace ClientAssembly
 
 	public class Player : NetworkBehaviour
 	{
-        [IncludeSerialization]
-        public class MyStructB
-        {
-            public float PositionX;
-            public float PositionY;
-            public float PositionZ;
+  //      [IncludeSerialization]
+  //      public class MyStructB
+  //      {
+  //          public float PositionX;
+  //          public float PositionY;
+  //          public float PositionZ;
 
-            public bool Hits;
-            public float Stamina;
-            public float VelocityX;
-            public float VelocityY;
-            public float VelocityZ;
-			public MyStructC StructC;
+  //          public bool Hits;
+  //          public float Stamina;
+  //          public float VelocityX;
+  //          public float VelocityY;
+  //          public float VelocityZ;
+		//	public MyStructC StructC;
 
-			public class MyStructC
-			{
-				public bool Works;
-			}
-        }
+		//	public class MyStructC
+		//	{
+		//		public bool Works;
+		//	}
+  //      }
 
-        [ServerRpc]
-		private void MyRpcOne(MyStructA ms)
-		{
-		}
+  //      [ServerRpc]
+		//private void MyRpcOne(MyStructA ms)
+		//{
+		//}
 		
-		[ServerRpc]
-		private void MyRpcTwo(MyStructB ms)
-		{
-		}
+		//[ServerRpc]
+		//private void MyRpcTwo(MyStructB ms)
+		//{
+		//}
 
 		// [ServerRpc]
 		// private void MyRpc(int value, Channel channel = Channel.Unreliable)

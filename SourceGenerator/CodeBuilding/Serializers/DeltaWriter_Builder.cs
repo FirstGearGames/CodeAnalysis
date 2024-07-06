@@ -116,7 +116,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             _stringBuilder.Clear();
 
-            _stringBuilder.AppendLine(indent, $"if ({optionsVariableName}.FastContains({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
+            _stringBuilder.AppendLine(indent, $"if ({optionsVariableName}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
             _stringBuilder.AppendLine(indent, "{");
             _stringBuilder.AppendLine(body);
             _stringBuilder.AppendLine(indent, "}");

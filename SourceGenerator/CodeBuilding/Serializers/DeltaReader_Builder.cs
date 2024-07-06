@@ -90,8 +90,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
                 sb.Indent(2).AppendLine($"public static {typeFullName} {mName}" +
                                         $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," +
-                                        $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}" +
-                                        $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
+                                        $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");
                 sb.Indent(2).Append('{');
 
                 return sb.ToString();
@@ -121,29 +120,33 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 sb.Clear();
 
-                ///* if (fullRead)
-                // *      return reader.Read<type>(); */
-                //CreateReadFullIf();
-                //void CreateReadFullIf()
-                //{
-                //    SerializerMethod fullSerializerMethod = GetFullReader(item.Key, true, out _);
-                //    sb.AppendLine(3, $"if ({Generated_ReadFullParameter_Name})");
-                //    sb.AppendLine(4, $"return {Generated_ReaderParameter_Name}.{fullSerializerMethod.MethodName}();");
-                //    sb.AppendLine();
-                //}
-
                 //Make a new instance of the type to return.
                 const string resultVariableName = "result";
                 sb.AppendLine(3, CodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
 
                 string totalFlagsVariable = "totalFlags";
-                sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable,
-                    CodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)));
+                sb.Append(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
+                sb.AppendLine($" = {CodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
                 sb.AppendLine();
+
+                /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
+                 * if (options.FastContains(DeltaSerializerOption.FullSerializer))
+                *      return reader.Read<type>(); */
+                CreateReadFullIf();
+                void CreateReadFullIf()
+                {
+                    string optionsVariable = DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
+                    sb.AppendLine(3, $"{FishNetConstants.DeltaSerializerOption_FullName} {optionsVariable} = ({FishNetConstants.DeltaSerializerOption_FullName}){totalFlagsVariable};");
+
+                    SerializerMethod fullSerializerMethod = GetFullReader(item.Key, true, out _);
+                    sb.AppendLine(3, $"if ({optionsVariable}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
+                    sb.AppendLine(4, $"return {Generated_ReaderParameter_Name}.{fullSerializerMethod.MethodName}();");
+                    sb.AppendLine();
+                }
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.NamedTypeSymbol);
 
-                ulong fieldFlag = 2;
+                ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     //if ((totalFlags & flag) == flag)
