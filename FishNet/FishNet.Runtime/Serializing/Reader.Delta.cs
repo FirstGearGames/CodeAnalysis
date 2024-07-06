@@ -14,6 +14,9 @@ namespace FishNet.Serializing
         [DefaultDeltaReader]
         public bool ReadDeltaBoolean(bool valueA) => ReadBoolean();
 
+        [DefaultDeltaReader]
+        public string ReadDeltaString(string valueA) => ReadString();
+
         #region Whole values.
         /// <summary>
         /// Reads a difference, appending it onto a value.

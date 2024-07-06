@@ -29,7 +29,7 @@ namespace ClientAssembly
 	//	public float VelocityZ;
 	//}
 
-	[IncludeSerialization]
+	
 	public class MyThingA : MyThingB
 	{
 		public string A;
@@ -43,8 +43,8 @@ namespace ClientAssembly
 
 	public class Player : NetworkBehaviour
 	{
-
-        public struct MyStructB
+        [IncludeSerialization]
+        public class MyStructB
         {
             public float PositionX;
             public float PositionY;
@@ -55,17 +55,23 @@ namespace ClientAssembly
             public float VelocityX;
             public float VelocityY;
             public float VelocityZ;
+			public MyStructC StructC;
+
+			public class MyStructC
+			{
+				public bool Works;
+			}
         }
 
-  //      [ServerRpc]
-		//private void MyRpcOne(MyStructA ms)
-		//{
-		//}
+        [ServerRpc]
+		private void MyRpcOne(MyStructA ms)
+		{
+		}
 		
-		//[ServerRpc]
-		//private void MyRpcTwo(MyStructB ms)
-		//{
-		//}
+		[ServerRpc]
+		private void MyRpcTwo(MyStructB ms)
+		{
+		}
 
 		// [ServerRpc]
 		// private void MyRpc(int value, Channel channel = Channel.Unreliable)

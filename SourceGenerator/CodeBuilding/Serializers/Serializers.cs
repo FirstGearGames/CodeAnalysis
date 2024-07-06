@@ -57,7 +57,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             else
             {
                 dict[sm.TypeFullName] = sm;
-                Debugg.Log($"-- Added {sm.TypeFullName} to writer {addType}. New Count is {dict.Count}.");
+                //Debugg.Log($"-- Added {sm.TypeFullName} to writer {addType}. New Count is {dict.Count}.");
             }
         }
 

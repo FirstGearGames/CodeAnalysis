@@ -59,11 +59,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 return;
             }
 
-
-            string lookupName = typeFullName;
-            if (lookupName.Contains("MyStructB"))
-                lookupName = lookupName.Replace(".MyStructB", "+MyStructB");
-            INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(lookupName);
+            Debugg.Log("Meta name is " + serializableType.FullMetadataName);
+            INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
             {
                 Debugg.Log($"Named symbol is null.");
@@ -79,7 +76,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.MetadataName));
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.GetSymbolFullMetaName()));
             }
 
             Debugg.Log("- Creating header and footer.");

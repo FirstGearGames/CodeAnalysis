@@ -5,12 +5,12 @@ namespace SourceGenerator.CodeBuilding.Serializers
     internal struct SerializableType : IEquatable<SerializableType>
     {
         public readonly string FullName;
-        public readonly string MetadataName;
+        public readonly string FullMetadataName;
 
-        public SerializableType(string fullName, string metadataName)
+        public SerializableType(string fullName, string fullMetadataName)
         {
             FullName = fullName;
-            MetadataName = metadataName;
+            FullMetadataName = fullMetadataName;
         }
 
         public bool Equals(SerializableType other) => (other.FullName == this.FullName);

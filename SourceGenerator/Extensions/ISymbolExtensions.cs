@@ -38,6 +38,25 @@ namespace FishNet.CodeAnalysis.Extensions
         }
 
         /// <summary>
+        /// Returns the full name of a symbol which includes the namespace.
+        /// </summary>
+        public static string GetSymbolFullMetaName(this ISymbol symbol)
+        {
+            if (symbol == null) return string.Empty;
+
+            string containingNamespace = symbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
+            containingNamespace = containingNamespace.RemoveGlobalAlias();
+
+            string fullyQualifiedName = string.Empty;
+            for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
+                fullyQualifiedName = $"{currentType.Name}+{fullyQualifiedName}";
+
+            fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
+            return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
+        }
+
+
+        /// <summary>
         /// Returns the short name of a symbol which includes the namespace.
         /// </summary>
         public static string GetSymbolName(this ISymbol symbol)

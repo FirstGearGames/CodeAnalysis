@@ -52,8 +52,8 @@ namespace SourceGenerating.SyntaxReceivers
 
                 if (!addedFullNames.Add(fullName)) return false;
 
-                string metadataName = theSymbol.MetadataName;
-                SerializableTypes.Add(new SerializableType(fullName, metadataName));
+                Debugg.Log(theSymbol.GetSymbolFullName());
+                SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName()));
 
                 return true;
             }
@@ -124,7 +124,7 @@ namespace SourceGenerating.SyntaxReceivers
             foreach (IParameterSymbol parameter in parameters)
             {
                 string fullName = parameter.Type.GetTypeFullName();
-                string metadataName = parameter.Type.MetadataName;
+                string metadataName = parameter.Type.GetSymbolFullMetaName();
                 SerializableTypes.Add(new SerializableType(fullName, metadataName));
             }
         }
