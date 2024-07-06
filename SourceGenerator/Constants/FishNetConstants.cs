@@ -48,6 +48,10 @@
 
         #region DeltaSerializing.
         /// <summary>
+        /// Maximum flag value within DeltaSerializerOption.
+        /// </summary>
+        public const ulong DeltaSerializerOption_MaxValue = 2;
+        /// <summary>
         /// DeltaSerializerOption enum.
         /// </summary>
         public const string DeltaSerializerOption_FullName = $"{Serializing_Namespace}.{DeltaSerializerOption_Name}";

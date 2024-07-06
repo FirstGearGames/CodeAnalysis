@@ -11,12 +11,11 @@
 				return true;
 			}
 
-			System.UInt64 totalFlags = 0;
+			System.UInt64 totalFlags = (ulong)options;
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			//Delta writer could not be found for type System.String. Please report this note.
-			pooledWriter.WriteString(value1.B);
-			totalFlags += 2;
+			if (pooledWriter.WriteDeltaString(value0.B, value1.B))
+				totalFlags += 4;
 
 			System.Boolean rootSerializer = options.FastContains(FishNet.Serializing.DeltaSerializerOption.RootSerialize);
 			System.Boolean changed = (totalFlags != 0);
@@ -38,15 +37,14 @@
 				return true;
 			}
 
-			System.UInt64 totalFlags = 0;
+			System.UInt64 totalFlags = (ulong)options;
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			//Delta writer could not be found for type System.String. Please report this note.
-			pooledWriter.WriteString(value1.A);
-			totalFlags += 2;
+			if (pooledWriter.WriteDeltaString(value0.A, value1.A))
+				totalFlags += 4;
 
 			if (pooledWriter.WriteDeltaClientAssembly_MyThingB(value0.C, value1.C))
-				totalFlags += 4;
+				totalFlags += 8;
 
 			System.Boolean rootSerializer = options.FastContains(FishNet.Serializing.DeltaSerializerOption.RootSerialize);
 			System.Boolean changed = (totalFlags != 0);

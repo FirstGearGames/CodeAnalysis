@@ -160,11 +160,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 }
 
                 //Starting flag for each modified field.
-                ulong fieldFlag = 2;
+                ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
 
                 //totalFlags and pooledWriter local variables.
                 string totalFlagsVariable = "totalFlags";
-                sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, "0"));
+                sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, $"(ulong){Generated_DeltaSerializerOption_Name}"));
                 sb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.NamedTypeSymbol);

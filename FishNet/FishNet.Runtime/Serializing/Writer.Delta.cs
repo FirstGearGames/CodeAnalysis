@@ -25,6 +25,15 @@ namespace FishNet.Serializing
             return true;
         }
 
+        [DefaultDeltaWriter]
+        public bool WriteDeltaString(string valueA, string valueB)
+        {
+            if (valueA == valueB) return false;
+
+            WriteString(valueB);
+
+            return true;
+        }
 
         #region Whole values.
         [DefaultDeltaWriter]
@@ -83,7 +92,6 @@ namespace FishNet.Serializing
             return true;
         }
         #endregion
-
 
         #region Precision values.
         private DeltaPrecisionType GetDeltaPrecisionPack(decimal positiveValue)

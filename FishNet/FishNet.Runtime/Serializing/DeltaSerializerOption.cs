@@ -1,7 +1,7 @@
 ﻿namespace FishNet.Serializing
 {
     [System.Flags]
-    public enum DeltaSerializerOption
+    public enum DeltaSerializerOption : ulong
     {
         Unset = 0,
         FullSerialize = 1,
