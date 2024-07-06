@@ -118,6 +118,12 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
             _stringBuilder.AppendLine(indent, $"if ({optionsVariableName}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
             _stringBuilder.AppendLine(indent, "{");
+            /* ulong flags = (ulong)options;
+             * writer.WriteUnsignedPackedWhole(flags); */
+            string flagsVariable = "optionsFlags";
+            _stringBuilder.Append(indent + 1, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, flagsVariable, string.Empty, false));
+            _stringBuilder.AppendLine($" = ({NativeConstants.UInt64_FullName}){Generated_DeltaSerializerOption_Name};");
+            _stringBuilder.AppendLine(indent + 1, CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, flagsVariable));
             _stringBuilder.AppendLine(body);
             _stringBuilder.AppendLine(indent, "}");
 

@@ -7,6 +7,8 @@
 		{
 			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 			{
+				System.UInt64 optionsFlags = (System.UInt64)options;
+				writer.WriteUnsignedPackedWhole(optionsFlags);
 				writer.Write(value1);
 				return true;
 			}
@@ -33,6 +35,8 @@
 		{
 			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 			{
+				System.UInt64 optionsFlags = (System.UInt64)options;
+				writer.WriteUnsignedPackedWhole(optionsFlags);
 				writer.Write(value1);
 				return true;
 			}
