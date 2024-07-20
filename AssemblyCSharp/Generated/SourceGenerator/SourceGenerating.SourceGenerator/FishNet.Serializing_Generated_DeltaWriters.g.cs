@@ -62,5 +62,12 @@
 			return changed;
 		}
 
+		[UnityEngine.RuntimeInitializeOnLoadMethod]
+		public static void InitializeSerializers()
+		{
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingB>.SetWrite(new Func<FishNet.Serializing.Writer, ClientAssembly.MyThingB, ClientAssembly.MyThingB, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(WriteDeltaClientAssembly_MyThingB));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingA>.SetWrite(new Func<FishNet.Serializing.Writer, ClientAssembly.MyThingA, ClientAssembly.MyThingA, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(WriteDeltaClientAssembly_MyThingA));
+		}
+
 	}
 }

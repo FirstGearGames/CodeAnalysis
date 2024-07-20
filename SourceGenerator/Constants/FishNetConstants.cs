@@ -3,7 +3,6 @@
     internal class FishNetConstants
     {
         #region Namespaces and assemblies.
-
         /// <summary>
         /// FishNet.Serializing namespace.
         /// </summary>
@@ -19,16 +18,17 @@
         #endregion
 
         #region Codegenerating special.
+        /// <summary>
+        /// [IncludeSerialization] class.
+        /// </summary>
         public const string IncludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.IncludeSerializationAttribute";
         /// <summary>
         /// [ExcludeSerialization] class.
         /// </summary>
         public const string ExcludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.ExcludeSerializationAttribute";
-
         #endregion
 
         #region RPCs.
-
         /// <summary>
         /// [targetRpc] class.
         /// </summary>
@@ -55,7 +55,6 @@
         /// DeltaSerializerOption enum.
         /// </summary>
         public const string DeltaSerializerOption_FullName = $"{Serializing_Namespace}.{DeltaSerializerOption_Name}";
-
         /// <summary>
         /// DeltaSerializerOption enum.
         /// </summary>
@@ -67,13 +66,27 @@
         /// <summary>
         /// DeltaSerializerOption.FullSerialize.
         /// </summary>
-
         public const string DeltaSerializerOption_FullSerialize_FullName = $"{DeltaSerializerOption_FullName}.FullSerialize";
         /// <summary>
         /// DeltaSerializerOption.RootSerialize.
         /// </summary>
-
         public const string DeltaSerializeOption_RootSerialize_FullName = $"{DeltaSerializerOption_FullName}.RootSerialize";
+        /// <summary>
+        /// GenericDeltaWriter class.
+        /// </summary>
+        public const string GenericDeltaWriter_FullName = $"{Serializing_Namespace}.GenericDeltaWriter";
+        /// <summary>
+        /// GenericDeltaWriter.SetWrite method.
+        /// </summary>
+        public const string GenericDeltaWriter_SetWrite_Name = $"SetWrite";
+        /// <summary>
+        /// GenericDeltaReader class.
+        /// </summary>
+        public const string GenericDeltaReader_FullName = $"{Serializing_Namespace}.GenericDeltaReader";
+        /// <summary>
+        /// GenericDeltaWriter.SetRead method.
+        /// </summary>
+        public const string GenericDeltaReader_SetRead_Name = $"SetRead";
         #endregion
 
 

@@ -22,6 +22,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         private const string Generated_Method_Prefix = "WriteDelta";
         private const string Generated_WriterParameter_Name = "writer";
         public const string Generated_DeltaSerializerOption_Name = "options";
+        private const string InitializeOnLoad_Method_Name = "InitializeSerializers";
 
         public void Initialize(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
         {
@@ -251,6 +252,12 @@ namespace SourceGenerator.CodeBuilding.Serializers
             string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
             sb.AppendLine(clsText);
 
+            //Default indenting for initialize on load method.
+            const int initializeIndent = 2;
+
+            StringBuilder initializeSb = new();
+            initializeSb.Append(CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name, out string initializeFooter));
+
             //Delta writers.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
@@ -259,11 +266,30 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 sb.AppendLine(dsm.Header);
                 sb.AppendLine(dsm.Body);
                 sb.AppendLine(dsm.Footer);
+
+                initializeSb.AppendLine(CreateInitializeFunction(initializeIndent + 1, dsm));
             }
+
+            initializeSb.AppendLine(initializeFooter);
+            sb.Append(initializeSb.ToString());
 
             sb.AppendLine(footer);
 
             context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
+        }
+
+        /// <summary>
+        /// Creates a call to the set method for generic serializers.
+        /// </summary>
+        private string CreateInitializeFunction(int indent, GeneratedDeltaSerializerMethod dsm)
+        {
+            StringBuilder sb = new();
+            //GenericDeltaSerializer<Type>.SetWrite(
+            sb.Append(indent, $"{FishNetConstants.GenericDeltaWriter_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaWriter_SetWrite_Name}(");
+            sb.Append($"{CodeBuilder.CreateFunction(NativeConstants.Boolean_FullName, FishNetConstants.Writer_FullName, dsm.TypeFullName, dsm.TypeFullName, FishNetConstants.DeltaSerializerOption_FullName)}");
+            sb.Append($"({dsm.MethodName}));");
+
+            return sb.ToString();
         }
 
         /// <summary>

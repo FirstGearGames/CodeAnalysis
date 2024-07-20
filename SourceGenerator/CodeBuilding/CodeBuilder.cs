@@ -163,5 +163,35 @@ namespace RoslynLearning.CodeBuilding
             return _stringBuilder.ToString();
         }
 
+
+        public static string CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName, out string footer)
+        {
+            _stringBuilder.Clear();
+            _stringBuilder.AppendLine(indent, $"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
+            _stringBuilder.AppendLine(indent, $"public static void {methodName}()");
+            _stringBuilder.AppendLine(indent,"{");
+
+            string header = _stringBuilder.ToString();
+            
+            _stringBuilder.Clear();
+            _stringBuilder.AppendLine(indent, "}");
+            footer = _stringBuilder.ToString();
+
+            return header;            
+        }
+
+        public static string CreateFunction(string returnType, params string[] types)
+        {
+            //new Func<{ FishNetConstants.Writer_FullName }, { dsm.TypeFullName}, { dsm.TypeFullName}, FishNet.Serializing.DeltaSerializerOption, { NativeConstants.Boolean_FullName}> ({ dsm.MethodName})); ";
+            _stringBuilder.Clear();
+
+            _stringBuilder.Append($"new Func<");
+            foreach (string item in types)
+                _stringBuilder.Append($"{item}, ");
+
+            _stringBuilder.Append($"{returnType}>");
+
+            return _stringBuilder.ToString();
+        }
     }
 }

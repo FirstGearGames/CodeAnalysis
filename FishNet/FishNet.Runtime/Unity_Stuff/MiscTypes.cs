@@ -1,68 +1,76 @@
-﻿namespace FishNet.Runtime.Unity_Stuff;
-
-public struct Color
+﻿namespace UnityEngine
 {
-}
-public struct Color32
-{
+    public class RuntimeInitializeOnLoadMethodAttribute : Attribute { }
 }
 
-public struct Vector2
+namespace FishNet.Runtime.Unity_Stuff
 {
-}
 
-public struct Vector3
-{
-}
+    public struct Color
+    {
+    }
+    public struct Color32
+    {
+    }
 
-public struct Vector4
-{
-}
+    public struct Vector2
+    {
+    }
 
-public struct Vector2Int
-{
-}
-public struct Vector3Int
-{
-}
+    public struct Vector3
+    {
+    }
 
-public struct Vector4Int
-{
-}
+    public struct Vector4
+    {
+    }
 
-public struct Quaternion
-{
-}
+    public struct Vector2Int
+    {
+    }
+    public struct Vector3Int
+    {
+    }
 
-public struct LayerMask
-{
-}
+    public struct Vector4Int
+    {
+    }
 
-public struct Ray
-{
-}
+    public struct Quaternion
+    {
+    }
 
-public struct Ray2D
-{
-}
+    public struct LayerMask
+    {
+    }
 
-public struct Transform
-{
-}
+    public struct Ray
+    {
+    }
 
-public struct GameObject
-{
-}
+    public struct Ray2D
+    {
+    }
 
-public struct Matrix4x4
-{
-    
-}
+    public struct Transform
+    {
+    }
 
-public struct Plane
-{
-}
+    public struct GameObject
+    {
+    }
 
-public struct Rect
-{
+    public struct Matrix4x4
+    {
+
+    }
+
+    public struct Plane
+    {
+    }
+
+    public struct Rect
+    {
+    }
+
 }
