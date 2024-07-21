@@ -1,17 +1,19 @@
 ﻿using System.Text;
 using SourceGenerator.Extensions;
 using SourceGenerating.Constants;
+using SourceGenerator.CodeBuilding;
+using SourceGenerator.CodeBuilding.Serializers;
 
 namespace RoslynLearning.CodeBuilding
 {
-    public static class CodeBuilder
+    internal static class CodeBuilder
     {
         private static StringBuilder _stringBuilder = new();
 
         /// <summary>
         /// Creates a class optionally wrapping it in a namespace.
         /// </summary>
-        public static string CreatePublicStaticClass(string className, out string footer, string namespaceName = "")
+        internal static string CreatePublicStaticClass(string className, out string footer, string namespaceName = "")
         {
             _stringBuilder.Clear();
 
@@ -43,7 +45,7 @@ namespace RoslynLearning.CodeBuilding
         /// Calls WriterPool to return a pooled writer.
         /// </summary>
         /// <param name="writerVariableName">Variable name result of </param>
-        public static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "",
+        internal static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "",
             bool closeCall = true)
         {
             _stringBuilder.Clear();
@@ -59,7 +61,7 @@ namespace RoslynLearning.CodeBuilding
         /// <summary>
         /// Calls Store on a pooled writer.
         /// </summary>
-        public static string CallStorePooledWriter(string writerVariableName, bool closeCall = true)
+        internal static string CallStorePooledWriter(string writerVariableName, bool closeCall = true)
         {
             _stringBuilder.Clear();
             _stringBuilder.Append($"{writerVariableName}.{FishNetConstants.PooledWriter_Store_Name}()");
@@ -73,7 +75,7 @@ namespace RoslynLearning.CodeBuilding
         /// <summary>
         /// Calls a method taking optional arguments.
         /// </summary>
-        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true,
+        internal static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true,
             params string[] variableNames)
         {
             if (callingVariable.Length > 0)
@@ -103,7 +105,7 @@ namespace RoslynLearning.CodeBuilding
         /// <summary>
         /// Creates a multiline if statement conditional.
         /// </summary>
-        public static string CreateMultiLineIf(int indent, string conditionaltext, string line)
+        internal static string CreateMultiLineIf(int indent, string conditionaltext, string line)
         {
             StringBuilder sb = new();
             sb.Append(indent + 1, line);
@@ -113,7 +115,7 @@ namespace RoslynLearning.CodeBuilding
         /// <summary>
         /// Creates a multiline if statement conditional.
         /// </summary>
-        public static string CreateMultiLineIf(int indent, string conditionaltext, StringBuilder lines)
+        internal static string CreateMultiLineIf(int indent, string conditionaltext, StringBuilder lines)
         {
             _stringBuilder.Clear();
             _stringBuilder.AppendLine(indent, $"if ({conditionaltext})");
@@ -124,7 +126,7 @@ namespace RoslynLearning.CodeBuilding
         }
 
 
-        public static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "", bool closeLine = true)
+        internal static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "", bool closeLine = true)
         {
             _stringBuilder.Clear();
             _stringBuilder.Append($"{fullTypeName} {variableName}");
@@ -137,7 +139,7 @@ namespace RoslynLearning.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-        public static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
+        internal static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
 
@@ -150,7 +152,7 @@ namespace RoslynLearning.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-        public static string CallWriteArraySegmentAndSize(string writerName, string otherWriterA, bool closeCall = true)
+        internal static string CallWriteArraySegmentAndSize(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
 
@@ -164,25 +166,17 @@ namespace RoslynLearning.CodeBuilding
         }
 
 
-        public static string CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName, out string footer)
+        internal static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
         {
-            _stringBuilder.Clear();
-            _stringBuilder.AppendLine(indent, $"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
-            _stringBuilder.AppendLine(indent, $"public static void {methodName}()");
-            _stringBuilder.AppendLine(indent,"{");
+            StringBuilder sb = new();
+            sb.AppendLine($"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
+            sb.Append(indent, $"public static void {methodName}()");
 
-            string header = _stringBuilder.ToString();
-            
-            _stringBuilder.Clear();
-            _stringBuilder.AppendLine(indent, "}");
-            footer = _stringBuilder.ToString();
-
-            return header;            
+            return new MethodContent(indent, sb.ToString());
         }
 
-        public static string CreateFunction(string returnType, params string[] types)
+        internal static string CreateFunction(string returnType, params string[] types)
         {
-            //new Func<{ FishNetConstants.Writer_FullName }, { dsm.TypeFullName}, { dsm.TypeFullName}, FishNet.Serializing.DeltaSerializerOption, { NativeConstants.Boolean_FullName}> ({ dsm.MethodName})); ";
             _stringBuilder.Clear();
 
             _stringBuilder.Append($"new Func<");

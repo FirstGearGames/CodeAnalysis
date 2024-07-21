@@ -4,6 +4,7 @@
 	{
 
 		public static ClientAssembly.MyThingB ReadDeltaClientAssembly_MyThingB(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingB value0)
+
 		{
 			ClientAssembly.MyThingB result = new();
 			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();
@@ -21,6 +22,7 @@
 		}
 
 		public static ClientAssembly.MyThingA ReadDeltaClientAssembly_MyThingA(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingA value0)
+
 		{
 			ClientAssembly.MyThingA result = new();
 			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();

@@ -78,28 +78,19 @@ namespace SourceGenerator.CodeBuilding.Serializers
             }
 
             string header = GetMethodHeader(out string methodName);
-            string footer = GetMethodFooter();
-
+            
             //Add to readers.
-            _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, typeFullName, methodName, header, footer, ""), AddSerializerType.Delta);
+            _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, typeFullName, methodName, header, ""), AddSerializerType.Delta);
 
             string GetMethodHeader(out string mName)
             {
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                sb.Indent(2).AppendLine($"public static {typeFullName} {mName}" +
+                sb.AppendLine($"public static {typeFullName} {mName}" +
                                         $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");
-                sb.Indent(2).Append('{');
 
-                return sb.ToString();
-            }
-
-            string GetMethodFooter()
-            {
-                StringBuilder sb = new();
-                sb.AppendLine(2, "}");
                 return sb.ToString();
             }
         }
@@ -109,8 +100,6 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// </summary>
         private void CreateDeltaSerializerBodies(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
         {
-            StringBuilder sb = new();
-
             //Iterate all serializers and if they are generated delta writers then complete them.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetReadDeltaMethods())
             {
@@ -118,7 +107,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
 
-                sb.Clear();
+                StringBuilder sb = new();
 
                 //Make a new instance of the type to return.
                 const string resultVariableName = "result";
@@ -180,7 +169,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 sb.Append(3, $"return {resultVariableName};");
 
-                gsm.Body = sb.ToString();
+                gsm.MethodContent.Body = sb;
             }
         }
 
@@ -198,9 +187,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 
-                sb.AppendLine(dsm.Header);
-                sb.AppendLine(dsm.Body);
-                sb.AppendLine(dsm.Footer);
+                sb.AppendLine(dsm.MethodContent.ToString());
             }
 
             sb.AppendLine(footer);

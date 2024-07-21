@@ -82,10 +82,9 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
             Debugg.Log("- Creating header and footer.");
             string header = GetMethodHeader(out string methodName);
-            string footer = GetMethodFooter();
             //Add to writers.
 
-            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, typeFullName, methodName, header, footer, ""), AddSerializerType.Delta);
+            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, typeFullName, methodName, header, ""), AddSerializerType.Delta);
             Debugg.Log($"- Added for type {typeFullName}.");
 
             string GetMethodHeader(out string mName)
@@ -93,19 +92,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                sb.Indent(2).AppendLine($"public static bool {mName}" +
+                sb.Append($"public static bool {mName}" +
                                         $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" +
                                         $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
-                sb.Indent(2).Append('{');
 
-                return sb.ToString();
-            }
-
-            string GetMethodFooter()
-            {
-                StringBuilder sb = new();
-                sb.AppendLine(2, "}");
                 return sb.ToString();
             }
         }
@@ -136,8 +127,6 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// </summary>
         private void CreateDeltaSerializerBodies(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
         {
-            StringBuilder sb = new();
-
             //Iterate all serializers and if they are generated delta writers then complete them.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
@@ -145,7 +134,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
 
-                sb.Clear();
+                StringBuilder sb = new();
 
                 /* If (options.FastContains(DeltaSerializerOption.FullSerialize))
                  * {
@@ -238,7 +227,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                  * the flags written will be read, even if that flag is 0. */
                 sb.Append(3, $"return {changedVariable};");
 
-                gsm.Body = sb.ToString();
+                gsm.MethodContent.Body = sb;
             }
         }
 
@@ -255,24 +244,19 @@ namespace SourceGenerator.CodeBuilding.Serializers
             //Default indenting for initialize on load method.
             const int initializeIndent = 2;
 
-            StringBuilder initializeSb = new();
-            initializeSb.Append(CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name, out string initializeFooter));
+            MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             //Delta writers.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 
-                sb.AppendLine(dsm.Header);
-                sb.AppendLine(dsm.Body);
-                sb.AppendLine(dsm.Footer);
-
-                initializeSb.AppendLine(CreateInitializeFunction(initializeIndent + 1, dsm));
+                sb.AppendLine(dsm.MethodContent.ToString());
+                
+                initializeMethod.AppendBodyLine(0, CreateInitializeFunction(initializeIndent, dsm));
             }
 
-            initializeSb.AppendLine(initializeFooter);
-            sb.Append(initializeSb.ToString());
-
+            sb.Append(initializeMethod.ToString());
             sb.AppendLine(footer);
 
             context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
