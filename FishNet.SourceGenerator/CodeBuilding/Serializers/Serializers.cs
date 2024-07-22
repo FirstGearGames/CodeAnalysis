@@ -260,8 +260,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             //Not a supported type. Must be a user defined struct or class.
             if (namedTypeSymbol == null || !namedTypeSymbol.IsUserDefinedClassOrStruct())
-            {
-                Debugg.Log($"   Cannot create serializer. Symbol null {(namedTypeSymbol == null)}. User defined {namedTypeSymbol?.IsUserDefinedClassOrStruct()}");
+            {                
+                Debugg.Log($"   Cannot create serializer. Symbol null {(namedTypeSymbol == null)}. User defined {namedTypeSymbol != null}");
                 return false;
             }
             //Too many parameters to process as a delta writer due to not enough flags.
