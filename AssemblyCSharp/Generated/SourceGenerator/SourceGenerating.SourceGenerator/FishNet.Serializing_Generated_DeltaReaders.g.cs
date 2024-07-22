@@ -3,9 +3,9 @@
 	public static class Generated_DeltaReaders
 	{
 
-		public static ClientAssembly.MyThingB ReadDeltaClientAssembly_MyThingB(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingB value0)
+public static ClientAssembly.MyThingB ReadDeltaClientAssembly_MyThingB(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingB value0)
 
-		{
+			{
 			ClientAssembly.MyThingB result = new();
 			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();
 
@@ -19,11 +19,11 @@
 				result.B = value0.B;
 
 			return result;
-		}
+			}
 
-		public static ClientAssembly.MyThingA ReadDeltaClientAssembly_MyThingA(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingA value0)
+public static ClientAssembly.MyThingA ReadDeltaClientAssembly_MyThingA(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingA value0)
 
-		{
+			{
 			ClientAssembly.MyThingA result = new();
 			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();
 
@@ -42,7 +42,7 @@
 				result.C = value0.C;
 
 			return result;
-		}
+			}
 
 	}
 }

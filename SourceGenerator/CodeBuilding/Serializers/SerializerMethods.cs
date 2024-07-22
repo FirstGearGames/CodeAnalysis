@@ -15,75 +15,54 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
     internal class MethodContent
     {
-        public string Signature;
-        public StringBuilder Body = new();
-        public int Indent;
+        public StringBuilder Signature;
+        public StringBuilder Body;
 
-        public MethodContent(int indent = 0)
+        public MethodContent()
         {
-            Indent = indent;
-        }
-        public MethodContent(int indent, string signature)
-        {
-            Indent = indent;
-            Signature = signature;
+            Signature = new();
+            Body = new();
         }
 
-        public MethodContent(int indent, string signature, string body)
+        public MethodContent(StringBuilder signature)
         {
-            Indent = indent;
             Signature = signature;
+            Body = new();
+        }
+        public MethodContent(string signature)
+        {
+            Signature = new(signature);
+            Body = new();
+        }
+
+        public MethodContent(StringBuilder signature, StringBuilder body)
+        {
+            Signature = signature;
+            Body = body;
+        }
+
+        public MethodContent(string signature, string body)
+        {
+            Signature = new(signature);
             Body = new(body);
         }
 
-        public void AppendBody(int extraIndent, string value)
-        {
-            if (Body.Length > 0)
-                Body.Append(extraIndent, value);
-            else
-                Body.Append(Indent + 1 + extraIndent, value);
-        }
-
-        public void AppendBodyLine(int extraIndent, string value)
-        {
-            if (Body.Length > 0)
-                Body.AppendLine(extraIndent, value);
-            else
-                Body.AppendLine(Indent + 1 + extraIndent, value);
-        }
-
-        public override string ToString()
-        {
-            return ToString(Body);
-        }
-
-        public string ToString(StringBuilder body)
+        public string ToString(int bracketIndent)
         {
             StringBuilder sb = new();
-            sb.Append(ToStringWithoutFooter(body));
-            sb.AppendLine(Indent, "}");
+            sb.Append(ToStringWithoutFooter(bracketIndent));
+            sb.AppendLine(bracketIndent, "}");
             return sb.ToString();
         }
-        public string ToString(string body)
-        {
-            StringBuilder bodySb = new();
-            bodySb.Append(Indent + 1, body);
-            return ToString(bodySb);
-        }
-
-        public string ToStringWithoutFooter()
-        {
-            return this.ToStringWithoutFooter(Body);
-        }
-
-        public string ToStringWithoutFooter(StringBuilder body)
+        public string ToStringWithoutFooter(int bracketIndent)
         {
             StringBuilder sb = new();
-            sb.AppendLine(Indent, Signature);
-            sb.AppendLine(Indent, "{");
-            sb.AppendLine(body.ToString());
+            sb.AppendLine(Signature.ToString());
+            sb.AppendLine(bracketIndent, "{");
+            sb.AppendLine(Body.ToString());
             return sb.ToString();
         }
+
     }
 
     internal class SerializerMethod
@@ -114,7 +93,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             TypeFullName = typeFullName;
             MethodName = methodName;
-            MethodContent = new(indent, methodSignature, methodBody);
+            MethodContent = new(methodSignature, methodBody);
         }
 
         public SerializerMethod(string typeFullName, string methodName, MethodContent methodContent)

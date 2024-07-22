@@ -187,7 +187,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 
-                sb.AppendLine(dsm.MethodContent.ToString());
+                sb.AppendLine(dsm.MethodContent.ToString(3));
             }
 
             sb.AppendLine(footer);

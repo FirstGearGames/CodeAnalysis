@@ -92,7 +92,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                sb.Append($"public static bool {mName}" +
+                sb.Append(3, $"public static bool {mName}" +
                                         $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" +
                                         $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
@@ -134,6 +134,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
 
+                const int bodyIndent = 4;
                 StringBuilder sb = new();
 
                 /* If (options.FastContains(DeltaSerializerOption.FullSerialize))
@@ -146,9 +147,9 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 {
                     SerializerMethod fullSerializerMethod = GetFullWriter(item.Key, true, out _);
                     StringBuilder ifBody = new();
-                    ifBody.AppendLine(4, $"{Generated_WriterParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
-                    ifBody.Append(4, "return true;");
-                    sb.AppendLine(CreateFullSerializeCheck(3, Generated_DeltaSerializerOption_Name, ifBody.ToString()));
+                    ifBody.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
+                    ifBody.Append(bodyIndent + 1, "return true;");
+                    sb.AppendLine(CreateFullSerializeCheck(bodyIndent, Generated_DeltaSerializerOption_Name, ifBody.ToString()));
                     //sb.AppendLine(CodeBuilder.CreateMultiLineIf(3, $"{Generated_WriteFullParameter_Name}", ifBody));
                 }
 
@@ -157,8 +158,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //totalFlags and pooledWriter local variables.
                 string totalFlagsVariable = "totalFlags";
-                sb.AppendLine(3, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, $"(ulong){Generated_DeltaSerializerOption_Name}"));
-                sb.AppendLine(3, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
+                sb.AppendLine(bodyIndent, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, $"(ulong){Generated_DeltaSerializerOption_Name}"));
+                sb.AppendLine(bodyIndent, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.NamedTypeSymbol);
                 //Call write for all members.
@@ -173,8 +174,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     if (!dsm.IsValid())
                     {
                         SerializerMethod sm = GetFullWriter(typeFullName, true, out bool _);
-                        sb.AppendLine(3, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
-                        sb.AppendLine(3, CodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
+                        sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
+                        sb.AppendLine(bodyIndent, CodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
                         AppendIncreaseTotalFlags(3);
                     }
                     //Delta writer found.
@@ -187,7 +188,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                         string writeDeltaText = CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
                                 $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
                                 $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
-                        sb.AppendLine(3, $"if ({writeDeltaText})");
+                        sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
                         AppendIncreaseTotalFlags(4);
                     }
                     sb.AppendLine();
@@ -203,29 +204,28 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 string changedVariable = "changed";
                 string rootSerializerVariable = "rootSerializer";
                 //System.Boolean rootSerializer = options.FastContains(DeltaSerializerOption.RootSerialize);
-                sb.Append(3, CodeBuilder.CreateLocalVariable(NativeConstants.Boolean_FullName, rootSerializerVariable, string.Empty, false));
+                sb.Append(bodyIndent, CodeBuilder.CreateLocalVariable(NativeConstants.Boolean_FullName, rootSerializerVariable, string.Empty, false));
                 sb.AppendLine($" = {Generated_DeltaSerializerOption_Name}.FastContains({FishNetConstants.DeltaSerializeOption_RootSerialize_FullName});");
                 //System.Boolean changed = (totalFlags != 0) || rootSerializer;
-                sb.AppendLine(3, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0);");// || {Generated_RootCallParameter_Name};");
+                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0);");// || {Generated_RootCallParameter_Name};");
 
                 /* if (changed)
                  {
                     writer.WritePackedWhole(totalFlags); */
-                sb.AppendLine(3, $"if ({changedVariable})");
-                sb.AppendLine(3, "{");
-                sb.AppendLine(4,
+                sb.AppendLine(bodyIndent, $"if ({changedVariable})");
+                sb.AppendLine(bodyIndent, "{");
+                sb.AppendLine(bodyIndent + 1,
                     CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name,
                         true, totalFlagsVariable));
                 /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
                  } */
-                sb.AppendLine(4,
-                    CodeBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariable));
-                sb.AppendLine(3, "}");
+                sb.AppendLine(bodyIndent + 1, CodeBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariable));
+                sb.AppendLine(bodyIndent, "}");
                 //store tmpWriter.
-                sb.AppendLine(3, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + NativeConstants.LineFeed);
+                sb.AppendLine(bodyIndent, CodeBuilder.CallStorePooledWriter(tmpWriterVariable) + NativeConstants.LineFeed);
                 /* Struct/class writers must always return true. This is so if they are being encapsulated
                  * the flags written will be read, even if that flag is 0. */
-                sb.Append(3, $"return {changedVariable};");
+                sb.Append(bodyIndent, $"return {changedVariable};");
 
                 gsm.MethodContent.Body = sb;
             }
@@ -251,12 +251,12 @@ namespace SourceGenerator.CodeBuilding.Serializers
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 
-                sb.AppendLine(dsm.MethodContent.ToString());
-                
-                initializeMethod.AppendBodyLine(0, CreateInitializeFunction(initializeIndent, dsm));
+                sb.AppendLine(dsm.MethodContent.ToString(3));
+
+                initializeMethod.Body.AppendLine(initializeIndent + 1, CreateInitializeFunction(dsm));
             }
 
-            sb.Append(initializeMethod.ToString());
+            sb.Append(initializeMethod.ToString(initializeIndent));
             sb.AppendLine(footer);
 
             context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
@@ -265,11 +265,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// <summary>
         /// Creates a call to the set method for generic serializers.
         /// </summary>
-        private string CreateInitializeFunction(int indent, GeneratedDeltaSerializerMethod dsm)
+        private string CreateInitializeFunction(GeneratedDeltaSerializerMethod dsm)
         {
             StringBuilder sb = new();
             //GenericDeltaSerializer<Type>.SetWrite(
-            sb.Append(indent, $"{FishNetConstants.GenericDeltaWriter_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaWriter_SetWrite_Name}(");
+            sb.Append($"{FishNetConstants.GenericDeltaWriter_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaWriter_SetWrite_Name}(");
             sb.Append($"{CodeBuilder.CreateFunction(NativeConstants.Boolean_FullName, FishNetConstants.Writer_FullName, dsm.TypeFullName, dsm.TypeFullName, FishNetConstants.DeltaSerializerOption_FullName)}");
             sb.Append($"({dsm.MethodName}));");
 

@@ -169,10 +169,10 @@ namespace RoslynLearning.CodeBuilding
         internal static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
         {
             StringBuilder sb = new();
-            sb.AppendLine($"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
+            sb.AppendLine(indent, $"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
             sb.Append(indent, $"public static void {methodName}()");
 
-            return new MethodContent(indent, sb.ToString());
+            return new MethodContent(sb);
         }
 
         internal static string CreateFunction(string returnType, params string[] types)
