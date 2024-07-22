@@ -129,7 +129,7 @@ namespace FishNet.Object.Synchronizing
 
 }
 
-namespace FishNet.Serializing
+namespace FishNet.CodeGenerating
 {
 
     /// <summary>

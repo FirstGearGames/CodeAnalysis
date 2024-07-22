@@ -36,11 +36,17 @@ namespace ClientAssembly
 		public MyThingB C;
 	}
 
-	public class MyThingB
+    [IncludeSerialization]
+    public class MyThingB
 	{
 		public string B;
 	}
 
+    [IncludeSerialization]
+    public struct MyThingC
+	{
+        public string C;
+    }
 	public class Player : NetworkBehaviour
 	{
   //      [IncludeSerialization]

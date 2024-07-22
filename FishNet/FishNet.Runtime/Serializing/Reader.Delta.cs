@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using FishNet.CodeGenerating;
 using FishNet.Managing;
 
 namespace FishNet.Serializing

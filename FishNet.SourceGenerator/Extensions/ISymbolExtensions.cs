@@ -73,7 +73,15 @@ namespace FishNet.CodeAnalysis.Extensions
             foreach (AttributeData item in symbol.GetAttributes())
             {
                 INamedTypeSymbol? typeSymbol = item.AttributeClass;
-                if (typeSymbol == null) continue;
+                if (typeSymbol == null)
+                {
+                   // Debugg.Log($"---- Not attributeClass");
+                    continue;
+                }
+                else
+                {
+                  //  Debugg.Log($"!___ Attribute name is {typeSymbol.GetSymbolFullName()}");
+                }
 
                 if (typeSymbol.GetSymbolFullName() == attributeFullName)
                 {

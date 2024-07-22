@@ -49,49 +49,47 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// <summary>
         /// Creates an empty delta serializer method for a type.
         /// </summary>
-        private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
+        private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Debugg.Log($"Trying to create writer for {typeFullName}.");
+            Debugg.Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta).IsValid())
             {
-                Debugg.Log($"Already exists.");
+                Debugg.Log($"{recursiveCount.ToIndent()}   Serializer already exists.");
                 return;
             }
 
-            Debugg.Log("Meta name is " + serializableType.FullMetadataName);
+            //Debugg.Log("Meta name is " + serializableType.FullMetadataName);
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
             {
-                Debugg.Log($"Named symbol is null.");
+                Debugg.Log($"{recursiveCount.ToIndent()}   Named symbol is null.");
                 return;
             }
             if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol, true))
-            {
-                Debugg.Log($"Cannot create serializer.");
                 return;
-            }
 
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.GetSymbolFullMetaName()));
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.GetSymbolFullMetaName()), recursiveCount + 1);
             }
 
-            Debugg.Log("- Creating header and footer.");
+            Debugg.Log($"{recursiveCount.ToIndent()}    Creating header and footer.");
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
 
             _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, typeFullName, methodName, header, ""), AddSerializerType.Delta);
-            Debugg.Log($"- Added for type {typeFullName}.");
+            Debugg.Log($"{recursiveCount.ToIndent()}Added for type {typeFullName}.");
 
             string GetMethodHeader(out string mName)
             {
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
+                inText = "";
                 sb.Append(2, $"public static bool {mName}" +
                                         $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" +
@@ -183,6 +181,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     {
                         //If a user defined struct then use the in keyword.
                         string inText = typeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
+                        inText = "";
                         /* if (writer.WriteDeltaXYZ(p0, p1))
                             totalFlags += x */
                         string writeDeltaText = CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
@@ -244,6 +243,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
             const int initializeIndent = 2;
             MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
+            int addedSerializers = 0;
+
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
@@ -254,12 +255,17 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 if (initializeMethod.Body.Length > 0)
                     initializeMethod.Body.AppendLine();
                 initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
+
+                addedSerializers++;
             }
 
             sb.Append(initializeMethod.ToString(initializeIndent));
             sb.AppendLine(footer);
 
-            context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
+            string fileName = $"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs";
+            context.AddSource($"{fileName}", sb.ToString());
+
+            Debugg.Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
         }
 
         /// <summary>

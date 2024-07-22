@@ -47,35 +47,25 @@ namespace SourceGenerator.CodeBuilding.Serializers
         /// <summary>
         /// Creates an empty delta serializer method for a type.
         /// </summary>
-        private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
+        private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Debugg.Log($"Trying to create reader for {typeFullName}.");
+            Debugg.Log($"{recursiveCount.ToIndent()}Trying to create reader for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetReadMethod(typeFullName, GetSerializerType.Delta).IsValid())
-            {
-                Debugg.Log($"Read method is not valid.");
                 return;
-            }
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
-            {
-                Debugg.Log($"namedType not resolved.");
                 return;
-            }
             if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol, true))
-            {
-                Debugg.Log($"Cannot create serializer.");
                 return;
-            }
 
-            Debugg.Log($"continuing...");
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.GetSymbolFullMetaName()));
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.GetSymbolFullMetaName()), recursiveCount + 1);
             }
 
             string header = GetMethodHeader(out string methodName);
@@ -88,6 +78,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
+                inText = "";
                 sb.Append(2, $"public static {typeFullName} {mName}" +
                                         $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");

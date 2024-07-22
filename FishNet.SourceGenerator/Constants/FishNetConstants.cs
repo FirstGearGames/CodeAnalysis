@@ -45,7 +45,6 @@
         public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";
         #endregion
 
-
         #region DeltaSerializing.
         /// <summary>
         /// Maximum flag value within DeltaSerializerOption.
@@ -151,12 +150,12 @@
         /// <summary>
         /// [DefaultWriter] class.
         /// </summary>
-        public const string DefaultWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultWriterAttribute";
+        public const string DefaultWriterAttribute_FullName = $"{CodeGenerating_Namespace}.DefaultWriterAttribute";
 
         /// <summary>
         /// [DefaultDeltaWriter] class.
         /// </summary>
-        public const string DefaultDeltaWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaWriterAttribute";
+        public const string DefaultDeltaWriterAttribute_FullName = $"{CodeGenerating_Namespace}.DefaultDeltaWriterAttribute";
         /// <summary>
         /// Prefix to use for all generated writers.
         /// </summary>
@@ -179,11 +178,11 @@
         /// <summary>
         /// [DefaultWriter] class.
         /// </summary>
-        public const string DefaultReaderAttribute_FullName = $"{Serializing_Namespace}.DefaultReaderAttribute";
+        public const string DefaultReaderAttribute_FullName = $"{CodeGenerating_Namespace}.DefaultReaderAttribute";
         /// <summary>
         /// [DefaultDeltaWriter] class.
         /// </summary>
-        public const string DefaultDeltaReaderAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaReaderAttribute";
+        public const string DefaultDeltaReaderAttribute_FullName = $"{CodeGenerating_Namespace}.DefaultDeltaReaderAttribute";
         /// <summary>
         /// Prefix to use for all generated readers.
         /// </summary>

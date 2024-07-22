@@ -21,16 +21,25 @@ namespace SourceGenerating.SyntaxReceivers
 
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)
                 FindClassSerializables(context, classDeclaration);
+            else if (syntaxNode is StructDeclarationSyntax structDeclaration)
+                FindStructSerializables(context, structDeclaration);
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
                 FindRpcSerializables(context, methodDeclaration);
         }
 
-        private void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
+
+        private void FindStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
+            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(structDeclaration);
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
-            if (!namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName)) return;
+            if (!namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName))
+            {
+               // Debugg.Log($"       No include serialization for {namedTypeSymbol.GetSymbolFullName()}");
+                return;
+            }
+
+            Debugg.Log($"Found includeSerialization for {namedTypeSymbol.GetSymbolFullName()}");
 
             /* FullNames added this iteration.
              * This is used to prevent endless loops. */
@@ -52,8 +61,49 @@ namespace SourceGenerating.SyntaxReceivers
 
                 if (!addedFullNames.Add(fullName)) return false;
 
-                Debugg.Log(theSymbol.GetSymbolFullName());
-                SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName()));
+                if (SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName())))
+                    Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
+
+                return true;
+            }
+        }
+
+
+        private void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
+        {
+            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
+
+            if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
+            if (!namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName))
+            {
+               // Debugg.Log($"       No include serialization for {namedTypeSymbol.GetSymbolFullName()}");
+                return;
+            }
+
+            Debugg.Log($"Found includeSerialization for {namedTypeSymbol.GetSymbolFullName()}");
+
+            /* FullNames added this iteration.
+             * This is used to prevent endless loops. */
+            HashSet<string> addedFullNames = new();
+
+            AddSerializableType(namedTypeSymbol);
+            while (namedTypeSymbol.BaseType is INamedTypeSymbol nestedNamedTypeSymbol)
+                /* The method indicated it could not add some reason.
+                 * Maybe the type had an attribute to not serialize or
+                 * its the previously checked type. */
+                if (!AddSerializableType(nestedNamedTypeSymbol)) break;
+
+            bool AddSerializableType(INamedTypeSymbol theSymbol)
+            {
+                //Has exclude serialization attribute.
+                if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+
+                string fullName = theSymbol.GetTypeFullName();
+
+                if (!addedFullNames.Add(fullName)) return false;
+
+                if (SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName())))
+                    Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
 
                 return true;
             }
@@ -67,7 +117,6 @@ namespace SourceGenerating.SyntaxReceivers
 
             List<IParameterSymbol> parameters = methodSymbol.Parameters.ToList();
             int parametersCount = parameters.Count;
-            Debugg.Log("Parameter count is  " + parametersCount);
 
             foreach (RpcAttributeData item in results)
             {

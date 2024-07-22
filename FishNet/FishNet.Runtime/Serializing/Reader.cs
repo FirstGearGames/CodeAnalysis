@@ -11,6 +11,7 @@ using FishNet.Object;
 using FishNet.Transporting;
 using System.Runtime.CompilerServices;
 using FishNet.Runtime.Unity_Stuff;
+using FishNet.CodeGenerating;
 
 
 namespace FishNet.Serializing

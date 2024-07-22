@@ -19,7 +19,7 @@ namespace SourceGenerating
         public void Execute(GeneratorExecutionContext context)
         {
             if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
-            Debugg.Log($"- Execute Start.");
+            Debugg.Log($"- Execute Start for {context.Compilation.AssemblyName}.");
 
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
             if (fishnetRuntimeAssemblySymbol == null)
@@ -39,7 +39,7 @@ namespace SourceGenerating
             DeltaReader_Builder deltaReaderBuilder = new();
             deltaReaderBuilder.Initialize(context, rootSyntaxReceiver, serializers);
             
-            Debugg.Log($"- Execute End.");
+            Debugg.Log($"- Execute End for {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
         }

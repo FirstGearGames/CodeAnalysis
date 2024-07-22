@@ -8,7 +8,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FishNet\FishNet.Runtime\FishNet.Runtime.csproj" />
-		<ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\FishNet.SourceGenerator\FishNet.SourceGenerator.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 	<PropertyGroup>

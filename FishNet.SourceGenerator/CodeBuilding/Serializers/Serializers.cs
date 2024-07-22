@@ -98,6 +98,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
             {
                 Dictionary<string, SerializerMethod> dict = (writer) ? _writeDeltaMethods : _readDeltaMethods;
                 dict.TryGetValue(typeFullName, out result);
+
+                if (typeFullName == "System.Boolean" && !dict.TryGetValue(typeFullName, out _))
+                {
+                    Debugg.Log(" ");
+                    Debugg.Log($"Missing for {typeFullName}. All serializers are...");
+                    foreach (string item in dict.Keys)
+                        Debugg.Log($"   {item}");
+                }
+
             }
             else if (getType == GetSerializerType.FavorFull || getType == GetSerializerType.FavorDelta)
             {
@@ -158,6 +167,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol)) return;
             if (nameTypeSymbol == null) return;
 
+          //  Debugg.Log($"<< Symbols count is {nameTypeSymbol.GetMembers().OfType<IMethodSymbol>().Count()}");
             foreach (IMethodSymbol methodSymbol in nameTypeSymbol.GetMembers().OfType<IMethodSymbol>())
             {
                 AddSerializerType addType = AddSerializerType.Unset;
@@ -168,6 +178,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 else if (methodSymbol.HasAttribute(FishNetConstants.DefaultDeltaWriterAttribute_FullName, out _))
                     addType = AddSerializerType.Delta;
 
+             //   Debugg.Log($"<<<< Serializer type is {addType} for {methodSymbol.Name}");
                 if (addType != AddSerializerType.Unset)
                 {
                     string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
@@ -183,8 +194,6 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Reader_FullName, out INamedTypeSymbol? nameTypeSymbol)) return;
             if (nameTypeSymbol == null) return;
-
-            Debugg.Log("Runnnnninggngng");
 
             foreach (IMethodSymbol methodSymbol in nameTypeSymbol.GetMembers().OfType<IMethodSymbol>())
             {
@@ -251,13 +260,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             //Not a supported type. Must be a user defined struct or class.
             if (namedTypeSymbol == null || !namedTypeSymbol.IsUserDefinedClassOrStruct())
+            {
+                Debugg.Log($"   Cannot create serializer. Symbol null {(namedTypeSymbol == null)}. User defined {namedTypeSymbol.IsUserDefinedClassOrStruct()}");
                 return false;
-
+            }
             //Too many parameters to process as a delta writer due to not enough flags.
             if (namedTypeSymbol.MemberNames.Count() >= 63)
             {
                 if (throwCritical)
-                    throw new Exception($"Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of 63 field members. Reduce the amount of field members or encapsulate members.");
+                    throw new Exception($"  Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of 63 field members. Reduce the amount of field members or encapsulate members.");
                 return false;
             }
 

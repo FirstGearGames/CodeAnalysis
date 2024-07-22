@@ -10,6 +10,13 @@ namespace RoslynLearning.CodeBuilding
     {
         private static StringBuilder _stringBuilder = new();
 
+        internal static string ToIndent(this int count)
+        {
+            _stringBuilder.Clear();
+            _stringBuilder.Indent(count);
+            return _stringBuilder.ToString();
+        }
+
         /// <summary>
         /// Creates a class optionally wrapping it in a namespace.
         /// </summary>
