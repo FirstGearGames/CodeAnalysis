@@ -1,15 +1,15 @@
 ﻿using Microsoft.CodeAnalysis;
-using RoslynLearning.Helpers;
-using SourceGenerating.SyntaxReceivers;
 using System.Collections.Immutable;
 using System.Linq;
-using SourceGenerating.Constants;
-using SourceGenerator.CodeBuilding.Serializers;
+using FishNet.SourceGenerating.CodeBuilding;
+using FishNet.SourceGenerating.SyntaxReceivers;
+using FishNet.SourceGenerating.Constants;
+using FishNet.SourceGenerating.Helpers;
 
-namespace SourceGenerating
+namespace FishNet.SourceGenerating
 {
     [Generator]
-    public sealed class SourceGenerator : ISourceGenerator
+    public sealed class MainGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -18,6 +18,8 @@ namespace SourceGenerating
 
         public void Execute(GeneratorExecutionContext context)
         {
+            if (!context.Compilation.AssemblyName.Contains("FishNet.Test")) return;
+
             if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
             Debugg.Log($"- Execute Start for {context.Compilation.AssemblyName}.");
 

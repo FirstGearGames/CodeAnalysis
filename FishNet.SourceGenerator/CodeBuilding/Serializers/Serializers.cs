@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8604 // Possible null reference argument.
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using FishNet.CodeAnalysis.Extensions;
-using RoslynLearning.Helpers;
-using SourceGenerating.Constants;
-using SourceGenerator.Extensions;
-using System;
+using FishNet.SourceGenerating.Helpers;
+using FishNet.SourceGenerating.Constants;
+using SourceGenerating.Extensions;
 
-namespace SourceGenerator.CodeBuilding.Serializers
+namespace FishNet.SourceGenerating.CodeBuilding
 {
     internal enum AddSerializerType
     {
@@ -55,10 +54,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             if (dict.ContainsKey(sm.TypeFullName))
                 Debugg.Log($"{addType} writer has already exists for {sm.TypeFullName}.");
             else
-            {
                 dict[sm.TypeFullName] = sm;
-                Debugg.Log($"-- Added {sm.TypeFullName} to writer {addType}. New Count is {dict.Count}.");
-            }
         }
 
         /// <summary>
@@ -167,7 +163,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             if (!runtimeAssemblySymbol.GetINamedTypeSymbol(FishNetConstants.Writer_FullName, out INamedTypeSymbol? nameTypeSymbol)) return;
             if (nameTypeSymbol == null) return;
 
-          //  Debugg.Log($"<< Symbols count is {nameTypeSymbol.GetMembers().OfType<IMethodSymbol>().Count()}");
+            //  Debugg.Log($"<< Symbols count is {nameTypeSymbol.GetMembers().OfType<IMethodSymbol>().Count()}");
             foreach (IMethodSymbol methodSymbol in nameTypeSymbol.GetMembers().OfType<IMethodSymbol>())
             {
                 AddSerializerType addType = AddSerializerType.Unset;
@@ -178,7 +174,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 else if (methodSymbol.HasAttribute(FishNetConstants.DefaultDeltaWriterAttribute_FullName, out _))
                     addType = AddSerializerType.Delta;
 
-             //   Debugg.Log($"<<<< Serializer type is {addType} for {methodSymbol.Name}");
+                //   Debugg.Log($"<<<< Serializer type is {addType} for {methodSymbol.Name}");
                 if (addType != AddSerializerType.Unset)
                 {
                     string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
@@ -220,18 +216,6 @@ namespace SourceGenerator.CodeBuilding.Serializers
         public string GetValueParameterName(int parameterIndex) => $"{Generated_ValueParameter_Prefix}{parameterIndex}";
 
         /// <summary>
-        /// Returns if a serializer can be generated for a symbol.
-        /// </summary>
-        public bool CanGenerateFieldSerializer(ISymbol symbol, out IFieldSymbol? fieldSymbol)
-        {
-            fieldSymbol = symbol as IFieldSymbol;
-            if (fieldSymbol == null) return false;
-            if (fieldSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
-
-            return true;
-        }
-
-        /// <summary>
         /// Gets fields which can be serialized over the network.
         /// </summary>
         /// <param name="namedTypeSymbol"></param>
@@ -244,31 +228,71 @@ namespace SourceGenerator.CodeBuilding.Serializers
             //Call write for all members.
             foreach (ISymbol symbol in namedTypeSymbol.GetMembers())
             {
-                if (CanGenerateFieldSerializer(symbol, out IFieldSymbol? fieldSymbol))
-#pragma warning disable CS8604 // Possible null reference argument.
-                    results.Add(fieldSymbol);
-#pragma warning restore CS8604 // Possible null reference argument.
+                IFieldSymbol? fieldSymbol = symbol as IFieldSymbol;
+                if (fieldSymbol == null) continue;
+
+                if (!CanSerializeFieldSymbol(fieldSymbol)) continue;
+
+                Debugg.Log("Added name " + fieldSymbol.OriginalDefinition.Name);
+                results.Add(fieldSymbol);
             }
 
             return results;
         }
 
         /// <summary>
+        /// Returns if a serializer can be generated for a symbol.
+        /// </summary>
+        public bool CanSerializeNamedTypeSymbol(INamedTypeSymbol? symbol)
+        {
+            if (symbol == null) return false;
+
+            if (symbol.IsReadOnly || symbol.IsAbstract || symbol.IsSealed
+                || symbol.IsExtern || symbol.DeclaredAccessibility != Accessibility.Public) return false;
+
+            if (symbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if a symbol can have a serializer generated for it.
+        /// </summary>
+        private bool CanSerializeFieldSymbol(IFieldSymbol? symbol)
+        {
+            if (symbol == null) return false;
+
+            if (symbol.IsReadOnly || symbol.IsAbstract || symbol.IsSealed || symbol.IsConst
+                || symbol.IsExtern || symbol.DeclaredAccessibility != Accessibility.Public) return false;
+
+            return true;
+        }
+
+        /// <summary>
         /// Returns if a type qualifies for a delta serializer.
         /// </summary>
-        public bool CanCreateDeltaSerializer(INamedTypeSymbol? namedTypeSymbol, bool throwCritical)
+        public bool CanCreateDeltaSerializer(INamedTypeSymbol? namedTypeSymbol)
         {
-            //Not a supported type. Must be a user defined struct or class.
-            if (namedTypeSymbol == null || !namedTypeSymbol.IsUserDefinedClassOrStruct())
-            {                
-                Debugg.Log($"   Cannot create serializer. Symbol null {(namedTypeSymbol == null)}. User defined {namedTypeSymbol != null}");
+            if (namedTypeSymbol == null)
+            {
+                Debugg.Log($"   Type symbol is null.");
                 return false;
             }
-            //Too many parameters to process as a delta writer due to not enough flags.
-            if (namedTypeSymbol.MemberNames.Count() >= 63)
+
+
+            //Not a supported type. Must be a user defined struct or class.
+            if (!namedTypeSymbol.IsUserDefinedClassOrStruct())
             {
-                if (throwCritical)
-                    throw new Exception($"  Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of 63 field members. Reduce the amount of field members or encapsulate members.");
+                Debugg.Log($"   Not user defined.");
+                return false;
+            }
+
+            int memberCount = (namedTypeSymbol.MemberNames != null) ? namedTypeSymbol.MemberNames.Count() : 0;
+            //Too many parameters to process as a delta writer due to not enough flags.
+            const int maxMemberCount = 62;
+            if (memberCount >= maxMemberCount)
+            {
+                Debugg.Log($"  Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of {maxMemberCount} field members. Reduce the amount of field members or encapsulate members.");
                 return false;
             }
 

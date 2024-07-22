@@ -1,9 +1,9 @@
-﻿namespace SourceGenerator.Extensions
+﻿namespace SourceGenerating.Extensions
 {
     internal static class StringExtensions
     {
         public static string RemovePeriods(this string value, string newValue = "") => value.Replace(".", newValue);
-         
+
         public static string RemoveGlobalAlias(this string value)
         {
             if (value.StartsWith("global::")) value = value.Substring(8);

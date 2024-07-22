@@ -1,8 +1,7 @@
-﻿using FishNet.CodeAnalysis.Extensions;
-using Microsoft.CodeAnalysis;
-using RoslynLearning.Helpers;
+﻿using Microsoft.CodeAnalysis;
+using FishNet.SourceGenerating.Helpers;
 
-namespace SourceGenerator.Extensions
+namespace SourceGenerating.Extensions
 {
     public static class IAssemblySymbolExtensions
     {

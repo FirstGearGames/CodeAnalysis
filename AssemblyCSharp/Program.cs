@@ -34,6 +34,8 @@ namespace ClientAssembly
 	{
 		public string A;
 		public MyThingB C;
+
+		private uint _tick;
 	}
 
     [IncludeSerialization]

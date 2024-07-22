@@ -1,13 +1,9 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using RoslynLearning.Helpers;
-using SourceGenerator.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 
-namespace FishNet.CodeAnalysis.Extensions
+namespace SourceGenerating.Extensions
 {
     internal static class ISymbolExtensions
     {
@@ -75,12 +71,12 @@ namespace FishNet.CodeAnalysis.Extensions
                 INamedTypeSymbol? typeSymbol = item.AttributeClass;
                 if (typeSymbol == null)
                 {
-                   // Debugg.Log($"---- Not attributeClass");
+                    // Debugg.Log($"---- Not attributeClass");
                     continue;
                 }
                 else
                 {
-                  //  Debugg.Log($"!___ Attribute name is {typeSymbol.GetSymbolFullName()}");
+                    //  Debugg.Log($"!___ Attribute name is {typeSymbol.GetSymbolFullName()}");
                 }
 
                 if (typeSymbol.GetSymbolFullName() == attributeFullName)
@@ -110,7 +106,7 @@ namespace FishNet.CodeAnalysis.Extensions
                     datas.Add(d!);
             }
 
-            return (datas.Count > 0);
+            return datas.Count > 0;
         }
 
         public static bool HasAttribute(this ISymbol thisSymbol, string attributeFullName)

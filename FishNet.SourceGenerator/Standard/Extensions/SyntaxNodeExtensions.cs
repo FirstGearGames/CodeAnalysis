@@ -1,8 +1,11 @@
 ﻿#pragma warning disable CS8601 // Possible null reference assignment.
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+
+#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
 
-namespace RoslynLearning.Extensions
+namespace SourceGenerating.Extensions
 {
     internal static class SyntaxNodeExtensions
     {
@@ -33,7 +36,7 @@ namespace RoslynLearning.Extensions
                     return true;
                 }
 
-                return TryGetParentSyntax<T>(syntaxNode, out result);
+                return TryGetParentSyntax(syntaxNode, out result);
             }
             catch
             {
@@ -42,5 +45,3 @@ namespace RoslynLearning.Extensions
         }
     }
 }
-#pragma warning restore CS8601 // Possible null reference assignment.
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

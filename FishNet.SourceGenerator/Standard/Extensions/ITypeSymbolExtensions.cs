@@ -1,29 +1,17 @@
 ﻿#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
-using RoslynLearning.Helpers;
-using SourceGenerator.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace FishNet.CodeAnalysis.Extensions
+namespace SourceGenerating.Extensions
 {
     internal static class ITypeSymbolExtensions
     {
-        //private static readonly SymbolDisplayFormat CustomSymbolDisplayFormat = SymbolDisplayFormat.FullyQualifiedFormat
-        //    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted)
-        //    .WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.None);
-
-        //public static string GetFullyQualifiedDisplayString(this ISymbol symbol)
-        //{
-        //    return symbol.ToDisplayString(CustomSymbolDisplayFormat);
-        //}
-
-
         public static string GetTypeFullName(this ITypeSymbol typeSymbol)
         {
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
-            
+
             string fullyQualifiedName = string.Empty;
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
@@ -58,7 +46,7 @@ namespace FishNet.CodeAnalysis.Extensions
 
         public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
         {
-            return (typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct());
+            return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
         }
 
         public static IEnumerable<ITypeSymbol> EnumerateTypeHierarchy(this ITypeSymbol thisTypeSymbol)

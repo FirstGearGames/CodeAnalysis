@@ -1,4 +1,4 @@
-﻿namespace SourceGenerating.Constants
+﻿namespace FishNet.SourceGenerating.Constants
 {
     internal class FishNetConstants
     {

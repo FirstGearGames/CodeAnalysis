@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SourceGenerator.Extensions
+namespace SourceGenerating.Extensions
 {
     internal static class EnumExtensions
     {

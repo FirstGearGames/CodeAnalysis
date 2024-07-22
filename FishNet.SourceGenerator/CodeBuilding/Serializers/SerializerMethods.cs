@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
-using SourceGenerator.Extensions;
+using SourceGenerating.Extensions;
 using System.Text;
 
-namespace SourceGenerator.CodeBuilding.Serializers
+namespace FishNet.SourceGenerating.CodeBuilding
 {
     internal static class SerializerMethodExtensions
     {

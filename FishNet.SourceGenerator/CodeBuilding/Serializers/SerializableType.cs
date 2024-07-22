@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SourceGenerator.CodeBuilding.Serializers
+namespace FishNet.SourceGenerating.CodeBuilding
 {
     internal struct SerializableType : IEquatable<SerializableType>
     {

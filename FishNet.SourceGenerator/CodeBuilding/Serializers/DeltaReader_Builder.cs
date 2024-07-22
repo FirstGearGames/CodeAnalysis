@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FishNet.CodeAnalysis.Extensions;
+using FishNet.SourceGenerating.Constants;
+using FishNet.SourceGenerating.SyntaxReceivers;
 using Microsoft.CodeAnalysis;
-using RoslynLearning.CodeBuilding;
-using RoslynLearning.Helpers;
+using FishNet.SourceGenerating.Helpers;
+using StandardCodeBuilder = SourceGenerating.CodeBuilding.CodeBuilder;
+using SourceGenerating.Extensions;
+using SourceGenerating.CodeBuilding;
 using SourceGenerating.Constants;
-using SourceGenerating.SyntaxReceivers;
-using SourceGenerator.Extensions;
 
-namespace SourceGenerator.CodeBuilding.Serializers
+namespace FishNet.SourceGenerating.CodeBuilding
 {
     internal class DeltaReader_Builder
     {
@@ -58,7 +58,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
                 return;
-            if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol, true))
+            if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol))
                 return;
 
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
@@ -104,11 +104,11 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //Make a new instance of the type to return.
                 const string resultVariableName = "result";
-                sb.AppendLine(bodyIndent, CodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
+                sb.AppendLine(bodyIndent, StandardCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
 
                 string totalFlagsVariable = "totalFlags";
-                sb.Append(bodyIndent, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
-                sb.AppendLine($" = {CodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
+                sb.Append(bodyIndent, StandardCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
+                sb.AppendLine($" = {StandardCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
                 sb.AppendLine();
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
@@ -148,7 +148,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     //Delta reader found.
                     else
                     {
-                        sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {CodeBuilder.CallMethod(dsm!.MethodName, Generated_ReaderParameter_Name, true,
+                        sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {StandardCodeBuilder.CallMethod(dsm!.MethodName, Generated_ReaderParameter_Name, true,
                             $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                     }
 
@@ -173,7 +173,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             StringBuilder sb = new();
 
-            string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+            string clsText = StandardCodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
@@ -188,7 +188,8 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 //Add return if body already contains value. This is just to make neater formatting.
                 if (initializeMethod.Body.Length > 0)
                     initializeMethod.Body.AppendLine();
-                initializeMethod.Body.AppendLine(initializeIndent + 1, CreateInitializeFunction(dsm));
+
+                initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
             }
 
             sb.Append(initializeMethod.ToString(initializeIndent));
@@ -206,7 +207,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             StringBuilder sb = new();
             //GenericDeltaSerializer<Type>.SetWrite(
             sb.Append($"{FishNetConstants.GenericDeltaReader_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaReader_SetRead_Name}(");
-            sb.Append($"{CodeBuilder.CreateFunction(dsm.TypeFullName, FishNetConstants.Reader_FullName, dsm.TypeFullName)}");
+            sb.Append($"{StandardCodeBuilder.CreateFunction(dsm.TypeFullName, FishNetConstants.Reader_FullName, dsm.TypeFullName)}");
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();

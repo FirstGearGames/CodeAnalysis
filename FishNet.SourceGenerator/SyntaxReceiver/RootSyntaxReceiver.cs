@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FishNet.CodeAnalysis.Extensions;
+using FishNet.SourceGenerating.Constants;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using RoslynLearning.Helpers;
-using SourceGenerating.Constants;
-using SourceGenerator.CodeBuilding.Serializers;
+using FishNet.SourceGenerating.Helpers;
+using FishNet.SourceGenerating.CodeBuilding;
+using SourceGenerating.Extensions;
 
-namespace SourceGenerating.SyntaxReceivers
+namespace FishNet.SourceGenerating.SyntaxReceivers
 {
     internal class RootSyntaxReceiver : ISyntaxContextReceiver
     {

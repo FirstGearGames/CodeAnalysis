@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FishNet.CodeAnalysis.Extensions;
+using FishNet.SourceGenerating.Constants;
+using FishNet.SourceGenerating.SyntaxReceivers;
+using StandardCodeBuilder = SourceGenerating.CodeBuilding.CodeBuilder;
 using Microsoft.CodeAnalysis;
-using RoslynLearning.CodeBuilding;
-using RoslynLearning.Helpers;
+using FishNet.SourceGenerating.Helpers;
+using SourceGenerating.Extensions;
 using SourceGenerating.Constants;
-using SourceGenerating.SyntaxReceivers;
-using SourceGenerator.Extensions;
 
-namespace SourceGenerator.CodeBuilding.Serializers
+namespace FishNet.SourceGenerating.CodeBuilding
 {
     internal class DeltaWriter_Builder
     {
@@ -59,7 +59,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 Debugg.Log($"{recursiveCount.ToIndent()}   Serializer already exists.");
                 return;
             }
-
+            Debugg.Log($"{recursiveCount.ToIndent()}    A");
             //Debugg.Log("Meta name is " + serializableType.FullMetadataName);
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
@@ -67,9 +67,10 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 Debugg.Log($"{recursiveCount.ToIndent()}   Named symbol is null.");
                 return;
             }
-            if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol, true))
+            Debugg.Log($"{recursiveCount.ToIndent()}    B");
+            if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol))
                 return;
-
+            Debugg.Log($"{recursiveCount.ToIndent()}    C");
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
@@ -111,9 +112,9 @@ namespace SourceGenerator.CodeBuilding.Serializers
             /* ulong flags = (ulong)options;
              * writer.WriteUnsignedPackedWhole(flags); */
             string flagsVariable = "optionsFlags";
-            _stringBuilder.Append(indent + 1, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, flagsVariable, string.Empty, false));
+            _stringBuilder.Append(indent + 1, StandardCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, flagsVariable, string.Empty, false));
             _stringBuilder.AppendLine($" = ({NativeConstants.UInt64_FullName}){Generated_DeltaSerializerOption_Name};");
-            _stringBuilder.AppendLine(indent + 1, CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, flagsVariable));
+            _stringBuilder.AppendLine(indent + 1, StandardCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, flagsVariable));
             _stringBuilder.AppendLine(body);
             _stringBuilder.AppendLine(indent, "}");
 
@@ -145,6 +146,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 {
                     SerializerMethod fullSerializerMethod = GetFullWriter(item.Key, true, out _);
                     StringBuilder ifBody = new();
+                    //ifBody.AppendLine(bodyIndent + 1, $"UnityEngine.Debug.Log(\"full write \" + UnityEngine.Time.frameCount);");
                     ifBody.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{fullSerializerMethod.MethodName}({_serializers.GetValueParameterName(1)});");
                     ifBody.Append(bodyIndent + 1, "return true;");
                     sb.AppendLine(CreateFullSerializeCheck(bodyIndent, Generated_DeltaSerializerOption_Name, ifBody.ToString()));
@@ -156,13 +158,15 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
                 //totalFlags and pooledWriter local variables.
                 string totalFlagsVariable = "totalFlags";
-                sb.AppendLine(bodyIndent, CodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, $"(ulong){Generated_DeltaSerializerOption_Name}"));
+                sb.AppendLine(bodyIndent, StandardCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, $"(ulong){Generated_DeltaSerializerOption_Name}"));
                 sb.AppendLine(bodyIndent, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.NamedTypeSymbol);
                 //Call write for all members.
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
+
+                    Debugg.Log("DOING THING FOR " + fieldSymbol.OriginalDefinition.Name);
                     ITypeSymbol typeSymbol = fieldSymbol!.Type;
                     string typeFullName = typeSymbol.GetTypeFullName();
 
@@ -173,7 +177,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                     {
                         SerializerMethod sm = GetFullWriter(typeFullName, true, out bool _);
                         sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
-                        sb.AppendLine(bodyIndent, CodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
+                        sb.AppendLine(bodyIndent, StandardCodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
                         AppendIncreaseTotalFlags(3);
                     }
                     //Delta writer found.
@@ -184,7 +188,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                         inText = "";
                         /* if (writer.WriteDeltaXYZ(p0, p1))
                             totalFlags += x */
-                        string writeDeltaText = CodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
+                        string writeDeltaText = StandardCodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
                                 $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
                                 $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
                         sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
@@ -203,10 +207,10 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 string changedVariable = "changed";
                 string rootSerializerVariable = "rootSerializer";
                 //System.Boolean rootSerializer = options.FastContains(DeltaSerializerOption.RootSerialize);
-                sb.Append(bodyIndent, CodeBuilder.CreateLocalVariable(NativeConstants.Boolean_FullName, rootSerializerVariable, string.Empty, false));
+                sb.Append(bodyIndent, StandardCodeBuilder.CreateLocalVariable(NativeConstants.Boolean_FullName, rootSerializerVariable, string.Empty, false));
                 sb.AppendLine($" = {Generated_DeltaSerializerOption_Name}.FastContains({FishNetConstants.DeltaSerializeOption_RootSerialize_FullName});");
                 //System.Boolean changed = (totalFlags != 0) || rootSerializer;
-                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0);");// || {Generated_RootCallParameter_Name};");
+                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0) || {rootSerializerVariable};");
 
                 /* if (changed)
                  {
@@ -214,7 +218,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 sb.AppendLine(bodyIndent, $"if ({changedVariable})");
                 sb.AppendLine(bodyIndent, "{");
                 sb.AppendLine(bodyIndent + 1,
-                    CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name,
+                    StandardCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name,
                         true, totalFlagsVariable));
                 /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
                  } */
@@ -237,7 +241,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         {
             StringBuilder sb = new();
 
-            string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+            string clsText = StandardCodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
@@ -254,6 +258,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 //Add return if body already contains value. This is just to make neater formatting.
                 if (initializeMethod.Body.Length > 0)
                     initializeMethod.Body.AppendLine();
+
                 initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
 
                 addedSerializers++;
@@ -276,7 +281,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
             StringBuilder sb = new();
             //GenericDeltaSerializer<Type>.SetWrite(
             sb.Append($"{FishNetConstants.GenericDeltaWriter_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaWriter_SetWrite_Name}(");
-            sb.Append($"{CodeBuilder.CreateFunction(NativeConstants.Boolean_FullName, FishNetConstants.Writer_FullName, dsm.TypeFullName, dsm.TypeFullName, FishNetConstants.DeltaSerializerOption_FullName)}");
+            sb.Append($"{StandardCodeBuilder.CreateFunction(NativeConstants.Boolean_FullName, FishNetConstants.Writer_FullName, dsm.TypeFullName, dsm.TypeFullName, FishNetConstants.DeltaSerializerOption_FullName)}");
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();
