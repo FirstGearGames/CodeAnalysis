@@ -18,7 +18,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         private Serializers _serializers;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private const string Generated_Class_Name = "Generated_DeltaReaders";
-        private const string Generated_Method_Prefix = "ReadDelta";
+        private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedReaderPrefix}ReadDelta";
         private const string Generated_ReaderParameter_Name = "reader";
         private string Generated_DeltaSerializerOption_Name => DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
 

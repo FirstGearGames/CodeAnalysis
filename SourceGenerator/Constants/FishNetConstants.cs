@@ -89,7 +89,6 @@
         public const string GenericDeltaReader_SetRead_Name = $"SetRead";
         #endregion
 
-
         #region Writer.
         ///// <summary>
         ///// Writer.WriteBytes method.
@@ -158,6 +157,10 @@
         /// [DefaultDeltaWriter] class.
         /// </summary>
         public const string DefaultDeltaWriterAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaWriterAttribute";
+        /// <summary>
+        /// Prefix to use for all generated writers.
+        /// </summary>
+        public const string GeneratedWriterPrefix = "GWrite___";
         #endregion
 
         #region Reader.
@@ -165,28 +168,27 @@
         /// Writer.Write() method.
         /// </summary>
         public const string Reader_Read_Name = "Read";
-
         /// <summary>
         /// Writer class.
         /// </summary>
-        public const string Reader_FullName = $"{Serializing_Namespace}.Reader";
-        
+        public const string Reader_FullName = $"{Serializing_Namespace}.Reader";       
         /// <summary>
         /// Writer.WriteUnsignedPackedWhole method.
         /// </summary>
         public const string Reader_ReadUnsignedPackedWhole_Name = "ReadUnsignedPackedWhole";
-
         /// <summary>
         /// [DefaultWriter] class.
         /// </summary>
         public const string DefaultReaderAttribute_FullName = $"{Serializing_Namespace}.DefaultReaderAttribute";
-
         /// <summary>
         /// [DefaultDeltaWriter] class.
         /// </summary>
         public const string DefaultDeltaReaderAttribute_FullName = $"{Serializing_Namespace}.DefaultDeltaReaderAttribute";
+        /// <summary>
+        /// Prefix to use for all generated readers.
+        /// </summary>
+        public const string GeneratedReaderPrefix = "GRead___";
         #endregion
-
 
         #region General.
         /// <summary>

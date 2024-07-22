@@ -3,7 +3,7 @@
 	public static class Generated_DeltaWriters
 	{
 
-			public static bool WriteDeltaClientAssembly_MyThingB(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingB value0, ClientAssembly.MyThingB value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+			public static bool GWrite___WriteDeltaClientAssembly_MyThingB(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingB value0, ClientAssembly.MyThingB value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
 			{
 				if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 				{
@@ -31,7 +31,7 @@
 				return changed;
 			}
 
-			public static bool WriteDeltaClientAssembly_MyThingA(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingA value0, ClientAssembly.MyThingA value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+			public static bool GWrite___WriteDeltaClientAssembly_MyThingA(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingA value0, ClientAssembly.MyThingA value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
 			{
 				if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 				{
@@ -47,7 +47,7 @@
 				if (pooledWriter.WriteDeltaString(value0.A, value1.A))
 				totalFlags += 4;
 
-				if (pooledWriter.WriteDeltaClientAssembly_MyThingB(value0.C, value1.C))
+				if (pooledWriter.GWrite___WriteDeltaClientAssembly_MyThingB(value0.C, value1.C))
 				totalFlags += 8;
 
 				System.Boolean rootSerializer = options.FastContains(FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -65,8 +65,8 @@
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
-			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingB>.SetWrite(new Func<FishNet.Serializing.Writer, ClientAssembly.MyThingB, ClientAssembly.MyThingB, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(WriteDeltaClientAssembly_MyThingB));
-			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingA>.SetWrite(new Func<FishNet.Serializing.Writer, ClientAssembly.MyThingA, ClientAssembly.MyThingA, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(WriteDeltaClientAssembly_MyThingA));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingB>.SetWrite(new Func<FishNet.Serializing.Writer, ClientAssembly.MyThingB, ClientAssembly.MyThingB, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingB));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingA>.SetWrite(new Func<FishNet.Serializing.Writer, ClientAssembly.MyThingA, ClientAssembly.MyThingA, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingA));
 
 		}
 	}
