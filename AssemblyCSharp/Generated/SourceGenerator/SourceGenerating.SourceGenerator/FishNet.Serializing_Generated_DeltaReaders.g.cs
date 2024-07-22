@@ -3,9 +3,8 @@
 	public static class Generated_DeltaReaders
 	{
 
-public static ClientAssembly.MyThingB GRead___ReadDeltaClientAssembly_MyThingB(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingB value0)
-
-			{
+		public static ClientAssembly.MyThingB GRead___ReadDeltaClientAssembly_MyThingB(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingB value0)
+		{
 			ClientAssembly.MyThingB result = new();
 			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();
 
@@ -19,11 +18,10 @@ public static ClientAssembly.MyThingB GRead___ReadDeltaClientAssembly_MyThingB(t
 				result.B = value0.B;
 
 			return result;
-			}
+		}
 
-public static ClientAssembly.MyThingA GRead___ReadDeltaClientAssembly_MyThingA(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingA value0)
-
-			{
+		public static ClientAssembly.MyThingA GRead___ReadDeltaClientAssembly_MyThingA(this FishNet.Serializing.Reader reader, ClientAssembly.MyThingA value0)
+		{
 			ClientAssembly.MyThingA result = new();
 			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();
 
@@ -42,7 +40,15 @@ public static ClientAssembly.MyThingA GRead___ReadDeltaClientAssembly_MyThingA(t
 				result.C = value0.C;
 
 			return result;
-			}
+		}
 
+		[UnityEngine.RuntimeInitializeOnLoadMethod]
+		public static void InitializeSerializers()
+		{
+			FishNet.Serializing.GenericDeltaReader<ClientAssembly.MyThingB>.SetRead(new Func<FishNet.Serializing.Reader, ClientAssembly.MyThingB, ClientAssembly.MyThingB>(GRead___ReadDeltaClientAssembly_MyThingB));
+
+			FishNet.Serializing.GenericDeltaReader<ClientAssembly.MyThingA>.SetRead(new Func<FishNet.Serializing.Reader, ClientAssembly.MyThingA, ClientAssembly.MyThingA>(GRead___ReadDeltaClientAssembly_MyThingA));
+
+		}
 	}
 }

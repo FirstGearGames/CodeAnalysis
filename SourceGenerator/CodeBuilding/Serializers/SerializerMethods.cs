@@ -15,35 +15,35 @@ namespace SourceGenerator.CodeBuilding.Serializers
 
     internal class MethodContent
     {
-        public StringBuilder Signature;
+        public StringBuilder Header;
         public StringBuilder Body;
 
         public MethodContent()
         {
-            Signature = new();
+            Header = new();
             Body = new();
         }
 
-        public MethodContent(StringBuilder signature)
+        public MethodContent(StringBuilder header)
         {
-            Signature = signature;
+            Header = header;
             Body = new();
         }
-        public MethodContent(string signature)
+        public MethodContent(string header)
         {
-            Signature = new(signature);
+            Header = new(header);
             Body = new();
         }
 
-        public MethodContent(StringBuilder signature, StringBuilder body)
+        public MethodContent(StringBuilder header, StringBuilder body)
         {
-            Signature = signature;
+            Header = header;
             Body = body;
         }
 
-        public MethodContent(string signature, string body)
+        public MethodContent(string header, string body)
         {
-            Signature = new(signature);
+            Header = new(header);
             Body = new(body);
         }
 
@@ -57,7 +57,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         public string ToStringWithoutFooter(int bracketIndent)
         {
             StringBuilder sb = new();
-            sb.AppendLine(Signature.ToString());
+            sb.AppendLine(Header.ToString());
             sb.AppendLine(bracketIndent, "{");
             sb.AppendLine(Body.ToString());
             return sb.ToString();

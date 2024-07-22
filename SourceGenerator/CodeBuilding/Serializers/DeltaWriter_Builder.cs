@@ -22,7 +22,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}WriteDelta";
         private const string Generated_WriterParameter_Name = "writer";
         public const string Generated_DeltaSerializerOption_Name = "options";
-        private const string InitializeOnLoad_Method_Name = "InitializeSerializers";
+        public const string InitializeOnLoad_Method_Name = "InitializeSerializers";
 
         public void Initialize(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
         {
@@ -92,7 +92,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                sb.Append(3, $"public static bool {mName}" +
+                sb.Append(2, $"public static bool {mName}" +
                                         $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," +
                                         $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" +
                                         $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
@@ -134,7 +134,7 @@ namespace SourceGenerator.CodeBuilding.Serializers
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
 
-                const int bodyIndent = 4;
+                const int bodyIndent = 3;
                 StringBuilder sb = new();
 
                 /* If (options.FastContains(DeltaSerializerOption.FullSerialize))
@@ -241,19 +241,19 @@ namespace SourceGenerator.CodeBuilding.Serializers
             string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
             sb.AppendLine(clsText);
 
-            //Default indenting for initialize on load method.
             const int initializeIndent = 2;
-
             MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
-            //Delta writers.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 
-                sb.AppendLine(dsm.MethodContent.ToString(3));
+                sb.AppendLine(dsm.MethodContent.ToString(2));
 
-                initializeMethod.Body.AppendLine(initializeIndent + 1, CreateInitializeFunction(dsm));
+                //Add return if body already contains value. This is just to make neater formatting.
+                if (initializeMethod.Body.Length > 0)
+                    initializeMethod.Body.AppendLine();
+                initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
             }
 
             sb.Append(initializeMethod.ToString(initializeIndent));

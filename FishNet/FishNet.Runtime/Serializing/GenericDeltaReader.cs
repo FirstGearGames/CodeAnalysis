@@ -12,7 +12,7 @@
         /// </summary>
         private static bool _hasCustomSerializer;
 
-        public static void SetReader(Func<Reader, T, T> value)
+        public static void SetRead(Func<Reader, T, T> value)
         {
             Read = value;
         }
