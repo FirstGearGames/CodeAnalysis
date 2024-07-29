@@ -1,5 +1,6 @@
 ﻿using FishNet.CodeGenerating;
 using FishNet.Object;
+using FishNet.Runtime.Unity_Stuff;
 using FishNet.Serializing;
 using FishNet.Transporting;
 
@@ -32,6 +33,7 @@ namespace ClientAssembly
     [IncludeSerialization]
     public class MyThingA : MyThingB
 	{
+		public Vector3 Position;
 		public string A;
 		public MyThingB C;
 

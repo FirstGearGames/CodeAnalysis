@@ -102,6 +102,10 @@ namespace FishNet.Serializing
             NetworkManager = manager;
         }
 
+        public void Skip(int count)
+        {
+        }
+
         /// <summary>
         /// Writes a dictionary.
         /// </summary>
@@ -264,6 +268,10 @@ namespace FishNet.Serializing
         {
         }
 
+
+        public void WriteInt8Unpacked(byte value)
+        {
+        }
 
         /// <summary>
         /// Writes a uint16.

@@ -19,6 +19,9 @@ namespace FishNet.Runtime.Unity_Stuff
 
     public struct Vector3
     {
+        public float x;
+        public float y;
+        public float z;
     }
 
     public struct Vector4
