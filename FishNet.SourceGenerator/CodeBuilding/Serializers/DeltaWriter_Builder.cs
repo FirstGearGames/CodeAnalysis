@@ -205,12 +205,8 @@ namespace FishNet.SourceGenerating.CodeBuilding
                 }
 
                 string changedVariable = "changed";
-                string rootSerializerVariable = "rootSerializer";
-                //System.Boolean rootSerializer = options.FastContains(DeltaSerializerOption.RootSerialize);
-                sb.Append(bodyIndent, StandardCodeBuilder.CreateLocalVariable(NativeConstants.Boolean_FullName, rootSerializerVariable, string.Empty, false));
-                sb.AppendLine($" = {Generated_DeltaSerializerOption_Name}.FastContains({FishNetConstants.DeltaSerializeOption_RootSerialize_FullName});");
                 //System.Boolean changed = (totalFlags != 0) || rootSerializer;
-                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0) || {rootSerializerVariable};");
+                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariable} != 0);");
 
                 /* if (changed)
                  {
