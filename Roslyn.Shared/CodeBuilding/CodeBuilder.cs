@@ -1,13 +1,12 @@
 ﻿using System.Text;
 using Roslyn.Extensions;
-using Roslyn.Constants;
+using Roslyn.Native.Constants;
 
-namespace SourceGenerating.CodeBuilding
+namespace Roslyn.CodeBuilding
 {
     internal static class CodeBuilder
     {
         private static StringBuilder _stringBuilder = new();
-
 
         /// <summary>
         /// Creates a class optionally wrapping it in a namespace.

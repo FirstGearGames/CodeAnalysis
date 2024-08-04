@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using FishNet.SourceGenerating.Constants;
-using FishNet.SourceGenerating.SyntaxReceivers;
 using Microsoft.CodeAnalysis;
-using FishNet.SourceGenerating.Helpers;
-using StandardCodeBuilder = SourceGenerating.CodeBuilding.CodeBuilder;
-using SourceGenerating.Extensions;
-using SourceGenerating.CodeBuilding;
-using SourceGenerating.Constants;
+using Rosly.FishNet.CodeBuilding;
+using Roslyn.Extensions;
+using Roslyn.FishNet.Constants;
+using Roslyn.FishNet.Helpers;
+using Roslyn.FishNet.Receivers;
+using Roslyn.FishNet.Serializing;
+using Roslyn.Native.Constants;
+using RoslynCodeBuilder = Roslyn.CodeBuilding.CodeBuilder;
 
-namespace FishNet.SourceGenerating.CodeBuilding
+
+namespace Roslyn.FishNet.CodeBuilding
 {
     internal class DeltaReader_Builder
     {
@@ -23,7 +24,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
         private const string Generated_DeltaSerializerOption_Name = DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
         public const string InitializeOnLoad_Method_Name = DeltaWriter_Builder.InitializeOnLoad_Method_Name;
 
-        public void Initialize(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, Serializers serializers)
         {
             _serializers = serializers;
 
@@ -38,9 +39,9 @@ namespace FishNet.SourceGenerating.CodeBuilding
         /// <summary>
         /// Creates SerializerMethod for each type in need.
         /// </summary>
-        private void CreateEmptySerializerMethods(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
+        private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in rootSyntaxReceiver.SerializableTypes)
+            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.SerializableTypes)
                 CreateEmptyDeltaSerializerMethod(context, item);
         }
 
@@ -90,7 +91,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
         /// <summary>
         /// Creates bodies for empty delta serializer methods.
         /// </summary>
-        private void CreateDeltaSerializerBodies(GeneratorExecutionContext context, RootSyntaxReceiver rootSyntaxReceiver)
+        private void CreateDeltaSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver)
         {
             //Iterate all serializers and if they are generated delta writers then complete them.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetReadDeltaMethods())
@@ -104,11 +105,11 @@ namespace FishNet.SourceGenerating.CodeBuilding
 
                 //Make a new instance of the type to return.
                 const string resultVariableName = "result";
-                sb.AppendLine(bodyIndent, StandardCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
+                sb.AppendLine(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
 
                 string totalFlagsVariable = "totalFlags";
-                sb.Append(bodyIndent, StandardCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
-                sb.AppendLine($" = {StandardCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
+                sb.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
+                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
                 sb.AppendLine();
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
@@ -149,7 +150,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
                     //Delta reader found.
                     else
                     {
-                        sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {StandardCodeBuilder.CallMethod(dsm!.MethodName, Generated_ReaderParameter_Name, true,
+                        sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod(dsm!.MethodName, Generated_ReaderParameter_Name, true,
                             $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                     }
 
@@ -174,7 +175,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
         {
             StringBuilder sb = new();
 
-            string clsText = StandardCodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+            string clsText = RoslynCodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
@@ -208,7 +209,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
             StringBuilder sb = new();
             //GenericDeltaSerializer<Type>.SetWrite(
             sb.Append($"{FishNetConstants.GenericDeltaReader_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaReader_SetRead_Name}(");
-            sb.Append($"{StandardCodeBuilder.CreateFunction(dsm.TypeFullName, FishNetConstants.Reader_FullName, dsm.TypeFullName)}");
+            sb.Append($"{RoslynCodeBuilder.CreateFunction(dsm.TypeFullName, FishNetConstants.Reader_FullName, dsm.TypeFullName)}");
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();

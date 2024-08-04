@@ -1,4 +1,4 @@
-﻿namespace FishNet.SourceAnaylzer
+﻿namespace FishNet.SourceAnaylze.Constants
 {
     internal static class DiagnosticIds
     {

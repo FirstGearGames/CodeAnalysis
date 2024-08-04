@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
-using SourceGenerating.Extensions;
+using Roslyn.Extensions;
 using System.Text;
 
-namespace FishNet.SourceGenerating.CodeBuilding
+namespace Roslyn.FishNet.CodeBuilding
 {
     internal static class SerializerMethodExtensions
     {

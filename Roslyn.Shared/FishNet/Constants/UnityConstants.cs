@@ -1,4 +1,4 @@
-﻿namespace FishNet.SourceGenerating.Constants
+﻿namespace Roslyn.FishNet.Constants
 {
     internal class UnityConstants
     {
@@ -19,7 +19,6 @@
         /// </summary>
         public const string RuntimeInitializeOnLoadMethod_FullName = $"{UnityEngine_Namespace}.RuntimeInitializeOnLoadMethod";
         #endregion
-
 
     }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using FishNet.SourceGenerating.Helpers;
-using System.Text;
+﻿using System.Text;
 
 namespace Roslyn.Extensions
 {

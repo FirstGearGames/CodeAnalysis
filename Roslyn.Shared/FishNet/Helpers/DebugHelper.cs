@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
-namespace FishNet.SourceGenerating.Helpers
+namespace Roslyn.FishNet.Helpers
 {
 	internal static class Debugg
 	{

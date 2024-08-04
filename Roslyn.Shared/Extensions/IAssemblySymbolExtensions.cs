@@ -1,9 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
-using FishNet.SourceGenerating.Helpers;
 
 namespace Roslyn.Extensions
 {
-    public static class IAssemblySymbolExtensions
+    internal static class IAssemblySymbolExtensions
     {
         public static bool GetINamedTypeSymbol(this IAssemblySymbol? assemblySymbol, string fullName, out INamedTypeSymbol? result, bool error = true)
         {

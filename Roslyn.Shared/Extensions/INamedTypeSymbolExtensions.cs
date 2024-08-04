@@ -1,9 +1,5 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
 using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using FishNet.SourceGenerating.Helpers;
 
 namespace Roslyn.Extensions
 {

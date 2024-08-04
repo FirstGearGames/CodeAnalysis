@@ -1,4 +1,4 @@
-﻿namespace Roslyn.Constants
+﻿namespace Roslyn.Native.Constants
 {
     internal static class NativeConstants
     {

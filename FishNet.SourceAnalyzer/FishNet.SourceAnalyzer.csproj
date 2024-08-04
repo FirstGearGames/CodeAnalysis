@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <RootNamespace>FishNet.SourceAnaylzer</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0-3.final" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0-3.final" />
+      <PackageReference Include="Roslyn.Diagnostics.Analyzers" Version="3.11.0-beta1.24318.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\Roslyn.Shared\CodeBuilding\CodeBuilder.cs">
+        <Link>Roslyn.Shared\CodeBuilding\CodeBuilder.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Constants\NativeConstants.cs">
+        <Link>Roslyn.Shared\Constants\NativeConstants.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\AttributeDataExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\AttributeDataExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\EnumExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\EnumExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\IAssemblySymbolExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\IAssemblySymbolExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\INamedTypeSymbolExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\INamedTypeSymbolExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\IntExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\IntExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\ISymbolExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\ISymbolExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\ITypeSymbolExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\ITypeSymbolExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\SemanticModelExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\SemanticModelExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\StringBuilderExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\StringBuilderExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\StringExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\StringExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\Extensions\SyntaxNodeExtensions.cs">
+        <Link>Roslyn.Shared\Extensions\SyntaxNodeExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\FishNet\Constants\FishNetConstants.cs">
+        <Link>Roslyn.Shared\FishNet\Constants\FishNetConstants.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\FishNet\Constants\UnityConstants.cs">
+        <Link>Roslyn.Shared\FishNet\Constants\UnityConstants.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\FishNet\Serializing\zzSerializerReceiver.cs">
+        <Link>Roslyn.Shared\FishNet\Serializing\zzSerializerReceiver.cs</Link>
+      </Compile>
+    </ItemGroup>
+
+</Project>

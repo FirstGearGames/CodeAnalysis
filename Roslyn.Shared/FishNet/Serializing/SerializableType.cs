@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
-using SourceGenerating.Extensions;
+using Roslyn.Extensions;
 
-namespace FishNet.SourceGenerating.CodeBuilding
+namespace Roslyn.FishNet.Serializing
 {
     internal struct SerializableType : IEquatable<SerializableType>
     {

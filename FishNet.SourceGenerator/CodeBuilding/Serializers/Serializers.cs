@@ -3,11 +3,11 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using FishNet.SourceGenerating.Helpers;
-using FishNet.SourceGenerating.Constants;
-using SourceGenerating.Extensions;
+using Roslyn.Extensions;
+using Roslyn.FishNet.Constants;
+using Roslyn.FishNet.Helpers;
 
-namespace FishNet.SourceGenerating.CodeBuilding
+namespace Roslyn.FishNet.CodeBuilding
 {
     internal enum AddSerializerType
     {

@@ -1,8 +1,8 @@
-﻿using FishNet.SourceGenerating.Constants;
-using SourceGenerating.Extensions;
-using System.Text;
+﻿using System.Text;
+using Roslyn.Extensions;
+using Roslyn.FishNet.Constants;
 
-namespace FishNet.SourceGenerating.CodeBuilding
+namespace Roslyn.FishNet.CodeBuilding
 {
     internal static class CodeBuilder
     {

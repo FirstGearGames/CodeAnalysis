@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using FishNet.SourceGenerating.Constants;
-using SourceGenerating.Extensions;
+using Roslyn.Extensions;
+using Roslyn.FishNet.Constants;
 
-namespace FishNet.SourceGenerating.Helpers
+namespace Roslyn.FishNet.Helpers
 {
 
     internal enum RPCType

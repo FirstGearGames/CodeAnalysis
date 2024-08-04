@@ -1,4 +1,4 @@
-﻿.Extensions
+﻿namespace Roslyn.Extensions
 {
     internal static class StringExtensions
     {

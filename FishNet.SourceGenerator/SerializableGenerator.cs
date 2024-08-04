@@ -1,24 +1,25 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
-using FishNet.SourceGenerating.CodeBuilding;
-using FishNet.SourceGenerating.SyntaxReceivers;
-using FishNet.SourceGenerating.Constants;
-using FishNet.SourceGenerating.Helpers;
+using Rosly.FishNet.CodeBuilding;
+using Roslyn.FishNet.CodeBuilding;
+using Roslyn.FishNet.Constants;
+using Roslyn.FishNet.Helpers;
+using Roslyn.FishNet.Receivers;
 
-namespace FishNet.SourceGenerating
+namespace Roslyn.FishNet
 {
     [Generator]
-    public sealed class MainGenerator : ISourceGenerator
+    public sealed class SerializableGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => new RootSyntaxReceiver());
+            context.RegisterForSyntaxNotifications(() => new GeneratorSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
+            if (context.SyntaxContextReceiver is not GeneratorSyntaxReceiver syntaxReceiver) return;
             Debugg.Log($"- Execute Start for {context.Compilation.AssemblyName}.");
 
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
@@ -35,23 +36,21 @@ namespace FishNet.SourceGenerating
             serializers.Initialize(fishnetRuntimeAssemblySymbol);
 
             DeltaWriter_Builder deltaWriterBuilder = new();
-            deltaWriterBuilder.Initialize(context, rootSyntaxReceiver, serializers);
+            deltaWriterBuilder.Initialize(context, syntaxReceiver, serializers);
             DeltaReader_Builder deltaReaderBuilder = new();
-            deltaReaderBuilder.Initialize(context, rootSyntaxReceiver, serializers);
+            deltaReaderBuilder.Initialize(context, syntaxReceiver, serializers);
             
             Debugg.Log($"- Execute End for {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
         }
-
-
+        
         private IAssemblySymbol? GetFishNetRuntimeAssemblySymbol(in GeneratorExecutionContext context)
         {
             ImmutableArray<IAssemblySymbol> assemblySymbols = context.Compilation.SourceModule.ReferencedAssemblySymbols;
             IAssemblySymbol? fishNetSymbol = assemblySymbols.FirstOrDefault(x => x.Name == FishNetConstants.Runtime_Assembly_Name);
             return fishNetSymbol;
         }
-
-  
+        
     }
 }
