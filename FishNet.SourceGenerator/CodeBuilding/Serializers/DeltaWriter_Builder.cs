@@ -75,7 +75,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol.GetTypeFullName(), typeSymbol.GetSymbolFullMetaName()), recursiveCount + 1);
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
             }
 
             Debugg.Log($"{recursiveCount.ToIndent()}    Creating header and footer.");

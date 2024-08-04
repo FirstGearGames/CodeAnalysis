@@ -174,7 +174,8 @@ namespace FishNet.SourceGenerating.SyntaxReceivers
                     return false;
             }
 
-            if (SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName())))
+            string metaName = theSymbol.GetSymbolFullMetaName();
+            if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName)))
                 Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
 
             return true;
