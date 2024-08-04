@@ -1,0 +1,104 @@
+﻿namespace FishNet.Serializing
+{
+	public static class Generated_DeltaWriters
+	{
+
+		public static bool GWrite___WriteDeltaClientAssembly_MyThingB(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingB value0, ClientAssembly.MyThingB value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+		{
+			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
+			{
+				System.UInt64 optionsFlags = (System.UInt64)options;
+				writer.WriteUnsignedPackedWhole(optionsFlags);
+				writer.Write(value1);
+				return true;
+			}
+
+			System.UInt64 totalFlags = (ulong)options;
+			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
+
+			//Delta writer could not be found for type System.String. Please report this note.
+			pooledWriter.WriteString(value1.B);
+			totalFlags += 4;
+
+			System.Boolean changed = (totalFlags != 0);
+			if (changed)
+			{
+				writer.WriteUnsignedPackedWhole(totalFlags);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
+			}
+			pooledWriter.Store();
+
+			return changed;
+		}
+
+		public static bool GWrite___WriteDeltaClientAssembly_MyThingA(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingA value0, ClientAssembly.MyThingA value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+		{
+			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
+			{
+				System.UInt64 optionsFlags = (System.UInt64)options;
+				writer.WriteUnsignedPackedWhole(optionsFlags);
+				writer.Write(value1);
+				return true;
+			}
+
+			System.UInt64 totalFlags = (ulong)options;
+			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
+
+			if (pooledWriter.WriteDeltaVector3(value0.Position, value1.Position))
+				totalFlags += 4;
+
+			//Delta writer could not be found for type System.String. Please report this note.
+			pooledWriter.WriteString(value1.A);
+			totalFlags += 8;
+
+			if (pooledWriter.GWrite___WriteDeltaClientAssembly_MyThingB(value0.C, value1.C))
+				totalFlags += 16;
+
+			System.Boolean changed = (totalFlags != 0);
+			if (changed)
+			{
+				writer.WriteUnsignedPackedWhole(totalFlags);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
+			}
+			pooledWriter.Store();
+
+			return changed;
+		}
+
+		public static bool GWrite___WriteDeltaClientAssembly_MyThingC(this FishNet.Serializing.Writer writer, ClientAssembly.MyThingC value0, ClientAssembly.MyThingC value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+		{
+			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
+			{
+				System.UInt64 optionsFlags = (System.UInt64)options;
+				writer.WriteUnsignedPackedWhole(optionsFlags);
+				writer.Write(value1);
+				return true;
+			}
+
+			System.UInt64 totalFlags = (ulong)options;
+			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
+
+			//Delta writer could not be found for type System.String. Please report this note.
+			pooledWriter.WriteString(value1.C);
+			totalFlags += 4;
+
+			System.Boolean changed = (totalFlags != 0);
+			if (changed)
+			{
+				writer.WriteUnsignedPackedWhole(totalFlags);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
+			}
+			pooledWriter.Store();
+
+			return changed;
+		}
+
+		[UnityEngine.RuntimeInitializeOnLoadMethod]
+		public static void InitializeSerializers()
+		{
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingB>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.MyThingB, ClientAssembly.MyThingB, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingB));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingA>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.MyThingA, ClientAssembly.MyThingA, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingA));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingC>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.MyThingC, ClientAssembly.MyThingC, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingC));
+		}
+	}
+}

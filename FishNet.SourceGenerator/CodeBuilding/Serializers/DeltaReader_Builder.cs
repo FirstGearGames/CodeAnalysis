@@ -69,7 +69,7 @@ namespace FishNet.SourceGenerating.CodeBuilding
             }
 
             string header = GetMethodHeader(out string methodName);
-            
+
             //Add to readers.
             _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, typeFullName, methodName, header, ""), AddSerializerType.Delta);
 
@@ -80,8 +80,8 @@ namespace FishNet.SourceGenerating.CodeBuilding
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
                 inText = "";
                 sb.Append(2, $"public static {typeFullName} {mName}" +
-                                        $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," +
-                                        $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");
+                             $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," +
+                             $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");
 
                 return sb.ToString();
             }
@@ -113,8 +113,9 @@ namespace FishNet.SourceGenerating.CodeBuilding
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
                  * if (options.FastContains(DeltaSerializerOption.FullSerializer))
-                *      return reader.Read<type>(); */
+                 *      return reader.Read<type>(); */
                 CreateReadFullIf();
+
                 void CreateReadFullIf()
                 {
                     string optionsVariable = Generated_DeltaSerializerOption_Name;

@@ -31,55 +31,37 @@ namespace FishNet.SourceGenerating.SyntaxReceivers
         private void FindStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
             ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(structDeclaration);
-
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
-            if (!namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName))
-            {
-               // Debugg.Log($"       No include serialization for {namedTypeSymbol.GetSymbolFullName()}");
-                return;
-            }
 
-            Debugg.Log($"Found includeSerialization for {namedTypeSymbol.GetSymbolFullName()}");
-
-            /* FullNames added this iteration.
-             * This is used to prevent endless loops. */
-            HashSet<string> addedFullNames = new();
-
-            AddSerializableType(namedTypeSymbol);
-            while (namedTypeSymbol.BaseType is INamedTypeSymbol nestedNamedTypeSymbol)
-                /* The method indicated it could not add some reason.
-                 * Maybe the type had an attribute to not serialize or
-                 * its the previously checked type. */
-                if (!AddSerializableType(nestedNamedTypeSymbol)) break;
-
-            bool AddSerializableType(INamedTypeSymbol theSymbol)
-            {
-                //Has exclude serialization attribute.
-                if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
-
-                string fullName = theSymbol.GetTypeFullName();
-
-                if (!addedFullNames.Add(fullName)) return false;
-
-                if (SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName())))
-                    Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
-
-                return true;
-            }
+            FindNamedTypeSymbolSerializables(namedTypeSymbol);
         }
 
 
         private void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
         {
             ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
-
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
-            if (!namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName))
-            {
-               // Debugg.Log($"       No include serialization for {namedTypeSymbol.GetSymbolFullName()}");
-                return;
-            }
 
+            FindNamedTypeSymbolSerializables(namedTypeSymbol);
+        }
+
+        /// <summary>
+        /// Finds serializables for an INamedTypeSymbol which may not be bound to specific mechanics, such as RPC.
+        /// </summary>
+        private void FindNamedTypeSymbolSerializables(INamedTypeSymbol namedTypeSymbol)
+        {
+            //Manually excluding serialization.
+            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return;
+
+            bool canSerialize = ImplementsPredictionInterface(namedTypeSymbol);
+            
+            if (!canSerialize)
+                canSerialize |= namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName);
+
+            //Nothing indicates value can be serialized.
+            if (!canSerialize)
+                return;
+            
             Debugg.Log($"Found includeSerialization for {namedTypeSymbol.GetSymbolFullName()}");
 
             /* FullNames added this iteration.
@@ -91,23 +73,20 @@ namespace FishNet.SourceGenerating.SyntaxReceivers
                 /* The method indicated it could not add some reason.
                  * Maybe the type had an attribute to not serialize or
                  * its the previously checked type. */
-                if (!AddSerializableType(nestedNamedTypeSymbol)) break;
-
-            bool AddSerializableType(INamedTypeSymbol theSymbol)
+                if (!AddSerializableType(nestedNamedTypeSymbol))
+                    break;
+            
+            //Returns if a symbol implements prediction interfaces.
+            bool ImplementsPredictionInterface(INamedTypeSymbol theSymbol)
             {
-                //Has exclude serialization attribute.
-                if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+                if (theSymbol.ImplementsInterface(FishNetConstants.IReplicate_FullName)) return true;
+                if (theSymbol.ImplementsInterface(FishNetConstants.IReconcile_FullName)) return true;
 
-                string fullName = theSymbol.GetTypeFullName();
-
-                if (!addedFullNames.Add(fullName)) return false;
-
-                if (SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName())))
-                    Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
-
-                return true;
+                return false;
             }
         }
+
+
 
         private void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
@@ -171,10 +150,35 @@ namespace FishNet.SourceGenerating.SyntaxReceivers
             //Anything left in parameters is serializable.
             foreach (IParameterSymbol parameter in parameters)
             {
-                string fullName = parameter.Type.GetTypeFullName();
-                string metadataName = parameter.Type.GetSymbolFullMetaName();
-                SerializableTypes.Add(new SerializableType(fullName, metadataName));
+                if (parameter is not INamedTypeSymbol namedSymbol) continue;
+
+                AddSerializableType(namedSymbol);
             }
         }
+        
+        /// <summary>
+        /// Adds a type to serializableTypes.
+        /// Returns true if added, false if already existed.
+        /// </summary>
+        private bool AddSerializableType(INamedTypeSymbol theSymbol)
+        {
+            //Has exclude serialization attribute.
+            if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+
+            string fullName = theSymbol.GetTypeFullName();
+
+            //Check if already added.
+            foreach (SerializableType st in SerializableTypes)
+            {
+                if (st.FullName == fullName)
+                    return false;
+            }
+
+            if (SerializableTypes.Add(new SerializableType(fullName, theSymbol.GetSymbolFullMetaName())))
+                Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
+
+            return true;
+        }
+
     }
 }

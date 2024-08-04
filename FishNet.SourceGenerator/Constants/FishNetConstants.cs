@@ -3,6 +3,7 @@
     internal class FishNetConstants
     {
         #region Namespaces and assemblies.
+
         /// <summary>
         /// FishNet.Serializing namespace.
         /// </summary>
@@ -15,9 +16,26 @@
         /// FishNet.Runtime assembly.
         /// </summary>
         public const string Runtime_Assembly_Name = "FishNet.Runtime";
+        /// <summary>
+        /// FishNet.Object.Prediction namespace.
+        /// </summary>
+        public const string Prediction_Namespace = "FishNet.Object.Prediction";
+
+        #endregion
+
+        #region Prediction.
+        /// <summary>
+        /// IReplicate interface.
+        /// </summary>
+        public const string IReplicate_FullName = $"{Prediction_Namespace}.IReplicateData";
+        /// <summary>
+        /// IReplicate interface.
+        /// </summary>
+        public const string IReconcile_FullName = $"{Prediction_Namespace}.IReconcileData";
         #endregion
 
         #region Codegenerating special.
+
         /// <summary>
         /// [IncludeSerialization] class.
         /// </summary>
@@ -26,9 +44,11 @@
         /// [ExcludeSerialization] class.
         /// </summary>
         public const string ExcludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.ExcludeSerializationAttribute";
+
         #endregion
 
         #region RPCs.
+
         /// <summary>
         /// [targetRpc] class.
         /// </summary>
@@ -43,9 +63,11 @@
         /// [ObserversRpc] class.
         /// </summary>
         public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";
+
         #endregion
 
         #region DeltaSerializing.
+
         /// <summary>
         /// Maximum flag value within DeltaSerializerOption.
         /// </summary>
@@ -86,9 +108,11 @@
         /// GenericDeltaWriter.SetRead method.
         /// </summary>
         public const string GenericDeltaReader_SetRead_Name = $"SetRead";
+
         #endregion
 
         #region Writer.
+
         ///// <summary>
         ///// Writer.WriteBytes method.
         ///// </summary>
@@ -160,9 +184,11 @@
         /// Prefix to use for all generated writers.
         /// </summary>
         public const string GeneratedWriterPrefix = "GWrite___";
+
         #endregion
 
         #region Reader.
+
         /// <summary>
         /// Writer.Write() method.
         /// </summary>
@@ -170,7 +196,7 @@
         /// <summary>
         /// Writer class.
         /// </summary>
-        public const string Reader_FullName = $"{Serializing_Namespace}.Reader";       
+        public const string Reader_FullName = $"{Serializing_Namespace}.Reader";
         /// <summary>
         /// Writer.WriteUnsignedPackedWhole method.
         /// </summary>
@@ -187,14 +213,16 @@
         /// Prefix to use for all generated readers.
         /// </summary>
         public const string GeneratedReaderPrefix = "GRead___";
+
         #endregion
 
         #region General.
+
         /// <summary>
         /// FastContains method.
         /// </summary>
         public const string FastContains_Name = "FastContains";
-        #endregion
 
+        #endregion
     }
 }

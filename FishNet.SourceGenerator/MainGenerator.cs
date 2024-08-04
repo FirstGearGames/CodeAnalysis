@@ -18,8 +18,6 @@ namespace FishNet.SourceGenerating
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (!context.Compilation.AssemblyName.Contains("FishNet.Test")) return;
-
             if (context.SyntaxContextReceiver is not RootSyntaxReceiver rootSyntaxReceiver) return;
             Debugg.Log($"- Execute Start for {context.Compilation.AssemblyName}.");
 

@@ -1,5 +1,6 @@
 ﻿using FishNet.CodeGenerating;
 using FishNet.Object;
+using FishNet.Object.Prediction;
 using FishNet.Runtime.Unity_Stuff;
 using FishNet.Serializing;
 using FishNet.Transporting;
@@ -30,8 +31,8 @@ namespace ClientAssembly
     //	public float VelocityZ;
     //}
 
-    [IncludeSerialization]
-    public class MyThingA : MyThingB
+    //[IncludeSerialization]
+    public class MyThingA : MyThingB, IReplicateData
 	{
 		public Vector3 Position;
 		public string A;
@@ -40,14 +41,14 @@ namespace ClientAssembly
 		private uint _tick;
 	}
 
-    [IncludeSerialization]
+   // [IncludeSerialization]
     public class MyThingB
 	{
 		public string B;
 	}
 
-    [IncludeSerialization]
-    public struct MyThingC
+   // [IncludeSerialization]
+    public struct MyThingC : IReplicateData
 	{
         public string C;
     }
