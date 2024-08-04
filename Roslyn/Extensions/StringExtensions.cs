@@ -1,4 +1,4 @@
-﻿namespace SourceGenerating.Extensions
+﻿.Extensions
 {
     internal static class StringExtensions
     {

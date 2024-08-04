@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using FishNet.SourceGenerating.Helpers;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     public static class IAssemblySymbolExtensions
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     internal static class StringBuilderExtensions
     {

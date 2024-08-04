@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using FishNet.SourceGenerating.Helpers;
 using FishNet.SourceGenerating.CodeBuilding;
-using SourceGenerating.Extensions;
+using Roslyn.Extensions;
 
 namespace FishNet.SourceGenerating.SyntaxReceivers
 {

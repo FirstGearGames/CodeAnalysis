@@ -1,6 +1,6 @@
-﻿using SourceGenerating.Constants;
-using SourceGenerating.Extensions;
-using System.Text;
+﻿using System.Text;
+using Roslyn.Extensions;
+using Roslyn.Constants;
 
 namespace SourceGenerating.CodeBuilding
 {

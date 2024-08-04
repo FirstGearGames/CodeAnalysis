@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using FishNet.SourceGenerating.Helpers;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     internal static class INamedTypeSymbolExtensions
     {

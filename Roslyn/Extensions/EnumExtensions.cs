@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     internal static class EnumExtensions
     {

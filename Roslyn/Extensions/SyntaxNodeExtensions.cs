@@ -5,7 +5,7 @@
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     internal static class SyntaxNodeExtensions
     {

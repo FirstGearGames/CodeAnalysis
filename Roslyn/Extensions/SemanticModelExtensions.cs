@@ -3,7 +3,7 @@
 using Microsoft.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     internal static class SemanticModelExtensions
     {

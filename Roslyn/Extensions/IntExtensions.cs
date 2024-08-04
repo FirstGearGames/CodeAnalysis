@@ -2,7 +2,7 @@
 using FishNet.SourceGenerating.Helpers;
 using System.Text;
 
-namespace SourceGenerating.Extensions
+namespace Roslyn.Extensions
 {
     public static class IntExtensions
     {

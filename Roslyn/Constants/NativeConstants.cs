@@ -1,4 +1,4 @@
-﻿namespace SourceGenerating.Constants
+﻿namespace Roslyn.Constants
 {
     internal static class NativeConstants
     {

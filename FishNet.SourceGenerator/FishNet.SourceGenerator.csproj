@@ -10,4 +10,42 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Compile Include="..\Roslyn\Constants\NativeConstants.cs">
+	    <Link>Roslyn\Constants\NativeConstants.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\AttributeDataExtensions.cs">
+	    <Link>Roslyn\Extensions\AttributeDataExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\EnumExtensions.cs">
+	    <Link>Roslyn\Extensions\EnumExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\IAssemblySymbolExtensions.cs">
+	    <Link>Roslyn\Extensions\IAssemblySymbolExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\INamedTypeSymbolExtensions.cs">
+	    <Link>Roslyn\Extensions\INamedTypeSymbolExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\IntExtensions.cs">
+	    <Link>Roslyn\Extensions\IntExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\ISymbolExtensions.cs">
+	    <Link>Roslyn\Extensions\ISymbolExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\ITypeSymbolExtensions.cs">
+	    <Link>Roslyn\Extensions\ITypeSymbolExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\SemanticModelExtensions.cs">
+	    <Link>Roslyn\Extensions\SemanticModelExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\StringBuilderExtensions.cs">
+	    <Link>Roslyn\Extensions\StringBuilderExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\StringExtensions.cs">
+	    <Link>Roslyn\Extensions\StringExtensions.cs</Link>
+	  </Compile>
+	  <Compile Include="..\Roslyn\Extensions\SyntaxNodeExtensions.cs">
+	    <Link>Roslyn\Extensions\SyntaxNodeExtensions.cs</Link>
+	  </Compile>
+	</ItemGroup>
 </Project>
