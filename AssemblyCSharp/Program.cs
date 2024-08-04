@@ -54,6 +54,10 @@ namespace ClientAssembly
     }
 	public class Player : NetworkBehaviour
 	{
+		private struct NestedStruct : IReplicateData
+		{
+			
+		}
   //      [IncludeSerialization]
   //      public class MyStructB
   //      {

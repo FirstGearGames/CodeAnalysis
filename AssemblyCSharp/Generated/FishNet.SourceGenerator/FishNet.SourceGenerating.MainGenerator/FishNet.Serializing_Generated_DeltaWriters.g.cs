@@ -93,12 +93,37 @@
 			return changed;
 		}
 
+		public static bool GWrite___WriteDeltaClientAssembly_Player_NestedStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.NestedStruct value0, ClientAssembly.Player.NestedStruct value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+		{
+			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
+			{
+				System.UInt64 optionsFlags = (System.UInt64)options;
+				writer.WriteUnsignedPackedWhole(optionsFlags);
+				writer.Write(value1);
+				return true;
+			}
+
+			System.UInt64 totalFlags = (ulong)options;
+			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
+
+			System.Boolean changed = (totalFlags != 0);
+			if (changed)
+			{
+				writer.WriteUnsignedPackedWhole(totalFlags);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
+			}
+			pooledWriter.Store();
+
+			return changed;
+		}
+
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
 			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingB>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.MyThingB, ClientAssembly.MyThingB, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingB));
 			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingA>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.MyThingA, ClientAssembly.MyThingA, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingA));
 			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.MyThingC>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.MyThingC, ClientAssembly.MyThingC, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_MyThingC));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.Player.NestedStruct>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.Player.NestedStruct, ClientAssembly.Player.NestedStruct, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_Player_NestedStruct));
 		}
 	}
 }
