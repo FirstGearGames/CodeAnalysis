@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Roslyn.FishNet.Helpers;
 
 namespace Roslyn.Extensions
 {

@@ -11,65 +11,6 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Compile Include="..\Roslyn.Shared\CodeBuilding\CodeBuilder.cs">
-	    <Link>Roslyn.Shared\CodeBuilding\CodeBuilder.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Constants\NativeConstants.cs">
-	    <Link>Roslyn.Shared\Constants\NativeConstants.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\AttributeDataExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\AttributeDataExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\EnumExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\EnumExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\IAssemblySymbolExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\IAssemblySymbolExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\INamedTypeSymbolExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\INamedTypeSymbolExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\IntExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\IntExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\ISymbolExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\ISymbolExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\ITypeSymbolExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\ITypeSymbolExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\SemanticModelExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\SemanticModelExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\StringBuilderExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\StringBuilderExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\StringExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\StringExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\Extensions\SyntaxNodeExtensions.cs">
-	    <Link>Roslyn.Shared\Extensions\SyntaxNodeExtensions.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\FishNet\Constants\FishNetConstants.cs">
-	    <Link>Roslyn.Shared\FishNet\Constants\FishNetConstants.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\FishNet\Constants\UnityConstants.cs">
-	    <Link>Roslyn.Shared\FishNet\Constants\UnityConstants.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\FishNet\Helpers\DebugHelper.cs">
-	    <Link>Roslyn.Shared\FishNet\Helpers\DebugHelper.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\FishNet\Helpers\RpcHelpers.cs">
-	    <Link>Roslyn.Shared\FishNet\Helpers\RpcHelpers.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\FishNet\Serializing\SerializableType.cs">
-	    <Link>Roslyn.Shared\FishNet\Serializing\SerializableType.cs</Link>
-	  </Compile>
-	  <Compile Include="..\Roslyn.Shared\FishNet\Serializing\SerializerReceiver.cs">
-	    <Link>Roslyn.Shared\FishNet\Serializing\SerializerReceiver.cs</Link>
-	  </Compile>
-	</ItemGroup>
-	<ItemGroup>
 	  <Folder Update="..\Roslyn" />
 	</ItemGroup>
 </Project>

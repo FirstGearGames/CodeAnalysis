@@ -2,7 +2,7 @@
 
 namespace Roslyn.Extensions
 {
-    internal static class IntExtensions
+    public static class IntExtensions
     {
         private static StringBuilder _stringBuilder = new();
 
