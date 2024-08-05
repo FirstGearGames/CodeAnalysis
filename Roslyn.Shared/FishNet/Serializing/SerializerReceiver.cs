@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -154,7 +155,7 @@ namespace Roslyn.FishNet.Serializing
             if (!canSerialize)
                 return;
 
-            Debugg.Log($"Found includeSerialization for {namedTypeSymbol.GetSymbolFullName()}");
+            Debugg.Log($"Found type to be serialized: {namedTypeSymbol.GetSymbolFullName()}");
 
             /* FullNames added this iteration.
              * This is used to prevent endless loops. */
@@ -228,9 +229,8 @@ namespace Roslyn.FishNet.Serializing
             if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
                 return true;
 
-            Debugg.Log("DERPPPPPP " + (context == null));
-            if (context is SyntaxNodeAnalysisContext analysisContext)
-                OnIsNotSerializableAccessible?.Invoke(analysisContext);
+             if (context is SyntaxNodeAnalysisContext analysisContext)
+                 OnIsNotSerializableAccessible?.Invoke(analysisContext);
 
             //Not partial.
             return false;
