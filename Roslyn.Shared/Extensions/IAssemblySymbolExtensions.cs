@@ -3,7 +3,7 @@ using Roslyn.FishNet.Helpers;
 
 namespace Roslyn.Extensions
 {
-    internal static class IAssemblySymbolExtensions
+    public static class IAssemblySymbolExtensions
     {
         public static bool GetINamedTypeSymbol(this IAssemblySymbol? assemblySymbol, string fullName, out INamedTypeSymbol? result, bool error = true)
         {

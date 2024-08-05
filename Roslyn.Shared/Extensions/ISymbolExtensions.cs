@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace Roslyn.Extensions
 {
-    internal static class ISymbolExtensions
+    public static class ISymbolExtensions
     {
         /// <summary>
         /// Returns the full name of a symbol which includes the namespace.

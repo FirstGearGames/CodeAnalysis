@@ -4,7 +4,7 @@ using Roslyn.FishNet.Serializing;
 
 namespace Roslyn.FishNet.Receivers
 {
-    internal class GeneratorSyntaxReceiver : ISyntaxContextReceiver
+    public class GeneratorSyntaxReceiver : ISyntaxContextReceiver
     {
         public SerializableReceiver SerializableReceiver = new();
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)

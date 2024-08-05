@@ -1,6 +1,6 @@
 ﻿namespace Roslyn.Native.Constants
 {
-    internal static class NativeConstants
+    public static class NativeConstants
     {
         public const string Func_FullName = "System.Func";
         public const string Boolean_FullName = "System.Boolean";

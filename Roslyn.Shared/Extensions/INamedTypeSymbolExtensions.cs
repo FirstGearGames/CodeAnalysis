@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Roslyn.Extensions
 {
-    internal static class INamedTypeSymbolExtensions
+    public static class INamedTypeSymbolExtensions
     {
         /// <summary>
         /// Returns the short name of a symbol which includes the namespace.

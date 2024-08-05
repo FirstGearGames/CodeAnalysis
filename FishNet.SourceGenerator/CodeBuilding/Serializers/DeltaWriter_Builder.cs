@@ -12,7 +12,7 @@ using RoslynCodeBuilder = Roslyn.CodeBuilding.CodeBuilder;
 
 namespace Rosly.FishNet.CodeBuilding
 {
-    internal class DeltaWriter_Builder
+    public class DeltaWriter_Builder
     {
         private static StringBuilder _stringBuilder = new();
 

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Roslyn.Extensions
 {
-    internal static class SemanticModelExtensions
+    public static class SemanticModelExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ISymbol GetSymbol(this SemanticModel semanticModel, SyntaxNode node)

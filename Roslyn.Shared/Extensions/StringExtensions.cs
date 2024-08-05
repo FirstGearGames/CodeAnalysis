@@ -1,6 +1,6 @@
 ﻿namespace Roslyn.Extensions
 {
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         public static string RemovePeriods(this string value, string newValue = "") => value.Replace(".", newValue);
 

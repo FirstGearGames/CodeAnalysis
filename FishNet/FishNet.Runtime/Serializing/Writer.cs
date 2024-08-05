@@ -314,7 +314,7 @@ namespace FishNet.Serializing
         /// <summary>
         /// Writes value to dst without error checking.
         /// </summary>
-        internal static void WriteUInt32Unpacked(byte[] dst, uint value, ref int position)
+        public static void WriteUInt32Unpacked(byte[] dst, uint value, ref int position)
         {
         }
 

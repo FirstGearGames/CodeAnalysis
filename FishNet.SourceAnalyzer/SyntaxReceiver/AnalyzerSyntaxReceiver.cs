@@ -5,7 +5,7 @@ using Roslyn.FishNet.Serializing;
 
 namespace Roslyn.FishNet.Receivers
 {
-    internal class AnalyzerSyntaxReceiver
+    public class AnalyzerSyntaxReceiver
     {
         public SerializableReceiver SerializableReceiver = new();
         

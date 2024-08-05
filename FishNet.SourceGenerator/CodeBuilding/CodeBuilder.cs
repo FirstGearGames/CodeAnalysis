@@ -4,7 +4,7 @@ using Roslyn.FishNet.Constants;
 
 namespace Roslyn.FishNet.CodeBuilding
 {
-    internal static class CodeBuilder
+    public static class CodeBuilder
     {
         private static StringBuilder _stringBuilder = new();
 
@@ -13,7 +13,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// Calls WriterPool to return a pooled writer.
         /// </summary>
         /// <param name="writerVariableName">Variable name result of </param>
-        internal static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "",
+        public static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "",
             bool closeCall = true)
         {
             _stringBuilder.Clear();
@@ -29,7 +29,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Calls Store on a pooled writer.
         /// </summary>
-        internal static string CallStorePooledWriter(string writerVariableName, bool closeCall = true)
+        public static string CallStorePooledWriter(string writerVariableName, bool closeCall = true)
         {
             _stringBuilder.Clear();
             _stringBuilder.Append($"{writerVariableName}.{FishNetConstants.PooledWriter_Store_Name}()");
@@ -39,7 +39,7 @@ namespace Roslyn.FishNet.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-        internal static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
+        public static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
 
@@ -52,7 +52,7 @@ namespace Roslyn.FishNet.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-        internal static string CallWriteArraySegmentAndSize(string writerName, string otherWriterA, bool closeCall = true)
+        public static string CallWriteArraySegmentAndSize(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
 
@@ -66,7 +66,7 @@ namespace Roslyn.FishNet.CodeBuilding
         }
 
 
-        internal static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
+        public static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
         {
             StringBuilder sb = new();
             sb.AppendLine(indent, $"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");

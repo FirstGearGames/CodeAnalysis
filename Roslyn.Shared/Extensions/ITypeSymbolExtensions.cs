@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace Roslyn.Extensions
 {
-    internal static class ITypeSymbolExtensions
+    public static class ITypeSymbolExtensions
     {
         public static string GetTypeFullName(this ITypeSymbol typeSymbol)
         {

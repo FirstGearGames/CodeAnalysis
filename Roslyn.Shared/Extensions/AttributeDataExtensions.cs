@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Roslyn.Extensions
 {
-    internal static class AttributeDataExtensions
+    public static class AttributeDataExtensions
     {
         public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
         {

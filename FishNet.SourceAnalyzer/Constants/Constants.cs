@@ -1,6 +1,6 @@
 ﻿namespace FishNet.SourceAnaylze.Constants
 {
-    internal static class DiagnosticIds
+    public static class DiagnosticIds
     {
         /// <summary>
         /// Network serializable types must be declared internal or public, or the declaring class must be partial.
@@ -8,7 +8,7 @@
         public const string FN0001 = nameof(FN0001);
     }
 
-    internal static class DiagnosticCategories
+    public static class DiagnosticCategories
     {
         /// <summary>
         /// Indicates a change in usage is required.

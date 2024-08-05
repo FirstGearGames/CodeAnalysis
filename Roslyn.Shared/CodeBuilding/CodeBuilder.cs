@@ -4,14 +4,14 @@ using Roslyn.Native.Constants;
 
 namespace Roslyn.CodeBuilding
 {
-    internal static class CodeBuilder
+    public static class CodeBuilder
     {
         private static StringBuilder _stringBuilder = new();
 
         /// <summary>
         /// Creates a class optionally wrapping it in a namespace.
         /// </summary>
-        internal static string CreatePublicStaticClass(string className, out string footer, string namespaceName = "")
+        public static string CreatePublicStaticClass(string className, out string footer, string namespaceName = "")
         {
             _stringBuilder.Clear();
 
@@ -42,7 +42,7 @@ namespace Roslyn.CodeBuilding
         /// <summary>
         /// Calls a method taking optional arguments.
         /// </summary>
-        internal static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true,
+        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true,
             params string[] variableNames)
         {
             if (callingVariable.Length > 0)
@@ -72,7 +72,7 @@ namespace Roslyn.CodeBuilding
         /// <summary>
         /// Creates a multiline if statement conditional.
         /// </summary>
-        internal static string CreateMultiLineIf(int indent, string conditionaltext, string line)
+        public static string CreateMultiLineIf(int indent, string conditionaltext, string line)
         {
             StringBuilder sb = new();
             sb.Append(indent + 1, line);
@@ -82,7 +82,7 @@ namespace Roslyn.CodeBuilding
         /// <summary>
         /// Creates a multiline if statement conditional.
         /// </summary>
-        internal static string CreateMultiLineIf(int indent, string conditionaltext, StringBuilder lines)
+        public static string CreateMultiLineIf(int indent, string conditionaltext, StringBuilder lines)
         {
             _stringBuilder.Clear();
             _stringBuilder.AppendLine(indent, $"if ({conditionaltext})");
@@ -93,7 +93,7 @@ namespace Roslyn.CodeBuilding
         }
 
 
-        internal static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "", bool closeLine = true)
+        public static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "", bool closeLine = true)
         {
             _stringBuilder.Clear();
             _stringBuilder.Append($"{fullTypeName} {variableName}");
@@ -106,7 +106,7 @@ namespace Roslyn.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-        internal static string CreateFunction(string returnType, params string[] types)
+        public static string CreateFunction(string returnType, params string[] types)
         {
             _stringBuilder.Clear();
 

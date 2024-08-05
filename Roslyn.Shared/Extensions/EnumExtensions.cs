@@ -2,7 +2,7 @@
 
 namespace Roslyn.Extensions
 {
-    internal static class EnumExtensions
+    public static class EnumExtensions
     {
         /// <summary>
         /// Returns the highest numeric value for T.

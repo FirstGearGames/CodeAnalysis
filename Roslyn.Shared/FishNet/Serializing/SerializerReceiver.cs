@@ -10,7 +10,7 @@ using Roslyn.FishNet.Helpers;
 
 namespace Roslyn.FishNet.Serializing
 {
-    internal class SerializableReceiver
+    public class SerializableReceiver
     {
         public const string NetworkConnection_FullName = "FishNet.Connection.NetworkConnection";
         public const string Channel_FullName = "FishNet.Transporting.Channel";

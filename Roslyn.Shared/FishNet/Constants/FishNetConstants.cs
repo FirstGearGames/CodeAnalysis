@@ -1,6 +1,6 @@
 ﻿namespace Roslyn.FishNet.Constants
 {
-    internal class FishNetConstants
+    public class FishNetConstants
     {
         #region Namespaces and assemblies.
 

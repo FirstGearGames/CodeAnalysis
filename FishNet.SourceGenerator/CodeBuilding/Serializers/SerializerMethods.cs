@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Roslyn.FishNet.CodeBuilding
 {
-    internal static class SerializerMethodExtensions
+    public static class SerializerMethodExtensions
     {
         public static bool IsValid(this SerializerMethod? sm)
         {
@@ -13,7 +13,7 @@ namespace Roslyn.FishNet.CodeBuilding
         }
     }
 
-    internal class MethodContent
+    public class MethodContent
     {
         public StringBuilder Header;
         public StringBuilder Body;
@@ -65,7 +65,7 @@ namespace Roslyn.FishNet.CodeBuilding
 
     }
 
-    internal class SerializerMethod
+    public class SerializerMethod
     {
         /// <summary>
         /// Full name of the type the serializer is for.
@@ -115,7 +115,7 @@ namespace Roslyn.FishNet.CodeBuilding
         public virtual bool IsDeltaSerializer() => false;
     }
 
-    internal class DeltaSerializerMethod : SerializerMethod
+    public class DeltaSerializerMethod : SerializerMethod
     {
         public DeltaSerializerMethod(string typeFullName, string methodName) : base(typeFullName, methodName) { }
 
@@ -126,7 +126,7 @@ namespace Roslyn.FishNet.CodeBuilding
         public override bool IsDeltaSerializer() => true;
     }
 
-    internal class GeneratedDeltaSerializerMethod : DeltaSerializerMethod
+    public class GeneratedDeltaSerializerMethod : DeltaSerializerMethod
     {
         /// <summary>
         /// NamedTypeSymbol of the method.
@@ -146,7 +146,7 @@ namespace Roslyn.FishNet.CodeBuilding
     }
 
 
-    internal class GeneratedSerializerMethod : SerializerMethod
+    public class GeneratedSerializerMethod : SerializerMethod
     {
         /// <summary>
         /// NamedTypeSymbol of the method.

@@ -22,7 +22,7 @@ namespace FishNet.CodeGenerating
     /// <summary>
     /// Method or type will be made public by codegen.
     /// </summary>
-    internal class MakePublicAttribute : Attribute { }
+    public class MakePublicAttribute : Attribute { }
     /// <summary>
     /// Method is a comparer for a value type.
     /// </summary>

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Roslyn.Extensions
 {
-    internal static class StringBuilderExtensions
+    public static class StringBuilderExtensions
     {
         public static StringBuilder Indent(this StringBuilder stringBuilder, int count = 1)
         {

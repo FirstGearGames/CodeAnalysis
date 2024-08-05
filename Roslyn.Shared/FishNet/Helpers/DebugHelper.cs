@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Roslyn.FishNet.Helpers
 {
-	internal static class Debugg
+	public static class Debugg
 	{
 		private static List<string> _msgs = new();
 

@@ -9,14 +9,14 @@ using Roslyn.FishNet.Helpers;
 
 namespace Roslyn.FishNet.CodeBuilding
 {
-    internal enum AddSerializerType
+    public enum AddSerializerType
     {
         Unset,
         Full,
         Delta,
     }
 
-    internal enum GetSerializerType
+    public enum GetSerializerType
     {
         Full,
         Delta,
@@ -24,7 +24,7 @@ namespace Roslyn.FishNet.CodeBuilding
         FavorDelta,
     }
 
-    internal class Serializers
+    public class Serializers
     {
         //Writers.
         private readonly Dictionary<string, SerializerMethod> _writeMethods = new();

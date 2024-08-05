@@ -6,7 +6,7 @@ using Roslyn.FishNet.Constants;
 namespace Roslyn.FishNet.Helpers
 {
 
-    internal enum RPCType
+    public enum RPCType
     {
         Unset,
         Target,
@@ -14,7 +14,7 @@ namespace Roslyn.FishNet.Helpers
         Observers
     }
 
-    internal struct RpcAttributeData
+    public struct RpcAttributeData
     {
         public AttributeData AttributeData;
         public RPCType RPCType;
@@ -26,7 +26,7 @@ namespace Roslyn.FishNet.Helpers
         }
     }
 
-    internal static class RpcHelpers
+    public static class RpcHelpers
     {
         public static RPCType GetRpcType(string attributeFullName)
         {

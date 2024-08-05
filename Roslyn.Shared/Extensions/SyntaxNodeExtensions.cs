@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Roslyn.Extensions
 {
-    internal static class SyntaxNodeExtensions
+    public static class SyntaxNodeExtensions
     {
         public static bool TryGetParentSyntax<T>(this SyntaxNode syntaxNode, out T result) where T : SyntaxNode
         {

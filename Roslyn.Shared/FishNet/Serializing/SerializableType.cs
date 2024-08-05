@@ -4,7 +4,7 @@ using Roslyn.Extensions;
 
 namespace Roslyn.FishNet.Serializing
 {
-    internal struct SerializableType : IEquatable<SerializableType>
+    public struct SerializableType : IEquatable<SerializableType>
     {
         /// <summary>
         /// Type the serializable is for.

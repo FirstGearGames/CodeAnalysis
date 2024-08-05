@@ -3,7 +3,7 @@
 namespace FishNet.Serializing
 {
     [System.Flags]
-    internal enum DeltaVector3Type : byte
+    public enum DeltaVector3Type : byte
     {
         /// <summary>
         /// This is unused.
@@ -44,7 +44,7 @@ namespace FishNet.Serializing
     }
 
     [System.Flags]
-    internal enum UDeltaPrecisionType : byte
+    public enum UDeltaPrecisionType : byte
     {
         /// <summary>
         /// Indicates there is no compression. This can also be used to initialize the enum.
@@ -77,7 +77,7 @@ namespace FishNet.Serializing
         UInt128 = 32,
     }
     [System.Flags]
-    internal enum DeltaPrecisionType : byte
+    public enum DeltaPrecisionType : byte
     {
         /// <summary>
         /// Indicates there is no compression. This can also be used to initialize the enum.
@@ -105,7 +105,7 @@ namespace FishNet.Serializing
         Int128 = 32,
     }
 
-    internal static class DeltaTypeExtensions
+    public static class DeltaTypeExtensions
     {
         public static bool FastContains(this UDeltaPrecisionType whole, UDeltaPrecisionType part) => (whole & part) == part;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

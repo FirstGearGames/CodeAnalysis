@@ -1,6 +1,6 @@
 ﻿namespace Roslyn.FishNet.Constants
 {
-    internal class UnityConstants
+    public class UnityConstants
     {
         #region Namespaces and assemblies.
         /// <summary>
