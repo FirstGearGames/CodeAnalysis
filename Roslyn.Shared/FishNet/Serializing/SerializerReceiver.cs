@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -8,7 +7,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.Extensions;
 using Roslyn.FishNet.Constants;
-using Roslyn.FishNet.Helpers;
 using Roslyn.FishNet.Helpers;
 
 namespace Roslyn.FishNet.Serializing
@@ -197,11 +195,16 @@ namespace Roslyn.FishNet.Serializing
                     return false;
             }
 
-            if (!IsSerializableAccessible(context, theSymbol))
+            SerializableType.TypeExposure typeExposure = GetSerializableTypeExposure(context, theSymbol);
+            if (typeExposure == SerializableType.TypeExposure.Unset)
+            {
+                if (context is SyntaxNodeAnalysisContext analysisContext)
+                    OnIsNotSerializableAccessible?.Invoke(analysisContext);
                 return false;
+            }
 
             string metaName = theSymbol.GetSymbolFullMetaName();
-            if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName)))
+            if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName, typeExposure)))
                 Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
 
             return true;
@@ -211,29 +214,26 @@ namespace Roslyn.FishNet.Serializing
         /// Returns if a type is accessible for serialization.
         /// This returns true if scope is internal or public, or if the class it's nested within is partial.
         /// </summary>
-        private bool IsSerializableAccessible(object context, INamedTypeSymbol typeSymbol)
+        private SerializableType.TypeExposure GetSerializableTypeExposure(object context, INamedTypeSymbol typeSymbol)
         {
             //Internal/public.
-            if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.Public or Accessibility.ProtectedAndInternal) return true;
+            if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.Public or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.PublicOrInternal;
 
             /* If here type is not exposed enough. See if containing type is partial which will allow us
              * to put the generated serializer in the containing type. */
 
-            if (typeSymbol.ContainingType is not INamedTypeSymbol baseNamedType) return false;
+            if (typeSymbol.ContainingType is not INamedTypeSymbol baseNamedType) return SerializableType.TypeExposure.Unset;
 
-            if (baseNamedType.DeclaringSyntaxReferences.First() is not SyntaxReference syntaxReference) return false;
+            if (baseNamedType.DeclaringSyntaxReferences.First() is not SyntaxReference syntaxReference) return SerializableType.TypeExposure.Unset;
 
             SyntaxNode node = syntaxReference.GetSyntax();
-            if (node is not TypeDeclarationSyntax typeDeclaration) return false;
+            if (node is not TypeDeclarationSyntax typeDeclaration) return SerializableType.TypeExposure.Unset;
 
             if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
-                return true;
-
-             if (context is SyntaxNodeAnalysisContext analysisContext)
-                 OnIsNotSerializableAccessible?.Invoke(analysisContext);
-
+                return SerializableType.TypeExposure.NestedWithinPartial;
+            
             //Not partial.
-            return false;
+            return SerializableType.TypeExposure.Unset;
         }
     }
 }

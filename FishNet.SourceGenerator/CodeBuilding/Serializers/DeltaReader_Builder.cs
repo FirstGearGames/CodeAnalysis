@@ -66,7 +66,7 @@ namespace Roslyn.FishNet.CodeBuilding
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol, SerializableType.TypeExposure.PublicOrInternal), recursiveCount + 1);
             }
 
             string header = GetMethodHeader(out string methodName);

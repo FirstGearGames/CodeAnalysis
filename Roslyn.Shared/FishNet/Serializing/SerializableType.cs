@@ -6,6 +6,14 @@ namespace Roslyn.FishNet.Serializing
 {
     public struct SerializableType : IEquatable<SerializableType>
     {
+        public enum TypeExposure
+        {
+            Unset = 0,
+            PublicOrInternal = 1,
+            NestedWithinPartial = 2,
+        }
+
+        public TypeExposure Exposure;
         /// <summary>
         /// Type the serializable is for.
         /// </summary>
@@ -19,17 +27,19 @@ namespace Roslyn.FishNet.Serializing
         /// </summary>
         public readonly string FullMetadataName;
 
-        public SerializableType(ITypeSymbol typeSymbol)
+        public SerializableType(ITypeSymbol typeSymbol, TypeExposure exposure)
         {
             TypeSymbol = typeSymbol;
             FullName = typeSymbol.GetSymbolFullName();
             FullMetadataName = typeSymbol.GetSymbolFullMetaName();
+            Exposure = exposure;
         }
-        public SerializableType(ITypeSymbol typeSymbol, string fullName, string fullMetadataName)
+        public SerializableType(ITypeSymbol typeSymbol, string fullName, string fullMetadataName, TypeExposure exposure)
         {
             TypeSymbol = typeSymbol;
             FullName = fullName;
             FullMetadataName = fullMetadataName;
+            Exposure = exposure;
         }
 
         public bool Equals(SerializableType other) => (other.FullName == this.FullName);
