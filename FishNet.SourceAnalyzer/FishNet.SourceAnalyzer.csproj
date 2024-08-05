@@ -16,6 +16,54 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="..\Roslyn.Shared\obj\project.assets.json">
+        <Link>Roslyn.Shared\obj\project.assets.json</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\project.nuget.cache">
+        <Link>Roslyn.Shared\obj\project.nuget.cache</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\project.packagespec.json">
+        <Link>Roslyn.Shared\obj\project.packagespec.json</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.AssemblyInfoInputs.cache">
+        <Link>Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.AssemblyInfoInputs.cache</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.assets.cache">
+        <Link>Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.assets.cache</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.csproj.AssemblyReference.cache">
+        <Link>Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.csproj.AssemblyReference.cache</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.GeneratedMSBuildEditorConfig.editorconfig">
+        <Link>Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.GeneratedMSBuildEditorConfig.editorconfig</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\rider.project.model.nuget.info">
+        <Link>Roslyn.Shared\obj\rider.project.model.nuget.info</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\rider.project.restore.info">
+        <Link>Roslyn.Shared\obj\rider.project.restore.info</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Roslyn.Shared.csproj.nuget.dgspec.json">
+        <Link>Roslyn.Shared\obj\Roslyn.Shared.csproj.nuget.dgspec.json</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Roslyn.Shared.csproj.nuget.g.props">
+        <Link>Roslyn.Shared\obj\Roslyn.Shared.csproj.nuget.g.props</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\obj\Roslyn.Shared.csproj.nuget.g.targets">
+        <Link>Roslyn.Shared\obj\Roslyn.Shared.csproj.nuget.g.targets</Link>
+      </Content>
+      <Content Include="..\Roslyn.Shared\Roslyn.Shared.csproj">
+        <Link>Roslyn.Shared\Roslyn.Shared.csproj</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="..\Roslyn.Shared\bin\Release\netstandard2.0\">
+        <Link>Roslyn.Shared\bin\Release\netstandard2.0</Link>
+      </Folder>
+    </ItemGroup>
+
+    <ItemGroup>
       <Compile Include="..\Roslyn.Shared\CodeBuilding\CodeBuilder.cs">
         <Link>Roslyn.Shared\CodeBuilding\CodeBuilder.cs</Link>
       </Compile>
@@ -61,8 +109,23 @@
       <Compile Include="..\Roslyn.Shared\FishNet\Constants\UnityConstants.cs">
         <Link>Roslyn.Shared\FishNet\Constants\UnityConstants.cs</Link>
       </Compile>
-      <Compile Include="..\Roslyn.Shared\FishNet\Serializing\zzSerializerReceiver.cs">
-        <Link>Roslyn.Shared\FishNet\Serializing\zzSerializerReceiver.cs</Link>
+      <Compile Include="..\Roslyn.Shared\FishNet\Helpers\DebugHelper.cs">
+        <Link>Roslyn.Shared\FishNet\Helpers\DebugHelper.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\FishNet\Helpers\RpcHelpers.cs">
+        <Link>Roslyn.Shared\FishNet\Helpers\RpcHelpers.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\FishNet\Serializing\SerializableType.cs">
+        <Link>Roslyn.Shared\FishNet\Serializing\SerializableType.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\FishNet\Serializing\SerializerReceiver.cs">
+        <Link>Roslyn.Shared\FishNet\Serializing\SerializerReceiver.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\obj\Release\netstandard2.0\.NETStandard,Version=v2.0.AssemblyAttributes.cs">
+        <Link>Roslyn.Shared\obj\Release\netstandard2.0\.NETStandard,Version=v2.0.AssemblyAttributes.cs</Link>
+      </Compile>
+      <Compile Include="..\Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.AssemblyInfo.cs">
+        <Link>Roslyn.Shared\obj\Release\netstandard2.0\Roslyn.Shared.AssemblyInfo.cs</Link>
       </Compile>
     </ItemGroup>
 
