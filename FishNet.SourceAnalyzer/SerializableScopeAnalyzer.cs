@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Roslyn.FishNet.Helpers;
 using Roslyn.FishNet.Receivers;
 
 namespace FishNet.SourceAnaylzer
@@ -25,6 +26,7 @@ namespace FishNet.SourceAnaylzer
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
+            Debugg.Log("Starting");
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             //context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.InvocationExpression);
             context.RegisterSyntaxNodeAction(_receiver.Anaylze, SyntaxKind.InvocationExpression);

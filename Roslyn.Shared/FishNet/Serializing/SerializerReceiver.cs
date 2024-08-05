@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.Extensions;
@@ -12,61 +14,64 @@ namespace Roslyn.FishNet.Serializing
 {
     public class SerializableReceiver
     {
+        public event Action<SyntaxNodeAnalysisContext> OnIsNotSerializableAccessible;
+
         public const string NetworkConnection_FullName = "FishNet.Connection.NetworkConnection";
         public const string Channel_FullName = "FishNet.Transporting.Channel";
         public HashSet<SerializableType> SerializableTypes = new();
 
         public void FindStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(structDeclaration);
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(namedTypeSymbol);
+            FindNamedTypeSymbolSerializables(null, namedTypeSymbol);
         }
 
         public void FindStructSerializables(SyntaxNodeAnalysisContext context, StructDeclarationSyntax structDeclaration)
         {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(structDeclaration);
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(namedTypeSymbol);
+            FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
 
         public void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
         {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(namedTypeSymbol);
+            FindNamedTypeSymbolSerializables(null, namedTypeSymbol);
         }
 
         public void FindClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
         {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(namedTypeSymbol);
-        }
-        
-        public void FindRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
-        {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
-            if (symbol is not IMethodSymbol methodSymbol) return;
-            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
-            
-            FindRpcSerializables(methodSymbol);
+            FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
 
         public void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
-            ISymbol? symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
             if (symbol is not IMethodSymbol methodSymbol) return;
             if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
 
-            FindRpcSerializables(methodSymbol);
+            FindRpcSerializables(null, methodSymbol);
         }
 
-        private void FindRpcSerializables(IMethodSymbol methodSymbol)
+
+        public void FindRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
+        {
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
+            if (symbol is not IMethodSymbol methodSymbol) return;
+            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
+
+            FindRpcSerializables(context, methodSymbol);
+        }
+
+        private void FindRpcSerializables(object context, IMethodSymbol methodSymbol)
         {
             if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
 
@@ -128,14 +133,14 @@ namespace Roslyn.FishNet.Serializing
             {
                 if (parameter is not INamedTypeSymbol namedSymbol) continue;
 
-                AddSerializableType(namedSymbol);
+                AddSerializableType(context, namedSymbol);
             }
         }
 
         /// <summary>
         /// Finds serializables for an INamedTypeSymbol which may not be bound to specific mechanics, such as RPC.
         /// </summary>
-        public void FindNamedTypeSymbolSerializables(INamedTypeSymbol namedTypeSymbol)
+        public void FindNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol)
         {
             //Manually excluding serialization.
             if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return;
@@ -155,12 +160,12 @@ namespace Roslyn.FishNet.Serializing
              * This is used to prevent endless loops. */
             HashSet<string> addedFullNames = new();
 
-            AddSerializableType(namedTypeSymbol);
+            AddSerializableType(context, namedTypeSymbol);
             while (namedTypeSymbol.BaseType is INamedTypeSymbol nestedNamedTypeSymbol)
                 /* The method indicated it could not add some reason.
                  * Maybe the type had an attribute to not serialize or
                  * its the previously checked type. */
-                if (!AddSerializableType(nestedNamedTypeSymbol))
+                if (!AddSerializableType(context, nestedNamedTypeSymbol))
                     break;
 
             //Returns if a symbol implements prediction interfaces.
@@ -172,12 +177,12 @@ namespace Roslyn.FishNet.Serializing
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Adds a type to serializableTypes.
         /// Returns true if added, false if already existed.
         /// </summary>
-        private bool AddSerializableType(INamedTypeSymbol theSymbol)
+        private bool AddSerializableType(object context, INamedTypeSymbol theSymbol)
         {
             //Has exclude serialization attribute.
             if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
@@ -191,11 +196,44 @@ namespace Roslyn.FishNet.Serializing
                     return false;
             }
 
+            if (!IsSerializableAccessible(context, theSymbol))
+                return false;
+
             string metaName = theSymbol.GetSymbolFullMetaName();
             if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName)))
                 Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
 
             return true;
+        }
+
+        /// <summary>
+        /// Returns if a type is accessible for serialization.
+        /// This returns true if scope is internal or public, or if the class it's nested within is partial.
+        /// </summary>
+        private bool IsSerializableAccessible(object context, INamedTypeSymbol typeSymbol)
+        {
+            //Internal/public.
+            if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.Public or Accessibility.ProtectedAndInternal) return true;
+
+            /* If here type is not exposed enough. See if containing type is partial which will allow us
+             * to put the generated serializer in the containing type. */
+
+            if (typeSymbol.ContainingType is not INamedTypeSymbol baseNamedType) return false;
+
+            if (baseNamedType.DeclaringSyntaxReferences.First() is not SyntaxReference syntaxReference) return false;
+
+            SyntaxNode node = syntaxReference.GetSyntax();
+            if (node is not TypeDeclarationSyntax typeDeclaration) return false;
+
+            if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
+                return true;
+
+            Debugg.Log("DERPPPPPP " + (context == null));
+            if (context is SyntaxNodeAnalysisContext analysisContext)
+                OnIsNotSerializableAccessible?.Invoke(analysisContext);
+
+            //Not partial.
+            return false;
         }
     }
 }
