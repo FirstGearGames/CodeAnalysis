@@ -9,11 +9,17 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-		<ProjectReference Include="..\Roslyn.Shared\Roslyn.Shared.csproj" />
 		<PackageReference Include="Roslyn.Diagnostics.Analyzers" Version="3.3.4">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Roslyn.Shared\**\*.cs">
+			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
 
 </Project>
