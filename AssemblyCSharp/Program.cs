@@ -42,7 +42,7 @@ namespace ClientAssembly
 	}
 
    // [IncludeSerialization]
-    public class MyThingB
+   public class MyThingB
 	{
 		public string B;
 	}
@@ -54,7 +54,7 @@ namespace ClientAssembly
     }
 	public class Player : NetworkBehaviour
 	{
-		private struct NestedStruct : IReplicateData
+		public struct NestedStruct : IReplicateData
 		{
 			
 		}

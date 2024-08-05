@@ -203,8 +203,8 @@ namespace Roslyn.FishNet.Serializing
                 return false;
             }
 
-            string metaName = theSymbol.GetSymbolFullMetaName();
-            if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName, typeExposure)))
+            //if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName, typeExposure)))
+            if (SerializableTypes.Add(new SerializableType(theSymbol, typeExposure)))
                 Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
 
             return true;
@@ -216,8 +216,10 @@ namespace Roslyn.FishNet.Serializing
         /// </summary>
         private SerializableType.TypeExposure GetSerializableTypeExposure(object context, INamedTypeSymbol typeSymbol)
         {
-            //Internal/public.
-            if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.Public or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.PublicOrInternal;
+            //Public.
+            if (typeSymbol.DeclaredAccessibility is Accessibility.Public) return SerializableType.TypeExposure.Public;
+            // //Internal.
+            // if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.PublicOrInternal;
 
             /* If here type is not exposed enough. See if containing type is partial which will allow us
              * to put the generated serializer in the containing type. */
@@ -229,8 +231,8 @@ namespace Roslyn.FishNet.Serializing
             SyntaxNode node = syntaxReference.GetSyntax();
             if (node is not TypeDeclarationSyntax typeDeclaration) return SerializableType.TypeExposure.Unset;
 
-            if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
-                return SerializableType.TypeExposure.NestedWithinPartial;
+            // if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
+            //     return SerializableType.TypeExposure.NestedWithinPartial;
             
             //Not partial.
             return SerializableType.TypeExposure.Unset;

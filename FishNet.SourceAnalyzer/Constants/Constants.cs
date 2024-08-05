@@ -3,7 +3,7 @@
     public static class DiagnosticIds
     {
         /// <summary>
-        /// Network serializable types must be declared internal or public, or the declaring class must be partial.
+        /// Network serializable types must be declared public. This limitation will be removed in a later release.
         /// </summary>
         public const string FN0001 = nameof(FN0001);
     }

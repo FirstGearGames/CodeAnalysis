@@ -9,11 +9,12 @@ namespace Roslyn.FishNet.Serializing
         public enum TypeExposure
         {
             Unset = 0,
-            PublicOrInternal = 1,
-            NestedWithinPartial = 2,
+            Public = 1,
+            Internal = 2,
+            Partial = 3,
         }
 
-        public TypeExposure Exposure;
+        // public TypeExposure Exposure;
         /// <summary>
         /// Type the serializable is for.
         /// </summary>
@@ -26,20 +27,34 @@ namespace Roslyn.FishNet.Serializing
         /// FullName as Metadata of the serializable.
         /// </summary>
         public readonly string FullMetadataName;
+        // /// <summary>
+        // /// Containing class of the type. When set serializers should be written as a partial of this class.
+        // /// </summary>
+        // public readonly string ContainingClassNamespace;
+        // /// <summary>
+        // /// Containing class of the type. When set serializers should be written as a partial of this class.
+        // /// </summary>
+        // public readonly string ContainingClass;
 
         public SerializableType(ITypeSymbol typeSymbol, TypeExposure exposure)
         {
             TypeSymbol = typeSymbol;
             FullName = typeSymbol.GetSymbolFullName();
             FullMetadataName = typeSymbol.GetSymbolFullMetaName();
-            Exposure = exposure;
+
+            // if (exposure == TypeExposure.NestedWithinPartial)
+            // {
+            //     ContainingClassNamespace = typeSymbol.GetNamespace();
+            //     ContainingClass = typeSymbol.Name;
+            // }
         }
-        public SerializableType(ITypeSymbol typeSymbol, string fullName, string fullMetadataName, TypeExposure exposure)
+
+        public SerializableType(string fullName, string fullMetadataName, string containingClassNamespace, string containingClass)
         {
-            TypeSymbol = typeSymbol;
             FullName = fullName;
             FullMetadataName = fullMetadataName;
-            Exposure = exposure;
+            // ContainingClassNamespace = containingClassNamespace;
+            // ContainingClass = containingClass;
         }
 
         public bool Equals(SerializableType other) => (other.FullName == this.FullName);

@@ -12,7 +12,7 @@ namespace FishNet.SourceAnaylzer.Analyzers
     internal sealed class SerializableScopeAnalyzer : DiagnosticAnalyzer
     {
         public static readonly DiagnosticDescriptor Descriptor1 = new(DiagnosticIds.FN0001, "Invalid scope of serializable type.",
-            "Network serializable types must be declared internal or public, or the declaring class must be partial.", DiagnosticCategories.Usage,
+            "Network serializable types must be declared public.", DiagnosticCategories.Usage,
             DiagnosticSeverity.Error, true, customTags: WellKnownDiagnosticTags.NotConfigurable);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
