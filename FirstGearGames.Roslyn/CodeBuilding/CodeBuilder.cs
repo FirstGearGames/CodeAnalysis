@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using Roslyn.Extensions;
-using Roslyn.Native.Constants;
+using FirstGearGames.Roslyn.Extensions;
+using FirstGearGames.Roslyn.Native.Constants;
 
-namespace Roslyn.CodeBuilding
+namespace FirstGearGames.Roslyn.CodeBuilding
 {
     public static class CodeBuilder
     {

@@ -1,4 +1,4 @@
-﻿namespace Roslyn.Native.Constants
+﻿namespace FirstGearGames.Roslyn.Native.Constants
 {
     public static class NativeConstants
     {

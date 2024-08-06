@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Roslyn.Extensions
+namespace FirstGearGames.Roslyn.Extensions
 {
     public static class IntExtensions
     {

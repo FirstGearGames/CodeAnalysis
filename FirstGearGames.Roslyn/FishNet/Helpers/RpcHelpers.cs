@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using Roslyn.Extensions;
-using Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.Extensions;
+using FirstGearGames.Roslyn.FishNet.Constants;
 
-namespace Roslyn.FishNet.Helpers
+namespace FirstGearGames.Roslyn.FishNet.Helpers
 {
 
     public enum RPCType

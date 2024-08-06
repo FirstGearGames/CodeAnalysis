@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>fd824511-9b2d-4e7a-9133-246ab0a6606e</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>FirstGearGames.Roslyn</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CodeBuilding\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants\NativeConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\AttributeDataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\EnumExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IAssemblySymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\INamedTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IntExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ISymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ITypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SemanticModelExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringBuilderExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Constants\FishNetConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Constants\UnityConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\DebugHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\RpcHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializableType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializerReceiver.cs" />
+  </ItemGroup>
+</Project>

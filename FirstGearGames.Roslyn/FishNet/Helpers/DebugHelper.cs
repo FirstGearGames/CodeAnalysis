@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
-namespace Roslyn.FishNet.Helpers
+namespace FirstGearGames.Roslyn.FishNet.Helpers
 {
 	public static class Debugg
 	{

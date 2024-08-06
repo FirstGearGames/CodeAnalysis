@@ -1,4 +1,4 @@
-﻿namespace Roslyn.FishNet.Constants
+﻿namespace FirstGearGames.Roslyn.FishNet.Constants
 {
     public class UnityConstants
     {

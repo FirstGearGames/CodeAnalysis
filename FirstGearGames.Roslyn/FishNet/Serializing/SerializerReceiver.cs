@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FirstGearGames.Roslyn.Extensions;
+using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Helpers;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.Extensions;
-using Roslyn.FishNet.Constants;
-using Roslyn.FishNet.Helpers;
 
-namespace Roslyn.FishNet.Serializing
+namespace FirstGearGames.Roslyn.FishNet.Serializing
 {
     public class SerializableReceiver
     {

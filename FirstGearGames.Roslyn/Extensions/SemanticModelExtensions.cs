@@ -3,7 +3,7 @@
 using Microsoft.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Roslyn.Extensions
+namespace FirstGearGames.Roslyn.Extensions
 {
     public static class SemanticModelExtensions
     {

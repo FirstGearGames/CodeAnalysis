@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-using Roslyn.FishNet.Helpers;
+﻿using FirstGearGames.Roslyn.FishNet.Helpers;
+using Microsoft.CodeAnalysis;
 
-namespace Roslyn.Extensions
+namespace FirstGearGames.Roslyn.Extensions
 {
     public static class IAssemblySymbolExtensions
     {

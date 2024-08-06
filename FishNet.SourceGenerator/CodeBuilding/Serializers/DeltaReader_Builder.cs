@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using FirstGearGames.Roslyn.Extensions;
+using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.FishNet.Receivers;
+using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
-using Rosly.FishNet.CodeBuilding;
-using Roslyn.Extensions;
-using Roslyn.FishNet.Constants;
-using Roslyn.FishNet.Helpers;
-using Roslyn.FishNet.Receivers;
-using Roslyn.FishNet.Serializing;
-using Roslyn.Native.Constants;
-using RoslynCodeBuilder = Roslyn.CodeBuilding.CodeBuilder;
+using Roslyn.FishNet.CodeBuilding;
+using RoslynCodeBuilder = FirstGearGames.Roslyn.CodeBuilding.CodeBuilder;
 
 
-namespace Roslyn.FishNet.CodeBuilding
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
     public class DeltaReader_Builder
     {

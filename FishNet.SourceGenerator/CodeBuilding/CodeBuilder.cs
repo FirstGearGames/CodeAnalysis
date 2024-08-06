@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using Roslyn.Extensions;
-using Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.Extensions;
+using FirstGearGames.Roslyn.FishNet.Constants;
 
-namespace Roslyn.FishNet.CodeBuilding
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
     public static class CodeBuilder
     {

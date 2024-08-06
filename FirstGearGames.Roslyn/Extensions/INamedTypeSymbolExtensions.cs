@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
 using Microsoft.CodeAnalysis;
 
-namespace Roslyn.Extensions
+namespace FirstGearGames.Roslyn.Extensions
 {
     public static class INamedTypeSymbolExtensions
     {

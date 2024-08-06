@@ -1,8 +1,8 @@
 ﻿using System;
+using FirstGearGames.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
-using Roslyn.Extensions;
 
-namespace Roslyn.FishNet.Serializing
+namespace FirstGearGames.Roslyn.FishNet.Serializing
 {
     public struct SerializableType : IEquatable<SerializableType>
     {

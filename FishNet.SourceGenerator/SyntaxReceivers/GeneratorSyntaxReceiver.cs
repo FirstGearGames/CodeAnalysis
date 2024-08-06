@@ -1,8 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using FirstGearGames.Roslyn.FishNet.Serializing;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Roslyn.FishNet.Serializing;
 
-namespace Roslyn.FishNet.Receivers
+namespace FirstGearGames.Roslyn.FishNet.Receivers
 {
     public class GeneratorSyntaxReceiver : ISyntaxContextReceiver
     {

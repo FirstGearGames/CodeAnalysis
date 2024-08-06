@@ -1,13 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
-using Rosly.FishNet.CodeBuilding;
+using FirstGearGames.Roslyn.FishNet.CodeBuilding;
+using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.FishNet.Receivers;
 using Roslyn.FishNet.CodeBuilding;
-using Roslyn.FishNet.Constants;
-using Roslyn.FishNet.Helpers;
-using Roslyn.FishNet.Receivers;
 
-namespace Roslyn.FishNet
+namespace FirstGearGames.Roslyn.FishNet
 {
     [Generator]
     public sealed class SerializableGenerator : ISourceGenerator

@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
-using Roslyn.Extensions;
 using System.Text;
+using FirstGearGames.Roslyn.Extensions;
 
-namespace Roslyn.FishNet.CodeBuilding
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
     public static class SerializerMethodExtensions
     {

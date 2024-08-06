@@ -1,10 +1,10 @@
 ﻿using System.Collections.Immutable;
+using FirstGearGames.Roslyn.FishNet.Serializing;
 using FishNet.SourceAnaylze.Constants;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.FishNet.Serializing;
 
 namespace FishNet.SourceAnaylzer.Analyzers
 {

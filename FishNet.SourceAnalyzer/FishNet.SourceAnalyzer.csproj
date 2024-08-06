@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="..\Roslyn.Shared\**\*.cs">
+		<Compile Include="..\FirstGearGames.Roslyn\**\*.cs">
 			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>

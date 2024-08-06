@@ -3,11 +3,11 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using Roslyn.Extensions;
-using Roslyn.FishNet.Constants;
-using Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.Extensions;
+using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Helpers;
 
-namespace Roslyn.FishNet.CodeBuilding
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
     public enum AddSerializerType
     {
