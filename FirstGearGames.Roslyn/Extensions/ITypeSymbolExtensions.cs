@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 
 namespace FirstGearGames.Roslyn.Extensions
@@ -39,33 +41,47 @@ namespace FirstGearGames.Roslyn.Extensions
         }
 
         /// <summary>
+        /// Returns generic arguments as ITypeSymbols.
+        /// </summary>
+        public static List<ITypeSymbol> GetGenericArgumentsTypeSymbol(this ISymbol symbol)
+        {
+            List<ITypeSymbol> results = new();
+
+            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
+                results.AddRange(namedTypeSymbol.TypeArguments.ToList());
+
+            return results;
+        }
+
+        /// <summary>
+        /// Returns generic arguments as fullName strings.
+        /// </summary>
+        public static List<string> GetGenericArgumentsString(this ISymbol symbol)
+        {
+            List<string> results = new();
+
+            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
+            {
+                foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
+                {
+                    if (typeArgument.TypeKind is TypeKind.TypeParameter)
+                        results.Add(typeArgument.Name);
+                    else
+                        results.Add(typeArgument.GetTypeFullName());
+                }
+            }
+
+            return results;
+        }
+
+        /// <summary>
         /// Adds generic arguments onto a string in the fashion of <type, type2, type3>.
         /// </summary>
         public static string AddGenericArguments(this string str, ISymbol symbol)
         {
-            //If named then check for generic arguments.
-            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-            {
-                string generics = string.Empty;
+            List<string> results = symbol.GetGenericArgumentsString();
 
-                foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
-                {
-                    //To separate each type.
-                    if (generics.Length > 0)
-                        generics += ", ";
-
-                    if (typeArgument.TypeKind is TypeKind.TypeParameter)
-                        generics += typeArgument.Name;
-                    else
-                        generics += typeArgument.GetTypeFullName();
-                }
-
-                //If any were added then add onto type symbol name.
-                if (generics.Length > 0)
-                    str += $"<{generics}>";
-            }
-
-            return str;
+            return $"{str}{results.CombineGenericArguments()}";
         }
 
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)

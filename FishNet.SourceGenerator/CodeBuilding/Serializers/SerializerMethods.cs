@@ -29,6 +29,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             Header = header;
             Body = new();
         }
+
         public MethodContent(string header)
         {
             Header = new(header);
@@ -54,6 +55,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             sb.AppendLine(bracketIndent, "}");
             return sb.ToString();
         }
+
         public string ToStringWithoutFooter(int bracketIndent)
         {
             StringBuilder sb = new();
@@ -62,7 +64,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             sb.AppendLine(Body.ToString());
             return sb.ToString();
         }
-
     }
 
     public class SerializerMethod
@@ -71,32 +72,34 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// Full name of the type the serializer is for.
         /// </summary>
         public readonly string TypeFullName;
-
         /// <summary>
         /// Name of the generated method.
         /// </summary>
         public readonly string MethodName;
         /// <summary>
+        /// Number of generic arguments for the method.
+        /// </summary>
+        public int GenericArguments;
+        /// <summary>
         /// Content of the method.
         /// </summary>
         public MethodContent MethodContent;
 
-        public SerializerMethod(string typeFullName, string methodName)
+        public SerializerMethod(string typeFullName, string methodName, int genericArguments)
         {
             TypeFullName = typeFullName;
             MethodName = methodName;
             MethodContent = new();
         }
 
-
-        public SerializerMethod(int indent, string typeFullName, string methodName, string methodSignature, string methodBody)
+        public SerializerMethod(int indent, string typeFullName, string methodName, int genericArguments, string methodSignature, string methodBody)
         {
             TypeFullName = typeFullName;
             MethodName = methodName;
             MethodContent = new(methodSignature, methodBody);
         }
 
-        public SerializerMethod(string typeFullName, string methodName, MethodContent methodContent)
+        public SerializerMethod(string typeFullName, string methodName, int genericArguments, MethodContent methodContent)
         {
             TypeFullName = typeFullName;
             MethodName = methodName;
@@ -117,11 +120,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
     public class DeltaSerializerMethod : SerializerMethod
     {
-        public DeltaSerializerMethod(string typeFullName, string methodName) : base(typeFullName, methodName) { }
+        public DeltaSerializerMethod(string typeFullName, string methodName, int genericArguments) : base(typeFullName, methodName, genericArguments) { }
 
-        public DeltaSerializerMethod(int indent, string typeFullName, string methodName, string methodSignature, string methodBody) :
-            base(indent, typeFullName, methodName, methodSignature, methodBody)
-        { }
+        public DeltaSerializerMethod(int indent, string typeFullName, string methodName, int genericArguments, string methodSignature, string methodBody) : base(indent, typeFullName, methodName, genericArguments, methodSignature, methodBody) { }
 
         public override bool IsDeltaSerializer() => true;
     }
@@ -138,13 +139,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         public override bool IsGenerated() => true;
 
-        public GeneratedDeltaSerializerMethod(int indent, INamedTypeSymbol namedTypeSymbol, string typeFullName, string methodName, string methodSignature, string methodBody) :
-            base(indent, typeFullName, methodName, methodSignature, methodBody)
+        public GeneratedDeltaSerializerMethod(int indent, INamedTypeSymbol namedTypeSymbol, string typeFullName, string methodName, int genericArguments, string methodSignature, string methodBody) : base(indent, typeFullName, methodName, genericArguments, methodSignature, methodBody)
         {
             NamedTypeSymbol = namedTypeSymbol;
         }
     }
-
 
     public class GeneratedSerializerMethod : SerializerMethod
     {
@@ -158,8 +157,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         public override bool IsGenerated() => true;
 
-        public GeneratedSerializerMethod(int indent, INamedTypeSymbol namedTypeSymbol, string typeFullName, string methodName, string methodSignature, string methodBody) :
-            base(indent, typeFullName, methodName, methodSignature, methodBody)
+        public GeneratedSerializerMethod(int indent, INamedTypeSymbol namedTypeSymbol, string typeFullName, string methodName, int genericArguments, string methodSignature, string methodBody) : base(indent, typeFullName, methodName, genericArguments, methodSignature, methodBody)
         {
             NamedTypeSymbol = namedTypeSymbol;
         }

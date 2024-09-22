@@ -178,6 +178,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 //   Debugg.Log($"<<<< Serializer type is {addType} for {methodSymbol.Name}");
                 if (addType != AddSerializerType.Unset)
                 {
+                    // if (methodSymbol.Parameters.First() is not INamedTypeSymbol namedTypeSymbol)
+                    //     continue;
+                    //
                     string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
                     AddWriteMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
                 }

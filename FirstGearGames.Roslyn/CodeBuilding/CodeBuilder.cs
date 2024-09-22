@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.Native.Constants;
+using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.CodeBuilding
 {
@@ -42,8 +44,7 @@ namespace FirstGearGames.Roslyn.CodeBuilding
         /// <summary>
         /// Calls a method taking optional arguments.
         /// </summary>
-        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true,
-            params string[] variableNames)
+        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true, params string[] variableNames)
         {
             if (callingVariable.Length > 0)
                 callingVariable += ".";
@@ -92,7 +93,6 @@ namespace FirstGearGames.Roslyn.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-
         public static string CreateLocalVariable(string fullTypeName, string variableName, string defaultValue = "", bool closeLine = true)
         {
             _stringBuilder.Clear();
@@ -117,6 +117,52 @@ namespace FirstGearGames.Roslyn.CodeBuilding
             _stringBuilder.Append($"{returnType}>");
 
             return _stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Combines generic argument strings into <str0, str1, str2 ...>
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
+        public static string CombineGenericArguments(this List<string> arguments)
+        {
+            if (arguments.Count == 0) return string.Empty;
+
+            _stringBuilder.Clear();
+
+            foreach (string s in arguments)
+            {
+                //Add separate if argument already exists.
+                if (_stringBuilder.Length != 0)
+                    _stringBuilder.Append(", ");
+
+                _stringBuilder.Append(s);
+            }
+
+            return $"<{_stringBuilder.ToString()}>";
+        }
+        
+        
+        /// <summary>
+        /// Combines generic argument strings into <str0, str1, str2 ...>
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
+        public static string CombineGenericArguments(this List<ITypeSymbol> arguments)
+        {
+            if (arguments.Count == 0) return string.Empty;
+
+            List<string> results = new();
+
+            foreach (ITypeSymbol typeSymbol in arguments)
+            {
+                if (typeSymbol.TypeKind is TypeKind.TypeParameter)
+                    results.Add(typeSymbol.Name);
+                else
+                    results.Add(typeSymbol.GetTypeFullName());
+            }
+
+            return results.CombineGenericArguments();
         }
     }
 }
