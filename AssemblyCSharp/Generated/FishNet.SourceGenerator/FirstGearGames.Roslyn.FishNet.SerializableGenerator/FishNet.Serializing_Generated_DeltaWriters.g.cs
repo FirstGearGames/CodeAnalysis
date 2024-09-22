@@ -17,11 +17,11 @@
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
 			//Delta writer could not be found for type System.String. Please report this note.
-			pooledWriter.Write(value1.B);
+			pooledWriter.WriteString(value1.B);
 			totalFlags += 4;
 
-			//Delta writer could not be found for type System.Collections.Generic.Dictionary<System.Int32, System.Boolean>. Please report this note.
-			pooledWriter.Write(value1.Dict);
+			//Delta writer could not be found for type System.Collections.Generic.Dictionary. Please report this note.
+			pooledWriter.WriteDictionary(value1.Dict);
 			totalFlags += 8;
 
 			System.Boolean changed = (totalFlags != 0);

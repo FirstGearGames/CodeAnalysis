@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS8601 // Possible null reference assignment.
 #pragma warning disable CS8604 // Possible null reference argument.
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using FirstGearGames.Roslyn.Extensions;
@@ -130,6 +131,20 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 result = null;
             }
 
+            if (result == null) 
+            {
+                
+                Debugg.Log($"<-------------- start for {typeFullName}. Writers count {_writeMethods.Count}. DeltaWriters count {_writeDeltaMethods.Count}");
+
+                foreach (KeyValuePair<string,SerializerMethod> serializerMethod in _writeMethods)
+                    Debugg.Log($"WriteMethods SM: {serializerMethod.Key}");
+
+
+                foreach (KeyValuePair<string,SerializerMethod> serializerMethod in _writeDeltaMethods)
+                    Debugg.Log($"WriteDeltaMethods SM: {serializerMethod.Key}");
+
+                
+            }
             return result;
         }
 
@@ -178,10 +193,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 //   Debugg.Log($"<<<< Serializer type is {addType} for {methodSymbol.Name}");
                 if (addType != AddSerializerType.Unset)
                 {
-                    if (methodSymbol.Parameters.First() is not INamedTypeSymbol namedTypeSymbol)
-                        continue;
-                    
-                    AddWriteMethod(new DeltaSerializerMethod(namedTypeSymbol, methodSymbol.Name), addType);
+                    if (methodSymbol.Parameters.First().Type is INamedTypeSymbol namedTypeSymbol)
+                        AddWriteMethod(new DeltaSerializerMethod(namedTypeSymbol, methodSymbol.Name), addType);
                 }
             }
         }
@@ -297,7 +310,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             const int maxMemberCount = 62;
             if (memberCount >= maxMemberCount)
             {
-                Debugg.Log($"  Type {namedTypeSymbol.GetTypeFullName()} exceeds the maximum of {maxMemberCount} field members. Reduce the amount of field members or encapsulate members.");
+                Debugg.Log($"  Type {namedTypeSymbol.GetTypeSymbolFullName()} exceeds the maximum of {maxMemberCount} field members. Reduce the amount of field members or encapsulate members.");
                 return false;
             }
 

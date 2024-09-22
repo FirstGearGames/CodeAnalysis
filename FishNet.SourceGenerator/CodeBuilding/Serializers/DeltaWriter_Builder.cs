@@ -167,7 +167,7 @@ namespace Roslyn.FishNet.CodeBuilding
                 {
                     Debugg.Log("DOING THING FOR " + fieldSymbol.OriginalDefinition.Name);
                     ITypeSymbol typeSymbol = fieldSymbol!.Type;
-                    string typeFullName = typeSymbol.GetTypeFullName();
+                    string typeFullName = typeSymbol.GetTypeSymbolFullName();
 
                     //Get delta writer method for the field.
                     DeltaSerializerMethod? dsm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
@@ -301,7 +301,7 @@ namespace Roslyn.FishNet.CodeBuilding
             SerializerMethod sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
             found = sm.IsValid();
             if (callWriteIfNull && !sm.IsValid())
-                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Writer_Write_Name}", genericArgumentsCount: 0);
+                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Writer_Write_Name}", genericArguments: new List<string>());
 
             return sm;
         }

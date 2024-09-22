@@ -102,7 +102,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.
-                    if (parameters[0].Type.GetTypeFullName() == NetworkConnection_FullName)
+                    if (parameters[0].Type.GetTypeSymbolFullName() == NetworkConnection_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
 
@@ -111,7 +111,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeFullName() == NetworkConnection_FullName)
+                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName() == NetworkConnection_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
 
@@ -121,7 +121,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                     if (parametersCount == 0) return;
                     if (!parameters[parametersCount - 1].IsOptional) return;
                     //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeFullName() == Channel_FullName)
+                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName() == Channel_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
             }
@@ -185,7 +185,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             //Has exclude serialization attribute.
             if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
 
-            string fullName = theSymbol.GetTypeFullName();
+            string fullName = theSymbol.GetTypeSymbolFullName();
 
             //Check if already added.
             foreach (SerializableType st in SerializableTypes)

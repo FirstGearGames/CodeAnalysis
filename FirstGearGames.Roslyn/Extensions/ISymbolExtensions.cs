@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using FirstGearGames.Roslyn.CodeBuilding;
 
 namespace FirstGearGames.Roslyn.Extensions
 {
@@ -29,16 +30,27 @@ namespace FirstGearGames.Roslyn.Extensions
             for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
 
-            string symbolName = symbol.Name.AddGenericArguments(symbol);            
-            fullyQualifiedName = $"{fullyQualifiedName}{symbolName}";
+            fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
             
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
-
+        
+        
         /// <summary>
         /// Returns the full name of a symbol which includes the namespace.
         /// </summary>
-        public static string GetSymbolFullMetaName(this ISymbol symbol)
+        public static string GetSymbolFullNameWithGenerics(this ISymbol symbol)
+        {
+            string metadataName = symbol.GetSymbolFullName();
+            string genericArguments = symbol.GetGenericArgumentsString().CombineGenericArguments();
+
+            return $"{metadataName}{genericArguments}";
+        }
+        
+        /// <summary>
+        /// Returns the full name of a symbol which includes the namespace.
+        /// </summary>
+        public static string GetSymbolFullMetadataName(this ISymbol symbol)
         {
             if (symbol == null) return string.Empty;
 
@@ -48,11 +60,22 @@ namespace FirstGearGames.Roslyn.Extensions
             string fullyQualifiedName = string.Empty;
             for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}+{fullyQualifiedName}";
-
-            string symbolName = symbol.Name.AddGenericArguments(symbol);            
-            fullyQualifiedName = $"{fullyQualifiedName}{symbolName}";
+            
+            fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
 
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
+        }
+
+             
+        /// <summary>
+        /// Returns the full name of a symbol which includes the namespace.
+        /// </summary>
+        public static string GetSymbolFullMetadataNameWithGenerics(this ISymbol symbol)
+        {
+            string metadataName = symbol.GetSymbolFullMetadataName();
+            string genericArguments = symbol.GetGenericArgumentsString().CombineGenericArguments();
+
+            return $"{metadataName}{genericArguments}";
         }
 
 

@@ -134,7 +134,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     sb.AppendLine(bodyIndent, ($"if (({totalFlagsVariable} & {fieldFlag}) == {fieldFlag})"));
 
                     //Get information on which read method to call.
-                    string typeFullName = fieldSymbol.Type.GetTypeFullName();
+                    string typeFullName = fieldSymbol.Type.GetTypeSymbolFullName();
                     //Get delta writer method for the field.
                     DeltaSerializerMethod? dsm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
                     //Delta reader not found.
@@ -232,7 +232,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             SerializerMethod sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
             found = sm.IsValid();
             if (callReadIfNull && !sm.IsValid())
-                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Reader_Read_Name}<{typeFullName}>", genericArgumentsCount: 0);
+                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Reader_Read_Name}<{typeFullName}>", genericArguments: new List<string>());
 
             return sm;
         }

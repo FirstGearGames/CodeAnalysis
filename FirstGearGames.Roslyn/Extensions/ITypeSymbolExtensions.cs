@@ -10,7 +10,7 @@ namespace FirstGearGames.Roslyn.Extensions
 {
     public static class ITypeSymbolExtensions
     {
-        public static string GetTypeFullName(this ITypeSymbol typeSymbol)
+        public static string GetTypeSymbolFullName(this ITypeSymbol typeSymbol)
         {
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
@@ -18,14 +18,21 @@ namespace FirstGearGames.Roslyn.Extensions
             string fullyQualifiedName = string.Empty;
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
-
-            string typeSymbolName = typeSymbol.Name.AddGenericArguments(typeSymbol);
-            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbolName}";
+            
+            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
 
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
-        public static string GetTypeMetadataName(this ITypeSymbol typeSymbol)
+        public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol)
+        {
+            string fullName = typeSymbol.GetTypeSymbolFullName();
+            string genericArguments = typeSymbol.GetGenericArgumentsString().CombineGenericArguments();
+
+            return $"{fullName}{genericArguments}";
+        }
+        
+        public static string GetTypeSymbolFullMetadataName(this ITypeSymbol typeSymbol)
         {
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
@@ -33,12 +40,21 @@ namespace FirstGearGames.Roslyn.Extensions
             string fullyQualifiedName = string.Empty;
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
-
-            string typeSymbolName = typeSymbol.Name.AddGenericArguments(typeSymbol);
-            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbolName}";
+            
+            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
 
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
+        
+        
+        public static string GetTypeFullMetadataNameWithGenericArguments(this ITypeSymbol typeSymbol)
+        {
+            string metadataName = typeSymbol.GetTypeSymbolFullMetadataName();
+            string genericArguments = typeSymbol.GetGenericArgumentsString().CombineGenericArguments();
+
+            return $"{metadataName}{genericArguments}";
+        }
+
 
         /// <summary>
         /// Returns generic arguments as ITypeSymbols.
@@ -79,7 +95,7 @@ namespace FirstGearGames.Roslyn.Extensions
                     if (typeArgument.TypeKind is TypeKind.TypeParameter)
                         results.Add(typeArgument.Name);
                     else
-                        results.Add(typeArgument.GetTypeFullName());
+                        results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments());
                 }
             }
 

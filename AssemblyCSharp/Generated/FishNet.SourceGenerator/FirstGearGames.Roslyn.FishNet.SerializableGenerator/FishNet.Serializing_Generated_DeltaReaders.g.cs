@@ -19,8 +19,8 @@
 				result.B = value0.B;
 
 			if ((totalFlags & 8) == 8)
-			//Delta reader could not be found for type System.Collections.Generic.Dictionary<System.Int32, System.Boolean>. Please report this note.
-				result.Dict = reader.Read<System.Collections.Generic.Dictionary<System.Int32, System.Boolean>>();
+			//Delta reader could not be found for type System.Collections.Generic.Dictionary. Please report this note.
+				result.Dict = reader.ReadDictionaryAllocated();
 			else
 				result.Dict = value0.Dict;
 

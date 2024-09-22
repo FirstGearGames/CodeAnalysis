@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 using System.Text;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Helpers;
@@ -84,7 +85,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Number of generic arguments for the method.
         /// </summary>
-        public int GenericArgumentsCount;
+        public List<string> GenericArguments;
         /// <summary>
         /// Content of the method.
         /// </summary>
@@ -93,42 +94,47 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public SerializerMethod(INamedTypeSymbol namedTypeSymbol, string methodName)
         {
             NamedTypeSymbol = namedTypeSymbol;
-            TypeFullName = namedTypeSymbol.GetTypeFullName();
-            GenericArgumentsCount = namedTypeSymbol.GetGenericArgumentsCount();
+            TypeFullName = namedTypeSymbol.GetTypeSymbolFullName();
+            GenericArguments = namedTypeSymbol.GetGenericArgumentsString();
             MethodName = methodName;
             MethodContent = new();
         }
 
-        public SerializerMethod(string typeFullName, string methodName, int genericArgumentsCount)
+        public SerializerMethod(string typeFullName, string methodName, List<string> genericArguments)
         {
             TypeFullName = typeFullName;
             MethodName = methodName;
-            GenericArgumentsCount = genericArgumentsCount;
+            if (genericArguments == null)
+                genericArguments = new();
+            GenericArguments = genericArguments;
             MethodContent = new();
         }
 
         public SerializerMethod(INamedTypeSymbol namedTypeSymbol, string methodName, string methodSignature, string methodBody)
         {
             NamedTypeSymbol = namedTypeSymbol;
-            TypeFullName = namedTypeSymbol.GetTypeFullName();
-            GenericArgumentsCount = namedTypeSymbol.GetGenericArgumentsCount();
+            TypeFullName = namedTypeSymbol.GetTypeSymbolFullName();
+            GenericArguments = namedTypeSymbol.GetGenericArgumentsString();
             MethodName = methodName;
-            MethodContent = new(methodSignature, methodBody);
-        }
-        
-        public SerializerMethod(string typeFullName, string methodName, int genericArgumentsCount, string methodSignature, string methodBody)
-        {
-            TypeFullName = typeFullName;
-            MethodName = methodName;
-            GenericArgumentsCount = genericArgumentsCount;
             MethodContent = new(methodSignature, methodBody);
         }
 
-        public SerializerMethod(string typeFullName, string methodName, int genericArgumentsCount, MethodContent methodContent)
+        public SerializerMethod(string typeFullName, string methodName, List<string> genericArguments, string methodSignature, string methodBody)
         {
             TypeFullName = typeFullName;
             MethodName = methodName;
-            GenericArgumentsCount = genericArgumentsCount;
+            if (genericArguments == null)
+                genericArguments = new();
+            GenericArguments = genericArguments;
+            MethodContent = new(methodSignature, methodBody);
+        }
+
+        public SerializerMethod(string typeFullName, string methodName, List<string> genericArguments,  MethodContent methodContent)
+        {
+            TypeFullName = typeFullName;
+            MethodName = methodName;
+            if (genericArguments == null)
+                genericArguments = new();
             MethodContent = methodContent;
         }
 
@@ -148,8 +154,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
     {
         public DeltaSerializerMethod(INamedTypeSymbol namedTypeSymbol, string methodName, string methodSignature, string methodBody) : base(namedTypeSymbol, methodName, methodSignature, methodBody) { }
         public DeltaSerializerMethod(INamedTypeSymbol namedTypeSymbol, string methodName) : base(namedTypeSymbol, methodName) { }
-        public DeltaSerializerMethod(string typeFullName, string methodName, int genericArguments) : base(typeFullName, methodName, genericArguments) { }
-        public DeltaSerializerMethod(string typeFullName, string methodName, int genericArguments, string methodSignature, string methodBody) : base(typeFullName, methodName, genericArguments, methodSignature, methodBody) { }
+        public DeltaSerializerMethod(string typeFullName, string methodName, List<string> genericArguments) : base(typeFullName, methodName, genericArguments) { }
+        public DeltaSerializerMethod(string typeFullName, string methodName, List<string> genericArguments, string methodSignature, string methodBody) : base(typeFullName, methodName, genericArguments, methodSignature, methodBody) { }
 
         public override bool IsDeltaSerializer() => true;
     }
