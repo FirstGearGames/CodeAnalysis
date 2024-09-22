@@ -71,7 +71,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             string header = GetMethodHeader(out string methodName);
 
             //Add to readers.
-            _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, typeFullName, methodName, header, ""), AddSerializerType.Delta);
+            _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, methodName, header, ""), AddSerializerType.Delta);
 
             string GetMethodHeader(out string mName)
             {
@@ -232,7 +232,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             SerializerMethod sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
             found = sm.IsValid();
             if (callReadIfNull && !sm.IsValid())
-                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Reader_Read_Name}<{typeFullName}>");
+                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Reader_Read_Name}<{typeFullName}>", sm.GenericArgumentsCount);
 
             return sm;
         }

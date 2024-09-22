@@ -53,6 +53,18 @@ namespace FirstGearGames.Roslyn.Extensions
             return results;
         }
 
+        
+        /// <summary>
+        /// Returns generic arguments count.
+        /// </summary>
+        public static int GetGenericArgumentsCount(this ISymbol symbol)
+        {
+            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
+                return namedTypeSymbol.TypeArguments.Length;
+
+            return 0;
+        }
+        
         /// <summary>
         /// Returns generic arguments as fullName strings.
         /// </summary>

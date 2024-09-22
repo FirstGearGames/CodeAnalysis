@@ -178,11 +178,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 //   Debugg.Log($"<<<< Serializer type is {addType} for {methodSymbol.Name}");
                 if (addType != AddSerializerType.Unset)
                 {
-                    // if (methodSymbol.Parameters.First() is not INamedTypeSymbol namedTypeSymbol)
-                    //     continue;
-                    //
-                    string typeFullName = methodSymbol.Parameters.First().Type.GetTypeFullName();
-                    AddWriteMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
+                    if (methodSymbol.Parameters.First() is not INamedTypeSymbol namedTypeSymbol)
+                        continue;
+                    
+                    AddWriteMethod(new DeltaSerializerMethod(namedTypeSymbol, methodSymbol.Name), addType);
                 }
             }
         }
@@ -207,8 +206,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                 if (addType != AddSerializerType.Unset)
                 {
-                    string typeFullName = methodSymbol.ReturnType.GetTypeFullName();
-                    AddReadMethod(new DeltaSerializerMethod(typeFullName, methodSymbol.Name), addType);
+                    if (methodSymbol.ReturnType is not INamedTypeSymbol namedTypeSymbol)
+                        continue;
+                    
+                    AddReadMethod(new DeltaSerializerMethod(namedTypeSymbol, methodSymbol.Name), addType);
                 }
             }
         }

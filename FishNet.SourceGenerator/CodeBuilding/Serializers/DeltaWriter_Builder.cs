@@ -83,7 +83,7 @@ namespace Roslyn.FishNet.CodeBuilding
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
 
-            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, typeFullName, methodName, header, ""), AddSerializerType.Delta);
+            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, methodName, header, ""), AddSerializerType.Delta);
             Debugg.Log($"{recursiveCount.ToIndent()}Added for type {typeFullName}.");
 
             string GetMethodHeader(out string mName)
@@ -299,7 +299,7 @@ namespace Roslyn.FishNet.CodeBuilding
             SerializerMethod sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
             found = sm.IsValid();
             if (callWriteIfNull && !sm.IsValid())
-                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Writer_Write_Name}");
+                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Writer_Write_Name}", sm.GenericArgumentsCount);
 
             return sm;
         }
