@@ -240,6 +240,8 @@ namespace FishNet.Serializing
 
         #endregion
 
+        
+        //public Dictionary<TKey, TValue> ReadDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA) => default;
 
         #region Generic.
 

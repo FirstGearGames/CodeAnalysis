@@ -7,8 +7,10 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
 {
 	public static class Debugg
 	{
+		private static string AssemblyName;
 		private static List<string> _msgs = new();
 
+		public static void SetAssemblyName(string value) => AssemblyName = value;
 		/// <summary>
 		/// Writes text over a TcpClient.
 		/// </summary>
@@ -21,7 +23,14 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
 
 		public static void Send()
 		{
-			string path = @"D:/Output.txt";
+			bool fileExist = File.Exists(@"D:\Development\Personal\FishNets\SourceGenFix.txt");
+			if (!fileExist)
+			{
+				_msgs.Clear();
+				return;
+			}
+
+			string path = @"D:/Output_" + AssemblyName + ".txt";
 			try
 			{
 				DateTime startTime = DateTime.Now;

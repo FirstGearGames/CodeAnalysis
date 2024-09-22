@@ -193,6 +193,7 @@ namespace FishNet.Serializing
         /// Reads a dictionary.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DefaultReader]
         public Dictionary<TKey, TValue> ReadDictionaryAllocated<TKey, TValue>()
             => default;
 

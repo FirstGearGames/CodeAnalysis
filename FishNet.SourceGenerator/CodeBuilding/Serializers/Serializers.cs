@@ -6,6 +6,7 @@ using System.Linq;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.Native.Constants;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
@@ -95,7 +96,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 Dictionary<string, SerializerMethod> dict = (writer) ? _writeDeltaMethods : _readDeltaMethods;
                 dict.TryGetValue(typeFullName, out result);
 
-                if (typeFullName == "System.Boolean" && !dict.TryGetValue(typeFullName, out _))
+                if (typeFullName == NativeConstants.Boolean_FullName && !dict.TryGetValue(typeFullName, out _))
                 {
                     Debugg.Log(" ");
                     Debugg.Log($"Missing for {typeFullName}. All serializers are...");
@@ -145,7 +146,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Returns the collection containing all delta readers.
         /// </summary>
-        public IReadOnlyDictionary<string, SerializerMethod> GeReadMethods() => _readMethods;
+        public IReadOnlyDictionary<string, SerializerMethod> GetReadMethods() => _readMethods;
 
         /// <summary>
         /// Returns the collection containing all delta readers.

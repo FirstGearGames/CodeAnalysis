@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
 using FirstGearGames.Roslyn.FishNet.CodeBuilding;
@@ -19,13 +20,27 @@ namespace FirstGearGames.Roslyn.FishNet
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxContextReceiver is not GeneratorSyntaxReceiver syntaxReceiver) return;
+            string assemblyName = context.Compilation.AssemblyName;
+            //Ignore unity assemblies.
+            if (assemblyName.StartsWith("Unity.", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            Debugg.SetAssemblyName(assemblyName);
+
+            if (context.SyntaxContextReceiver is not GeneratorSyntaxReceiver syntaxReceiver)
+            {
+                Debugg.Log($"Failing for assembly.");
+                Debugg.Send();
+                return;
+            }
+
             Debugg.Log($"- Execute Start for {context.Compilation.AssemblyName}.");
 
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
             if (fishnetRuntimeAssemblySymbol == null)
             {
                 Debugg.Log($"Assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
+                Debugg.Send();
                 return;
             }
 
@@ -39,18 +54,27 @@ namespace FirstGearGames.Roslyn.FishNet
             deltaWriterBuilder.Initialize(context, syntaxReceiver, serializers);
             DeltaReader_Builder deltaReaderBuilder = new();
             deltaReaderBuilder.Initialize(context, syntaxReceiver, serializers);
-            
+
             Debugg.Log($"- Execute End for {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
         }
-        
+
         private IAssemblySymbol? GetFishNetRuntimeAssemblySymbol(in GeneratorExecutionContext context)
         {
-            ImmutableArray<IAssemblySymbol> assemblySymbols = context.Compilation.SourceModule.ReferencedAssemblySymbols;
-            IAssemblySymbol? fishNetSymbol = assemblySymbols.FirstOrDefault(x => x.Name == FishNetConstants.Runtime_Assembly_Name);
+            IAssemblySymbol? fishNetSymbol = null;
+
+            if (context.Compilation.SourceModule.ContainingAssembly.Name == FishNetConstants.Runtime_Assembly_Name)
+            {
+                fishNetSymbol = context.Compilation.SourceModule.ContainingAssembly;
+            }
+            else
+            {
+                ImmutableArray<IAssemblySymbol> assemblySymbols = context.Compilation.SourceModule.ReferencedAssemblySymbols;
+                fishNetSymbol = assemblySymbols.FirstOrDefault(x => x.Name == FishNetConstants.Runtime_Assembly_Name);
+            }
+
             return fishNetSymbol;
         }
-        
     }
 }

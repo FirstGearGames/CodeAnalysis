@@ -217,8 +217,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         {
             //Public.
             if (typeSymbol.DeclaredAccessibility is Accessibility.Public) return SerializableType.TypeExposure.Public;
-            // //Internal.
-            // if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.PublicOrInternal;
+            ////Internal.
+            //if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.Internal;
 
             /* If here type is not exposed enough. See if containing type is partial which will allow us
              * to put the generated serializer in the containing type. */
@@ -232,7 +232,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             // if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
             //     return SerializableType.TypeExposure.NestedWithinPartial;
-            
+
             //Not partial.
             return SerializableType.TypeExposure.Unset;
         }

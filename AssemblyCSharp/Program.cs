@@ -8,15 +8,15 @@ using FishNet.Transporting;
 
 namespace ClientAssembly
 {
-	public struct MyStructA
-	{
-		public float Horizontal;
-		public float Vertical;
-		public bool Running;
-		public bool Firing;
-		public bool Jumping;
-
-	}
+	// public struct MyStructA
+	// {
+	// 	public float Horizontal;
+	// 	public float Vertical;
+	// 	public bool Running;
+	// 	public bool Firing;
+	// 	public bool Jumping;
+	//
+	// }
 
     //public struct MyStructB
     //{
@@ -32,32 +32,33 @@ namespace ClientAssembly
     //}
 
     //[IncludeSerialization]
-    public class MyThingA : MyThingB, IReplicateData
-	{
-		public Vector3 Position;
-		public string A;
-		public MyThingB C;
+ //    public class MyThingA : MyThingB, IReplicateData
+	// {
+	// 	public Vector3 Position;
+	// 	public string A;
+	// 	public MyThingB C;
+ //
+	// 	private uint _tick;
+	// }
 
-		private uint _tick;
-	}
-
-   // [IncludeSerialization]
+    [IncludeSerialization]
    public class MyThingB
 	{
 		public string B;
+		public Dictionary<int, bool> Dict;  
 	}
 
    // [IncludeSerialization]
-    public struct MyThingC : IReplicateData
-	{
-        public string C;
-    }
+ //    public struct MyThingC : IReplicateData
+	// {
+ //        public string C;
+ //    }
 	public class Player : NetworkBehaviour
 	{
-		public struct NestedStruct : IReplicateData
-		{
-			
-		}
+		// public struct NestedStruct : IReplicateData
+		// {
+		// 	
+		// }
   //      [IncludeSerialization]
   //      public class MyStructB
   //      {

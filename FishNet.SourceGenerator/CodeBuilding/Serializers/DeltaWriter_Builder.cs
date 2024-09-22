@@ -92,10 +92,7 @@ namespace Roslyn.FishNet.CodeBuilding
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
                 inText = "";
-                sb.Append(2, $"public static bool {mName}" +
-                                        $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," +
-                                        $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" +
-                                        $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
+                sb.Append(2, $"public static bool {mName}" + $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," + $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)}, {inText}{typeFullName} {_serializers.GetValueParameterName(1)}" + $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
 
                 return sb.ToString();
             }
@@ -139,10 +136,11 @@ namespace Roslyn.FishNet.CodeBuilding
 
                 /* If (options.FastContains(DeltaSerializerOption.FullSerialize))
                  * {
-                 *      writer.Write(type); 
+                 *      writer.Write(type);
                  *      return;
                  * } */
                 CreateWriteFullIf();
+
                 void CreateWriteFullIf()
                 {
                     SerializerMethod fullSerializerMethod = GetFullWriter(item.Key, true, out _);
@@ -166,7 +164,6 @@ namespace Roslyn.FishNet.CodeBuilding
                 //Call write for all members.
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
-
                     Debugg.Log("DOING THING FOR " + fieldSymbol.OriginalDefinition.Name);
                     ITypeSymbol typeSymbol = fieldSymbol!.Type;
                     string typeFullName = typeSymbol.GetTypeFullName();
@@ -189,9 +186,21 @@ namespace Roslyn.FishNet.CodeBuilding
                         inText = "";
                         /* if (writer.WriteDeltaXYZ(p0, p1))
                             totalFlags += x */
-                        string writeDeltaText = RoslynCodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false,
-                                $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}",
-                                $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
+
+                        string writeDeltaText;
+                        
+                        //TODO get working to call method directly once delta serializers are fully supported.
+                        if (dsm!.IsGenerated())
+                        {
+                            
+                            writeDeltaText = RoslynCodeBuilder.CallMethod("WriteDelta", tmpWriterVariable, false, $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
+                        }
+                        else
+                        {
+                            writeDeltaText = RoslynCodeBuilder.CallMethod(dsm!.MethodName, tmpWriterVariable, false, $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
+                        }
+                        // ifBody.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.WriteDelta<{fullSerializerMethod.TypeFullName}>({_serializers.GetValueParameterName(1)});");
+
                         sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
                         AppendIncreaseTotalFlags(4);
                     }
@@ -214,9 +223,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     writer.WritePackedWhole(totalFlags); */
                 sb.AppendLine(bodyIndent, $"if ({changedVariable})");
                 sb.AppendLine(bodyIndent, "{");
-                sb.AppendLine(bodyIndent + 1,
-                    RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name,
-                        true, totalFlagsVariable));
+                sb.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariable));
                 /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
                  } */
                 sb.AppendLine(bodyIndent + 1, CodeBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariable));

@@ -29,7 +29,9 @@ namespace FirstGearGames.Roslyn.Extensions
             for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
 
-            fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
+            string symbolName = symbol.Name.AddGenericArguments(symbol);            
+            fullyQualifiedName = $"{fullyQualifiedName}{symbolName}";
+            
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
@@ -47,7 +49,9 @@ namespace FirstGearGames.Roslyn.Extensions
             for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}+{fullyQualifiedName}";
 
-            fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
+            string symbolName = symbol.Name.AddGenericArguments(symbol);            
+            fullyQualifiedName = $"{fullyQualifiedName}{symbolName}";
+
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
@@ -58,7 +62,7 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetSymbolName(this ISymbol symbol)
         {
             if (symbol == null) return string.Empty;
-            return symbol.Name;
+            return symbol.Name.AddGenericArguments(symbol);
         }
 
         /// <summary>
