@@ -83,7 +83,7 @@ namespace Roslyn.FishNet.CodeBuilding
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
 
-            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(2, namedTypeSymbol, methodName, header, ""), AddSerializerType.Delta);
+            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, ""), AddSerializerType.Delta);
             Debugg.Log($"{recursiveCount.ToIndent()}Added for type {typeFullName}.");
 
             string GetMethodHeader(out string mName)
@@ -161,6 +161,7 @@ namespace Roslyn.FishNet.CodeBuilding
                 sb.AppendLine(bodyIndent, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariable) + NativeConstants.LineFeed);
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.NamedTypeSymbol);
+            
                 //Call write for all members.
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
@@ -173,6 +174,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     //Delta writer not found.
                     if (!dsm.IsValid())
                     {
+                        Debugg.Log("ERROR AAA");
                         SerializerMethod sm = GetFullWriter(typeFullName, true, out bool _);
                         sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
                         sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod(sm!.MethodName, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
@@ -299,7 +301,7 @@ namespace Roslyn.FishNet.CodeBuilding
             SerializerMethod sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
             found = sm.IsValid();
             if (callWriteIfNull && !sm.IsValid())
-                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Writer_Write_Name}", sm.GenericArgumentsCount);
+                sm = new SerializerMethod(typeFullName, $"{FishNetConstants.Writer_Write_Name}", genericArgumentsCount: 0);
 
             return sm;
         }

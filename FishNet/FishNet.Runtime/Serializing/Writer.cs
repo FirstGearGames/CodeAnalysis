@@ -109,7 +109,7 @@ namespace FishNet.Serializing
         /// <summary>
         /// Writes a dictionary.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DefaultWriter]
         public void WriteDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict)
         {
         }

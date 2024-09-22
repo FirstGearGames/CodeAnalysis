@@ -49,12 +49,13 @@ namespace FirstGearGames.Roslyn.FishNet
              default serializers for types native to fishnet. */
             Serializers serializers = new();
             serializers.Initialize(fishnetRuntimeAssemblySymbol);
-
+            
             DeltaWriter_Builder deltaWriterBuilder = new();
             deltaWriterBuilder.Initialize(context, syntaxReceiver, serializers);
+            
             DeltaReader_Builder deltaReaderBuilder = new();
             deltaReaderBuilder.Initialize(context, syntaxReceiver, serializers);
-
+    
             Debugg.Log($"- Execute End for {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
