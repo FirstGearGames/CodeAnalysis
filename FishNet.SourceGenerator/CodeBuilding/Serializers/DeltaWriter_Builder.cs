@@ -172,10 +172,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     //Delta writer not found.
                     if (!dsm.IsValid())
                     {
-
-                        Debugg.Log($"CHECKED NAME {typeFullName}.");
-
-                        string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                        string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString());
 
                         SerializerMethod sm = GetFullWriter(typeFullName, true, out bool _);
                         sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
