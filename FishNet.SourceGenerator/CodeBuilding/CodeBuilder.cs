@@ -65,7 +65,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-
+        
         public static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
         {
             StringBuilder sb = new();

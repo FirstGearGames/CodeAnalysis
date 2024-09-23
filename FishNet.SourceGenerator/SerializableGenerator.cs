@@ -13,6 +13,12 @@ namespace FirstGearGames.Roslyn.FishNet
     [Generator]
     public sealed class SerializableGenerator : ISourceGenerator
     {
+        internal Serializers Serializers;
+        internal DeltaWriter_Builder DeltaWriterBuilder;
+        internal DeltaReader_Builder DeltaReaderBuilder;
+        internal Writer_Builder WriterBuilder;
+        internal Reader_Builder ReaderBuilder;
+
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => new GeneratorSyntaxReceiver());
@@ -47,15 +53,26 @@ namespace FirstGearGames.Roslyn.FishNet
             /* All objects which might be referenced need to be found
              first. The serialization generation process will rely on
              default serializers for types native to fishnet. */
-            Serializers serializers = new();
-            serializers.Initialize(fishnetRuntimeAssemblySymbol);
-            
-            DeltaWriter_Builder deltaWriterBuilder = new();
-            deltaWriterBuilder.Initialize(context, syntaxReceiver, serializers);
-            
-            DeltaReader_Builder deltaReaderBuilder = new();
-            deltaReaderBuilder.Initialize(context, syntaxReceiver, serializers);
-    
+            Serializers = new();
+            Serializers.Initialize(fishnetRuntimeAssemblySymbol);
+
+            DeltaWriterBuilder = new();
+            DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
+
+            DeltaReaderBuilder = new();
+            DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+
+            WriterBuilder = new();
+            WriterBuilder.Initialize(context, syntaxReceiver, this);
+
+            ReaderBuilder = new();
+            ReaderBuilder.Initialize(context, syntaxReceiver, this);
+
+            DeltaWriterBuilder.Execute();
+            DeltaReaderBuilder.Execute();
+            WriterBuilder.Execute();
+            ReaderBuilder.Execute();
+
             Debugg.Log($"- Execute End for {context.Compilation.AssemblyName}.");
 
             Debugg.Send();

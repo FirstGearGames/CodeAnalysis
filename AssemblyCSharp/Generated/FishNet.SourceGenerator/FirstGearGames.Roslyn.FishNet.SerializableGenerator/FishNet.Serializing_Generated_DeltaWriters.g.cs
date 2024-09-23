@@ -9,7 +9,7 @@
 			{
 				System.UInt64 optionsFlags = (System.UInt64)options;
 				writer.WriteUnsignedPackedWhole(optionsFlags);
-				writer.Write(value1);
+				writer.Write<ClientAssembly.MyThingB>(value1);
 				return true;
 			}
 

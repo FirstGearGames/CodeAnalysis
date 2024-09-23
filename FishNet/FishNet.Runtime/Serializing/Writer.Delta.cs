@@ -348,7 +348,8 @@ namespace FishNet.Serializing
 
         #endregion
 
-        //public void WriteDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA, Dictionary<TKey, TValue> valueB, DeltaSerializerOption option) { }
+        [DefaultDeltaReader]
+        public void WriteDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA, Dictionary<TKey, TValue> valueB, DeltaSerializerOption option) { }
 
         #region Generic.
 
