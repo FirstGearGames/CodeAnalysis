@@ -21,7 +21,7 @@
 			totalFlags += 4;
 
 			//Delta writer could not be found for type System.Collections.Generic.Dictionary. Please report this note.
-			pooledWriter.WriteDictionary(value1.Dict);
+			pooledWriter.WriteDictionary<TKey, TValue>(value1.Dict);
 			totalFlags += 8;
 
 			System.Boolean changed = (totalFlags != 0);

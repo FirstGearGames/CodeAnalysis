@@ -131,20 +131,20 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 result = null;
             }
 
-            if (result == null) 
-            {
-                
-                Debugg.Log($"<-------------- start for {typeFullName}. Writers count {_writeMethods.Count}. DeltaWriters count {_writeDeltaMethods.Count}");
-
-                foreach (KeyValuePair<string,SerializerMethod> serializerMethod in _writeMethods)
-                    Debugg.Log($"WriteMethods SM: {serializerMethod.Key}");
-
-
-                foreach (KeyValuePair<string,SerializerMethod> serializerMethod in _writeDeltaMethods)
-                    Debugg.Log($"WriteDeltaMethods SM: {serializerMethod.Key}");
-
-                
-            }
+            // if (result == null) 
+            // {
+            //     
+            //     Debugg.Log($"<-------------- start for {typeFullName}. Writers count {_writeMethods.Count}. DeltaWriters count {_writeDeltaMethods.Count}");
+            //
+            //     foreach (KeyValuePair<string,SerializerMethod> serializerMethod in _writeMethods)
+            //         Debugg.Log($"WriteMethods SM: {serializerMethod.Key}");
+            //
+            //
+            //     foreach (KeyValuePair<string,SerializerMethod> serializerMethod in _writeDeltaMethods)
+            //         Debugg.Log($"WriteDeltaMethods SM: {serializerMethod.Key}");
+            //
+            //     
+            // }
             return result;
         }
 

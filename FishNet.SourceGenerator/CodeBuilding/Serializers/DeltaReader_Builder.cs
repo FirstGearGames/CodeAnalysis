@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
@@ -71,7 +72,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             string header = GetMethodHeader(out string methodName);
 
             //Add to readers.
-            _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, ""), AddSerializerType.Delta);
+            _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
 
             string GetMethodHeader(out string mName)
             {
@@ -106,7 +107,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                 string totalFlagsVariable = "totalFlags";
                 sb.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
-                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
+                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, combinedGenericArguments: string.Empty, Generated_ReaderParameter_Name)}");
                 sb.AppendLine();
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
@@ -147,21 +148,17 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     //Delta reader found.
                     else
                     {
-                        // sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod(dsm!.MethodName, Generated_ReaderParameter_Name, true,
-                        //     $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
-
                         //TODO get working to call method directly once delta serializers are fully supported.
-                        if (dsm!.IsGenerated())
+                        if (dsm.IsGenerated())
                         {
-                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod("ReadDelta", Generated_ReaderParameter_Name, true,
+                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod("ReadDelta", combinedGenericArguments: string.Empty, Generated_ReaderParameter_Name, true,
                                 $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                         }
-                        else 
+                        else
                         {
-                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod(dsm!.MethodName, Generated_ReaderParameter_Name, true,
+                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod(dsm.MethodName, dsm.GetCombinedGenericArguments(), Generated_ReaderParameter_Name, true,
                                 $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                         }
-
                     }
 
                     /* else

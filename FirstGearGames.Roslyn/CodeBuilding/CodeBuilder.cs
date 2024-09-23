@@ -43,14 +43,14 @@ namespace FirstGearGames.Roslyn.CodeBuilding
 
         /// <summary>
         /// Calls a method taking optional arguments.
-        /// </summary>
-        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true, params string[] variableNames)
+        /// </summary> 
+        public static string CallMethod(string methodName, string combinedGenericArguments, string callingVariable = "", bool closeCall = true, params string[] variableNames)
         {
             if (callingVariable.Length > 0)
                 callingVariable += ".";
 
             _stringBuilder.Clear();
-            _stringBuilder.Append($"{callingVariable}{methodName}(");
+            _stringBuilder.Append($"{callingVariable}{methodName}{combinedGenericArguments}(");
 
             //Add arguments.
             for (int i = 0; i < variableNames.Length; i++)
@@ -124,7 +124,7 @@ namespace FirstGearGames.Roslyn.CodeBuilding
         /// </summary>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static string CombineGenericArguments(this List<string> arguments)
+        public static string GetCombinedGenericArguments(this List<string> arguments)
         {
             if (arguments.Count == 0) return string.Empty;
 
@@ -162,7 +162,7 @@ namespace FirstGearGames.Roslyn.CodeBuilding
                     results.Add(typeSymbol.GetTypeSymbolFullNameWithGenericArguments());
             }
 
-            return results.CombineGenericArguments();
+            return results.GetCombinedGenericArguments();
         }
     }
 }

@@ -42,7 +42,7 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetSymbolFullNameWithGenerics(this ISymbol symbol)
         {
             string metadataName = symbol.GetSymbolFullName();
-            string genericArguments = symbol.GetGenericArgumentsString().CombineGenericArguments();
+            string genericArguments = symbol.GetGenericArgumentsString().GetCombinedGenericArguments();
 
             return $"{metadataName}{genericArguments}";
         }
@@ -73,7 +73,7 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetSymbolFullMetadataNameWithGenerics(this ISymbol symbol)
         {
             string metadataName = symbol.GetSymbolFullMetadataName();
-            string genericArguments = symbol.GetGenericArgumentsString().CombineGenericArguments();
+            string genericArguments = symbol.GetGenericArgumentsString().GetCombinedGenericArguments();
 
             return $"{metadataName}{genericArguments}";
         }

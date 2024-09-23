@@ -23,13 +23,13 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
 
 		public static void Send()
 		{
-			bool fileExist = File.Exists(@"D:\Development\Personal\FishNets\SourceGenFix.txt");
-			if (!fileExist)
-			{
-				_msgs.Clear();
-				return;
-			}
-
+			// bool fileExist = File.Exists(@"D:\Development\Personal\FishNets\SourceGenFix.txt");
+			// if (!fileExist)
+			// {
+			// 	_msgs.Clear();
+			// 	return;
+			// }
+			
 			string path = @"D:/Output_" + AssemblyName + ".txt";
 			try
 			{

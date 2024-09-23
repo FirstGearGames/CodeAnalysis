@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Text;
+using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 
@@ -148,6 +149,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         /// <returns></returns>
         public virtual bool IsDeltaSerializer() => false;
+
+        /// <summary>
+        /// Returns GenericArguments combined as <arg0, arg1, ...>.
+        /// </summary>
+        public string GetCombinedGenericArguments() => GenericArguments.GetCombinedGenericArguments();
     }
 
     public class DeltaSerializerMethod : SerializerMethod

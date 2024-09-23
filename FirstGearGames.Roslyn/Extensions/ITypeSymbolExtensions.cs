@@ -27,7 +27,7 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol)
         {
             string fullName = typeSymbol.GetTypeSymbolFullName();
-            string genericArguments = typeSymbol.GetGenericArgumentsString().CombineGenericArguments();
+            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
 
             return $"{fullName}{genericArguments}";
         }
@@ -50,7 +50,7 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetTypeFullMetadataNameWithGenericArguments(this ITypeSymbol typeSymbol)
         {
             string metadataName = typeSymbol.GetTypeSymbolFullMetadataName();
-            string genericArguments = typeSymbol.GetGenericArgumentsString().CombineGenericArguments();
+            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
 
             return $"{metadataName}{genericArguments}";
         }
@@ -109,7 +109,7 @@ namespace FirstGearGames.Roslyn.Extensions
         {
             List<string> results = symbol.GetGenericArgumentsString();
 
-            return $"{str}{results.CombineGenericArguments()}";
+            return $"{str}{results.GetCombinedGenericArguments()}";
         }
 
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
