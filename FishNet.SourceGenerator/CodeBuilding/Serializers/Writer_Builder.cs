@@ -15,19 +15,18 @@ namespace Roslyn.FishNet.CodeBuilding
 {
     public class Writer_Builder
     {
-        private static StringBuilder _stringBuilder = new();
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private Serializers _serializers => _generator.Serializers;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private const string Generated_Class_Name = "Generated_Writers";
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}Write";
         private const string Generated_WriterParameter_Name = "writer";
         public const string InitializeOnLoad_Method_Name = "InitializeSerializers";
 
+        private static StringBuilder _stringBuilder = new();
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        private Serializers _serializers => _generator.Serializers;
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
         {

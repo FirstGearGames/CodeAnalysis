@@ -15,18 +15,18 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
     public class DeltaReader_Builder
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private Serializers _serializers => _generator.Serializers;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        private const string InitializeOnLoad_Method_Name = DeltaWriter_Builder.InitializeOnLoad_Method_Name;
         private const string Generated_Class_Name = "Generated_DeltaReaders";
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedReaderPrefix}ReadDelta";
         private const string Generated_ReaderParameter_Name = "reader";
         private const string Generated_DeltaSerializerOption_Name = DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
-        public const string InitializeOnLoad_Method_Name = DeltaWriter_Builder.InitializeOnLoad_Method_Name;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        private Serializers _serializers => _generator.Serializers;
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
         {
