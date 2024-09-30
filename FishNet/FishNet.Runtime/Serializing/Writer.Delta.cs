@@ -20,7 +20,6 @@ namespace FishNet.Serializing
         internal const decimal DECIMAL_ACCURACY = 1000m;
 
         #region Other.
-
         /// <summary>
         /// Writes a delta value.
         /// </summary>
@@ -30,11 +29,9 @@ namespace FishNet.Serializing
         {
             return default;
         }
-
         #endregion
 
         #region Whole values.
-
         /// <summary>
         /// Writes a delta value.
         /// </summary>
@@ -113,25 +110,18 @@ namespace FishNet.Serializing
         {
             return default;
         }
-
         #endregion
 
         #region Single.
         /// <summary>
         /// Writes a single using DeltaPrecisionType.
         /// </summary>
-        private void WriteDeltaSingle(DeltaPrecisionType dpt, float value)
-        {
-
-        }
+        private void WriteDeltaSingle(DeltaPrecisionType dpt, float value) { }
 
         /// <summary>
         /// Writes a single using DeltaPrecisionType.
         /// </summary>
-        private void WriteUDeltaSingle(UDeltaPrecisionType dpt, float positiveValue)
-        {
-
-        }
+        private void WriteUDeltaSingle(UDeltaPrecisionType dpt, float positiveValue) { }
 
         /// <summary>
         /// Writes a delta value.
@@ -179,26 +169,18 @@ namespace FishNet.Serializing
         {
             return default;
         }
-        
         #endregion
 
         #region Double.
-
         /// <summary>
         /// Writes a decimal using DeltaPrecisionType.
         /// </summary>
-        private void WriteDeltaDouble(DeltaPrecisionType dpt, double value)
-        {
-
-        }
+        private void WriteDeltaDouble(DeltaPrecisionType dpt, double value) { }
 
         /// <summary>
         /// Writes a double using DeltaPrecisionType.
         /// </summary>
-        private void WriteUDeltaDouble(UDeltaPrecisionType dpt, double positiveValue)
-        {
-
-        }
+        private void WriteUDeltaDouble(UDeltaPrecisionType dpt, double positiveValue) { }
 
         /// <summary>
         /// Writes a delta value.
@@ -256,26 +238,18 @@ namespace FishNet.Serializing
         {
             return default;
         }
-
         #endregion
 
         #region Decimal
-        
         /// <summary>
         /// Writes a decimal using DeltaPrecisionType.
         /// </summary>
-        private void WriteDeltaDecimal(DeltaPrecisionType dpt, decimal value)
-        {
-
-        }
+        private void WriteDeltaDecimal(DeltaPrecisionType dpt, decimal value) { }
 
         /// <summary>
         /// Writes a decimal using DeltaPrecisionType.
         /// </summary>
-        private void WriteUDeltaDecimal(UDeltaPrecisionType dpt, decimal positiveValue)
-        {
-            
-        }
+        private void WriteUDeltaDecimal(UDeltaPrecisionType dpt, decimal positiveValue) { }
 
         /// <summary>
         /// Writes a delta value.
@@ -332,11 +306,9 @@ namespace FishNet.Serializing
         {
             return default;
         }
-
         #endregion
 
         #region Unity.
-
         /// <summary>
         /// Writes a delta Vector3.
         /// </summary>
@@ -345,20 +317,16 @@ namespace FishNet.Serializing
         {
             return default;
         }
-
         #endregion
-
-        [DefaultDeltaReader]
-        public void WriteDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA, Dictionary<TKey, TValue> valueB, DeltaSerializerOption option) { }
+ 
+        [DefaultDeltaWriter]
+        public bool WriteDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA, Dictionary<TKey, TValue> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) { }
 
         #region Generic.
-
-        public bool WriteDelta<T>(T prev, T next, DeltaSerializerOption option)
+        public bool WriteDelta<T>(T prev, T next, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
             return default;
         }
-
         #endregion
     }
-    
 }

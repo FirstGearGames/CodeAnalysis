@@ -45,7 +45,7 @@ namespace ClientAssembly
    public class MyThingB
 	{
 		public string B;
-		public Dictionary<int, bool> Dict;  
+		public Dictionary<int, bool> Dict;
 	}
 
    // [IncludeSerialization]

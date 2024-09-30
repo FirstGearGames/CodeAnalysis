@@ -44,13 +44,13 @@ namespace FirstGearGames.Roslyn.CodeBuilding
         /// <summary>
         /// Calls a method taking optional arguments.
         /// </summary> 
-        public static string CallMethod(string methodName, string combinedGenericArguments, string callingVariable = "", bool closeCall = true, params string[] variableNames)
+        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true, params string[] variableNames)
         {
             if (callingVariable.Length > 0)
                 callingVariable += ".";
 
             _stringBuilder.Clear();
-            _stringBuilder.Append($"{callingVariable}{methodName}{combinedGenericArguments}(");
+            _stringBuilder.Append($"{callingVariable}{methodName}(");
 
             //Add arguments.
             for (int i = 0; i < variableNames.Length; i++)

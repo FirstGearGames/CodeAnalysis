@@ -116,7 +116,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                 string totalFlagsVariable = "totalFlags";
                 sb.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
-                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, combinedGenericArguments: string.Empty, Generated_ReaderParameter_Name)}");
+                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
                 sb.AppendLine();
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
@@ -154,13 +154,12 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     //Delta reader not found.
                     if (!dsm.IsValid())
                     {
-                        string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString());
-
                         SerializerMethod sm = GetFullReader(typeFullName, out bool serializerFound);
                         if (!serializerFound)
                             sm = _generator.ReaderBuilder.CreateReadSerializerMethod(item.Value.TypeSymbol);
                         
                         sb.AppendLine(bodyIndent, $"//Delta reader could not be found for type {typeFullName}. Please report this note.");
+                        string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
                         sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{sm.MethodName}{genericArguments}();");
                     }
                     //Delta reader found.
@@ -169,12 +168,14 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         //TODO get working to call method directly once delta serializers are fully supported.
                         if (dsm.IsGenerated())
                         {
-                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod("ReadDelta", combinedGenericArguments: string.Empty, Generated_ReaderParameter_Name, true,
+                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod("ReadDelta", Generated_ReaderParameter_Name, true,
                                 $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                         }
                         else
                         {
-                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod(dsm.MethodName, dsm.GetCombinedGenericArguments(), Generated_ReaderParameter_Name, true,
+                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{genericArguments}", Generated_ReaderParameter_Name, true,
                                 $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                         }
                     }

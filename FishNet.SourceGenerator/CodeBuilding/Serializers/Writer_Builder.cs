@@ -41,7 +41,7 @@ namespace Roslyn.FishNet.CodeBuilding
         {
             if (typeSymbol == null)
             {
-                Debugg.Log("XULL TYPE");
+                Debugg.Log("NULL TYPE");
                 Debugg.Send();
             }
             return new SerializerMethod(typeSymbol, $"{FishNetConstants.Writer_Write_Name}<{typeSymbol.GetTypeSymbolFullName()}>");

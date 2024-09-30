@@ -121,7 +121,7 @@ namespace Roslyn.FishNet.CodeBuilding
             string flagsVariable = "optionsFlags";
             _stringBuilder.Append(indent + 1, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, flagsVariable, string.Empty, false));
             _stringBuilder.AppendLine($" = ({NativeConstants.UInt64_FullName}){Generated_DeltaSerializerOption_Name};");
-            _stringBuilder.AppendLine(indent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, combinedGenericArguments: string.Empty, Generated_WriterParameter_Name, true, flagsVariable));
+            _stringBuilder.AppendLine(indent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, flagsVariable));
             _stringBuilder.AppendLine(body);
             _stringBuilder.AppendLine(indent, "}");
 
@@ -192,7 +192,7 @@ namespace Roslyn.FishNet.CodeBuilding
                         sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
                         
                         string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString());
-                        sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod(sm.MethodName, genericArguments, tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
+                        sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod($"{sm.MethodName}{genericArguments}", tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
                         AppendIncreaseTotalFlags(3);
                     }
                     //Delta writer found.
@@ -209,11 +209,13 @@ namespace Roslyn.FishNet.CodeBuilding
                         //TODO get working to call method directly once delta serializers are fully supported.
                         if (dsm.IsGenerated())
                         {
-                            writeDeltaText = RoslynCodeBuilder.CallMethod("WriteDelta", combinedGenericArguments: string.Empty, tmpWriterVariable, false, $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
+                            string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString());
+                            writeDeltaText = RoslynCodeBuilder.CallMethod($"WriteDelta{genericArguments}", tmpWriterVariable, false, $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
                         }
                         else
                         {
-                            writeDeltaText = RoslynCodeBuilder.CallMethod(dsm.MethodName, dsm.GetCombinedGenericArguments(), tmpWriterVariable, false, $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
+                            string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString());
+                            writeDeltaText = RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{genericArguments}", tmpWriterVariable, false, $"{inText}{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{inText}{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
                         }
                         // ifBody.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.WriteDelta<{fullSerializerMethod.TypeFullName}>({_serializers.GetValueParameterName(1)});");
 
@@ -239,7 +241,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     writer.WritePackedWhole(totalFlags); */
                 sb.AppendLine(bodyIndent, $"if ({changedVariable})");
                 sb.AppendLine(bodyIndent, "{");
-                sb.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, combinedGenericArguments: string.Empty, Generated_WriterParameter_Name, true, totalFlagsVariable));
+                sb.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariable));
                 /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
                  } */
                 sb.AppendLine(bodyIndent + 1, CodeBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariable));
