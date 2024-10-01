@@ -243,6 +243,20 @@ namespace FishNet.Serializing
         [DefaultDeltaReader]
         public Dictionary<TKey, TValue> ReadDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA) => default;
 
+        [DefaultDeltaReader]
+        public List<T> ReadDeltaList<T>(List<T> valueA) => default;
+
+        [DefaultDeltaReader]
+
+        public byte[] ReadDeltaUInt8Array(byte[] valueA) => default;
+
+        [DefaultDeltaReader]
+        public T[] ReadDeltaUArray<T>(T[] valueA) => default;
+
+        [DefaultDeltaReader]
+        public ArraySegment<byte> ReadDeltaArraySegment(ArraySegment<byte> valueA) => default;
+
+
         #region Generic.
 
         /// <summary>

@@ -19,10 +19,15 @@
 				result.B = value0.B;
 
 			if ((totalFlags & 8) == 8)
-			//Delta reader could not be found for type System.Collections.Generic.Dictionary. Please report this note.
-				result.Dict = reader.ReadDictionaryAllocated<System.Int32, System.Boolean>();
+				result.Dict = reader.ReadDeltaDictionary<System.Int32, System.Boolean>(value0.Dict);
 			else
 				result.Dict = value0.Dict;
+
+			if ((totalFlags & 16) == 16)
+			//Delta reader could not be found for type System.Byte[]. Please report this note.
+				result.Bytey = reader.Read<ClientAssembly.MyThingB>();
+			else
+				result.Bytey = value0.Bytey;
 
 			return result;
 		}

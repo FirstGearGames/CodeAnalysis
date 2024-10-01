@@ -113,6 +113,14 @@ namespace FishNet.Serializing
         public void WriteDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict)
         {
         }
+
+        /// <summary>
+        /// Writes a dictionary.
+        /// </summary>
+        [DefaultWriter]
+        public void WriteList<T>(List<T> valueA)
+        {
+        }
         
         /// <summary>
         /// Ensures the buffer Capacity is of minimum count.
@@ -221,6 +229,7 @@ namespace FishNet.Serializing
         /// </summary>
         /// <param name="value"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DefaultWriter]
         public void WriteUInt8ArrayAndSize(byte[] value)
         {
         }

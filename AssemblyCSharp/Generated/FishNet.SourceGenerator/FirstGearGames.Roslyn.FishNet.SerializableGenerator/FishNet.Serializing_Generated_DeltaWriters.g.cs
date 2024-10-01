@@ -1,4 +1,5 @@
-﻿namespace FishNet.Serializing
+﻿//FishNet generated file.
+namespace FishNet.Serializing
 {
 	public static class Generated_DeltaWriters
 	{
@@ -20,9 +21,11 @@
 			pooledWriter.WriteString(value1.B);
 			totalFlags += 4;
 
-			//Delta writer could not be found for type System.Collections.Generic.Dictionary. Please report this note.
-			pooledWriter.WriteDictionary<System.Int32, System.Boolean>(value1.Dict);
-			totalFlags += 8;
+			if (pooledWriter.WriteDeltaDictionary<System.Int32, System.Boolean>(value0.Dict, value1.Dict))
+				totalFlags += 8;
+
+			if (pooledWriter.WriteDeltaUInt8Array(value0.Bytey, value1.Bytey))
+				totalFlags += 16;
 
 			System.Boolean changed = (totalFlags != 0);
 			if (changed)

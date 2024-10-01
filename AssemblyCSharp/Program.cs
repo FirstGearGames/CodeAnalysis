@@ -46,6 +46,7 @@ namespace ClientAssembly
 	{
 		public string B;
 		public Dictionary<int, bool> Dict;
+		public byte[] Bytey;
 	}
 
    // [IncludeSerialization]

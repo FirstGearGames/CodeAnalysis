@@ -1,62 +1,29 @@
-﻿using System;
-using FirstGearGames.Roslyn.Extensions;
+﻿using FirstGearGames.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.FishNet.Serializing
 {
-    public struct SerializableType : IEquatable<SerializableType>
+    public struct SerializableType
     {
-        public enum TypeExposure
-        {
-            Unset = 0,
-            Public = 1,
-            Internal = 2,
-            Partial = 3,
-        }
-
         // public TypeExposure Exposure;
         /// <summary>
         /// Type the serializable is for.
         /// </summary>
         public ITypeSymbol TypeSymbol;
         /// <summary>
-        /// FullName of the serializable.
+        /// Full name of the type.
         /// </summary>
-        public readonly string FullName;
+        public string FullName;
         /// <summary>
-        /// FullName as Metadata of the serializable.
+        /// Full meta name of the type.
         /// </summary>
-        public readonly string FullMetadataName;
-        // /// <summary>
-        // /// Containing class of the type. When set serializers should be written as a partial of this class.
-        // /// </summary>
-        // public readonly string ContainingClassNamespace;
-        // /// <summary>
-        // /// Containing class of the type. When set serializers should be written as a partial of this class.
-        // /// </summary>
-        // public readonly string ContainingClass;
+        public string FullMetadataName;
 
-        public SerializableType(ITypeSymbol typeSymbol, TypeExposure exposure)
+        public SerializableType(ITypeSymbol typeSymbol)
         {
             TypeSymbol = typeSymbol;
-            FullName = typeSymbol.GetSymbolFullName();
-            FullMetadataName = typeSymbol.GetSymbolFullMetadataName();
-
-            // if (exposure == TypeExposure.NestedWithinPartial)
-            // {
-            //     ContainingClassNamespace = typeSymbol.GetNamespace();
-            //     ContainingClass = typeSymbol.Name;
-            // }
+            FullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments();
+            FullMetadataName = typeSymbol.GetTypeFullMetadataNameWithGenericArguments();
         }
-
-        public SerializableType(string fullName, string fullMetadataName, string containingClassNamespace, string containingClass)
-        {
-            FullName = fullName;
-            FullMetadataName = fullMetadataName;
-            // ContainingClassNamespace = containingClassNamespace;
-            // ContainingClass = containingClass;
-        }
-
-        public bool Equals(SerializableType other) => (other.FullName == this.FullName);
     }
 }

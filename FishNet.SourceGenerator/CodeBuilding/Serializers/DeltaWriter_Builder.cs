@@ -15,11 +15,11 @@ namespace Roslyn.FishNet.CodeBuilding
 {
     public class DeltaWriter_Builder
     {
+        public const string InitializeOnLoad_Method_Name = Writer_Builder.InitializeOnLoad_Method_Name;
+        public const string Generated_DeltaSerializerOption_Name = "options";
         private const string Generated_Class_Name = "Generated_DeltaWriters";
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}WriteDelta";
-        private const string Generated_WriterParameter_Name = "writer";
-        public const string Generated_DeltaSerializerOption_Name = "options";
-        public const string InitializeOnLoad_Method_Name = "InitializeSerializers";
+        private const string Generated_WriterParameter_Name = Writer_Builder.Generated_WriterParameter_Name;
 
         private static StringBuilder _stringBuilder = new();
 
@@ -85,7 +85,7 @@ namespace Roslyn.FishNet.CodeBuilding
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol, SerializableType.TypeExposure.Public), recursiveCount + 1);
+                CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
             }
 
             Debugg.Log($"{recursiveCount.ToIndent()}    Creating header and footer.");
@@ -154,7 +154,7 @@ namespace Roslyn.FishNet.CodeBuilding
                 {
                     SerializerMethod sm = GetFullWriter(item.Key, out bool serializerFound);
                     if (!serializerFound)
-                        sm = _generator.WriterBuilder.CreateWriteSerializerMethod(item.Value.TypeSymbol);
+                        sm = _generator.WriterBuilder.CreateSerializerMethod(item.Value.TypeSymbol);
                     
                     StringBuilder ifBody = new();
 
@@ -187,7 +187,7 @@ namespace Roslyn.FishNet.CodeBuilding
 
                         SerializerMethod sm = GetFullWriter(typeFullName, out bool serializerFound);
                         if (!serializerFound)
-                            sm = _generator.WriterBuilder.CreateWriteSerializerMethod(typeSymbol);
+                            sm = _generator.WriterBuilder.CreateSerializerMethod(typeSymbol);
 
                         sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
                         
@@ -264,6 +264,7 @@ namespace Roslyn.FishNet.CodeBuilding
             StringBuilder sb = new();
 
             string clsText = RoslynCodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+            sb.AppendLine($"//FishNet generated file.");
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;

@@ -12,6 +12,13 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 {
     public class SerializableReceiver
     {
+        public enum TypeScope 
+        {
+            Unset,
+            Public,
+            Private,
+        }
+
         public event Action<SyntaxNodeAnalysisContext> OnIsNotSerializableAccessible;
 
         public const string NetworkConnection_FullName = "FishNet.Connection.NetworkConnection";
@@ -180,31 +187,28 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// Adds a type to serializableTypes.
         /// Returns true if added, false if already existed.
         /// </summary>
-        private bool AddSerializableType(object context, INamedTypeSymbol theSymbol)
+        private bool AddSerializableType(object context, INamedTypeSymbol namedTypeSymbol)
         {
             //Has exclude serialization attribute.
-            if (theSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
-
-            string fullName = theSymbol.GetTypeSymbolFullName();
+            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
 
             //Check if already added.
             foreach (SerializableType st in SerializableTypes)
             {
-                if (st.FullName == fullName)
+                if (st.TypeSymbol == namedTypeSymbol)
                     return false;
             }
 
-            SerializableType.TypeExposure typeExposure = GetSerializableTypeExposure(context, theSymbol);
-            if (typeExposure == SerializableType.TypeExposure.Unset)
+            TypeScope typeScope = GetTypeScope(context, namedTypeSymbol);
+            if (typeScope == TypeScope.Unset)
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnIsNotSerializableAccessible?.Invoke(analysisContext);
                 return false;
             }
 
-            //if (SerializableTypes.Add(new SerializableType(theSymbol, fullName, metaName, typeExposure)))
-            if (SerializableTypes.Add(new SerializableType(theSymbol, typeExposure)))
-                Debugg.Log($"   Added {theSymbol.GetSymbolFullName()} to serializable types.");
+            if (SerializableTypes.Add(new SerializableType(namedTypeSymbol)))
+                Debugg.Log($"   Added {namedTypeSymbol.GetSymbolFullName()} to serializable types.");
 
             return true;
         }
@@ -213,28 +217,28 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// Returns if a type is accessible for serialization.
         /// This returns true if scope is internal or public, or if the class it's nested within is partial.
         /// </summary>
-        private SerializableType.TypeExposure GetSerializableTypeExposure(object context, INamedTypeSymbol typeSymbol)
+        private TypeScope GetTypeScope(object context, INamedTypeSymbol typeSymbol)
         {
             //Public.
-            if (typeSymbol.DeclaredAccessibility is Accessibility.Public) return SerializableType.TypeExposure.Public;
+            if (typeSymbol.DeclaredAccessibility is Accessibility.Public) return TypeScope.Public;
             ////Internal.
             //if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.Internal;
 
             /* If here type is not exposed enough. See if containing type is partial which will allow us
              * to put the generated serializer in the containing type. */
 
-            if (typeSymbol.ContainingType is not INamedTypeSymbol baseNamedType) return SerializableType.TypeExposure.Unset;
+            if (typeSymbol.ContainingType is not INamedTypeSymbol baseNamedType) return TypeScope.Unset;
 
-            if (baseNamedType.DeclaringSyntaxReferences.First() is not SyntaxReference syntaxReference) return SerializableType.TypeExposure.Unset;
+            if (baseNamedType.DeclaringSyntaxReferences.First() is not SyntaxReference syntaxReference) return TypeScope.Unset;
 
             SyntaxNode node = syntaxReference.GetSyntax();
-            if (node is not TypeDeclarationSyntax typeDeclaration) return SerializableType.TypeExposure.Unset;
+            if (node is not TypeDeclarationSyntax typeDeclaration) return TypeScope.Unset;
 
             // if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
             //     return SerializableType.TypeExposure.NestedWithinPartial;
 
             //Not partial.
-            return SerializableType.TypeExposure.Unset;
+            return TypeScope.Unset;
         }
     }
 }

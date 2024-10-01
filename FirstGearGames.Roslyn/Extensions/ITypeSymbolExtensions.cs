@@ -12,15 +12,24 @@ namespace FirstGearGames.Roslyn.Extensions
     {
         public static string GetTypeSymbolFullName(this ITypeSymbol typeSymbol)
         {
+            //Overwrite symbol is array and set array suffix.
+            string arraySuffix = string.Empty;
+            if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
+            {
+                typeSymbol = arrayTypeSymbol.ElementType;
+                arraySuffix = "[]";
+            }
+            
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
 
+            
             string fullyQualifiedName = string.Empty;
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
             
-            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
-
+            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}{arraySuffix}";
+            
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
