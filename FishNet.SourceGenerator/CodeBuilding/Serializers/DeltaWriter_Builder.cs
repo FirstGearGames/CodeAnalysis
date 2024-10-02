@@ -69,7 +69,7 @@ namespace Roslyn.FishNet.CodeBuilding
                 Debugg.Log($"{recursiveCount.ToIndent()}   Serializer already exists.");
                 return;
             }
-            Debugg.Log($"{recursiveCount.ToIndent()}    A");
+            Debugg.Log($"{recursiveCount.ToIndent()}    A   {serializableType.FullMetadataName}");
             //Debugg.Log("Meta name is " + serializableType.FullMetadataName);
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)

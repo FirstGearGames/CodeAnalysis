@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using FirstGearGames.Roslyn.CodeBuilding;
 
 namespace FirstGearGames.Roslyn.Extensions
@@ -19,7 +20,8 @@ namespace FirstGearGames.Roslyn.Extensions
         /// <summary>
         /// Returns the full name of a symbol which includes the namespace.
         /// </summary>
-        public static string GetSymbolFullName(this ISymbol symbol)
+        /// <param name="metadataName">True to return name as metadata.</param>
+        public static string GetSymbolFullName(this ISymbol? symbol, bool metadataName)
         {
             if (symbol == null) return string.Empty;
 
@@ -27,86 +29,99 @@ namespace FirstGearGames.Roslyn.Extensions
             containingNamespace = containingNamespace.RemoveGlobalAlias();
 
             string fullyQualifiedName = string.Empty;
+            string joiningChar = (metadataName) ? "+" : ".";
             for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
-                fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
+                fullyQualifiedName = $"{currentType.Name}{joiningChar}{fullyQualifiedName}";
 
-            fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
-            
-            return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
-        }
-        
-        
-        /// <summary>
-        /// Returns the full name of a symbol which includes the namespace.
-        /// </summary>
-        public static string GetSymbolFullNameWithGenerics(this ISymbol symbol)
-        {
-            string metadataName = symbol.GetSymbolFullName();
-            string genericArguments = symbol.GetGenericArgumentsString().GetCombinedGenericArguments();
-
-            return $"{metadataName}{genericArguments}";
-        }
-        
-        /// <summary>
-        /// Returns the full name of a symbol which includes the namespace.
-        /// </summary>
-        public static string GetSymbolFullMetadataName(this ISymbol symbol)
-        {
-            if (symbol == null) return string.Empty;
-
-            string containingNamespace = symbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
-            containingNamespace = containingNamespace.RemoveGlobalAlias();
-
-            string fullyQualifiedName = string.Empty;
-            for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
-                fullyQualifiedName = $"{currentType.Name}+{fullyQualifiedName}";
-            
             fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
 
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
-             
         /// <summary>
         /// Returns the full name of a symbol which includes the namespace.
         /// </summary>
-        public static string GetSymbolFullMetadataNameWithGenerics(this ISymbol symbol)
+        /// <param name="metadataName">True to return name as metadata.</param>
+        public static string GetSymbolFullNameWithGenerics(this ISymbol symbol, bool metadataName)
         {
-            string metadataName = symbol.GetSymbolFullMetadataName();
+            string fullName = symbol.GetSymbolFullName(metadataName);
             string genericArguments = symbol.GetGenericArgumentsString().GetCombinedGenericArguments();
 
-            return $"{metadataName}{genericArguments}";
+            return $"{fullName}{genericArguments}";
+        }
+        
+        
+        /// <summary>
+        /// Returns generic arguments as ITypeSymbols.
+        /// </summary>
+        public static List<ITypeSymbol> GetGenericArgumentsTypeSymbol(this ISymbol symbol)
+        {
+            List<ITypeSymbol> results = new();
+
+            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
+                results.AddRange(namedTypeSymbol.TypeArguments.ToList());
+
+            return results;
         }
 
 
         /// <summary>
-        /// Returns the short name of a symbol which includes the namespace.
+        /// Returns generic arguments count.
         /// </summary>
-        public static string GetSymbolName(this ISymbol symbol)
+        public static int GetGenericArgumentsCount(this ISymbol symbol)
         {
-            if (symbol == null) return string.Empty;
-            return symbol.Name.AddGenericArguments(symbol);
+            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
+                return namedTypeSymbol.TypeArguments.Length;
+
+            return 0;
         }
+
+        
+        /// <summary>
+        /// Returns generic arguments as fullName strings.
+        /// </summary>
+        public static List<string> GetGenericArgumentsString(this ISymbol symbol)
+        {
+            List<string> results = new();
+
+            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
+            {
+                foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
+                {
+                    if (typeArgument.TypeKind is TypeKind.TypeParameter)
+                        results.Add(typeArgument.Name);
+                    else
+                        results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments());
+                }
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Adds generic arguments onto a string in the fashion of <type, type2, type3>.
+        /// </summary>
+        public static string AddGenericArguments(this string str, ISymbol symbol)
+        {
+            List<string> results = symbol.GetGenericArgumentsString();
+
+            return $"{str}{results.GetCombinedGenericArguments()}";
+        }
+
 
         /// <summary>
         /// Returns if a symbol has an attribute, and outputs it if so.
         /// </summary>
-        public static bool HasAttribute(this ISymbol symbol, string attributeFullName, out AttributeData data)
+        /// <param name="isMetadataName">True if the attributeFullName is a metadataName.</param>
+        public static bool HasAttribute(this ISymbol symbol, string attributeFullName, bool isMetadataName, out AttributeData data)
         {
             foreach (AttributeData item in symbol.GetAttributes())
             {
                 INamedTypeSymbol? typeSymbol = item.AttributeClass;
                 if (typeSymbol == null)
-                {
-                    // Debugg.Log($"---- Not attributeClass");
                     continue;
-                }
-                else
-                {
-                    //  Debugg.Log($"!___ Attribute name is {typeSymbol.GetSymbolFullName()}");
-                }
 
-                if (typeSymbol.GetSymbolFullName() == attributeFullName)
+                if (typeSymbol.GetSymbolFullName(isMetadataName) == attributeFullName)
                 {
                     data = item;
                     return true;
@@ -123,61 +138,41 @@ namespace FirstGearGames.Roslyn.Extensions
         /// <summary>
         /// Returns if a symbol has any of the supplied attributes, and outputs it if so.
         /// </summary>
-        public static bool HasAttributes(this ISymbol symbol, string[] attributeFullNames, out List<AttributeData> datas)
+        public static bool HasAttributes(this ISymbol symbol, string[] attributeFullNames, bool isMetadataName, out List<AttributeData> datas)
         {
             datas = new List<AttributeData>();
 
             foreach (string fullName in attributeFullNames)
             {
-                if (symbol.HasAttribute(fullName, out AttributeData? d))
+                if (symbol.HasAttribute(fullName, isMetadataName, out AttributeData? d))
                     datas.Add(d!);
             }
 
             return datas.Count > 0;
         }
 
-        public static bool HasAttribute(this ISymbol thisSymbol, string attributeFullName)
+        public static bool HasAttribute(this ISymbol thisSymbol, string attributeFullName, bool isMetadataName)
         {
             foreach (AttributeData attribute in thisSymbol.GetAttributes())
             {
                 if (attribute.AttributeClass is not INamedTypeSymbol namedTypeSymbol) continue;
 
-                string symbolFullName = namedTypeSymbol.GetSymbolFullName();
+                string symbolFullName = namedTypeSymbol.GetSymbolFullName(isMetadataName);
                 if (symbolFullName == attributeFullName) return true;
             }
 
             return false;
         }
 
-        public static bool HasAttributes(this ISymbol thisSymbol, params string[] attributeFullNames)
+        public static bool HasAttributes(this ISymbol thisSymbol, bool isMetadataNames, params string[] attributeFullNames)
         {
             foreach (string fullyQualifiedAttributeName in attributeFullNames)
-                if (thisSymbol.HasAttribute(fullyQualifiedAttributeName)) return true;
+                if (thisSymbol.HasAttribute(fullyQualifiedAttributeName, isMetadataNames))
+                    return true;
 
             return false;
         }
 
-        public static AttributeData? GetAttribute(this ISymbol thisSymbol, string fullyQualifiedAttributeName)
-        {
-            foreach (AttributeData attribute in thisSymbol.GetAttributes())
-            {
-                if (attribute.AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == fullyQualifiedAttributeName) return attribute;
-            }
-
-            return null;
-        }
-
-        public static ImmutableArray<AttributeData> GetAttributes(this ISymbol thisSymbol, string fullyQualifiedAttributeName)
-        {
-            ImmutableArray<AttributeData>.Builder attributes = ImmutableArray.CreateBuilder<AttributeData>();
-
-            foreach (AttributeData attribute in thisSymbol.GetAttributes())
-            {
-                if (attribute.AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == fullyQualifiedAttributeName) attributes.Add(attribute);
-            }
-
-            return attributes.ToImmutable();
-        }
     }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 }

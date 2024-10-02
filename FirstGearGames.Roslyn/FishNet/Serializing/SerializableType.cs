@@ -23,7 +23,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         {
             TypeSymbol = typeSymbol;
             FullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments();
-            FullMetadataName = typeSymbol.GetTypeFullMetadataNameWithGenericArguments();
+            FullMetadataName = typeSymbol.GetTypeSymbolFullMetadataName();
         }
     }
 }

@@ -10,7 +10,12 @@ namespace FirstGearGames.Roslyn.Extensions
 {
     public static class ITypeSymbolExtensions
     {
-        public static string GetTypeSymbolFullName(this ITypeSymbol typeSymbol)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolFullName(this ITypeSymbol typeSymbol, bool metadataName)
         {
             //Overwrite symbol is array and set array suffix.
             string arraySuffix = string.Empty;
@@ -25,100 +30,26 @@ namespace FirstGearGames.Roslyn.Extensions
 
             
             string fullyQualifiedName = string.Empty;
+            string joiningChar = (metadataName) ? "+" : ".";
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
-                fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
+                fullyQualifiedName = $"{currentType.Name}{joiningChar}{fullyQualifiedName}";
             
             fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}{arraySuffix}";
             
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
-        public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol, bool metadataName)
         {
-            string fullName = typeSymbol.GetTypeSymbolFullName();
+            string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
             string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
 
             return $"{fullName}{genericArguments}";
-        }
-        
-        public static string GetTypeSymbolFullMetadataName(this ITypeSymbol typeSymbol)
-        {
-            string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
-            containingNamespace = containingNamespace.RemoveGlobalAlias();
-
-            string fullyQualifiedName = string.Empty;
-            for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
-                fullyQualifiedName = $"{currentType.Name}.{fullyQualifiedName}";
-            
-            fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
-
-            return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
-        }
-        
-        
-        public static string GetTypeFullMetadataNameWithGenericArguments(this ITypeSymbol typeSymbol)
-        {
-            string metadataName = typeSymbol.GetTypeSymbolFullMetadataName();
-            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
-
-            return $"{metadataName}{genericArguments}";
-        }
-
-
-        /// <summary>
-        /// Returns generic arguments as ITypeSymbols.
-        /// </summary>
-        public static List<ITypeSymbol> GetGenericArgumentsTypeSymbol(this ISymbol symbol)
-        {
-            List<ITypeSymbol> results = new();
-
-            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-                results.AddRange(namedTypeSymbol.TypeArguments.ToList());
-
-            return results;
-        }
-
-        
-        /// <summary>
-        /// Returns generic arguments count.
-        /// </summary>
-        public static int GetGenericArgumentsCount(this ISymbol symbol)
-        {
-            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-                return namedTypeSymbol.TypeArguments.Length;
-
-            return 0;
-        }
-        
-        /// <summary>
-        /// Returns generic arguments as fullName strings.
-        /// </summary>
-        public static List<string> GetGenericArgumentsString(this ISymbol symbol)
-        {
-            List<string> results = new();
-
-            if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-            {
-                foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
-                {
-                    if (typeArgument.TypeKind is TypeKind.TypeParameter)
-                        results.Add(typeArgument.Name);
-                    else
-                        results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments());
-                }
-            }
-
-            return results;
-        }
-
-        /// <summary>
-        /// Adds generic arguments onto a string in the fashion of <type, type2, type3>.
-        /// </summary>
-        public static string AddGenericArguments(this string str, ISymbol symbol)
-        {
-            List<string> results = symbol.GetGenericArgumentsString();
-
-            return $"{str}{results.GetCombinedGenericArguments()}";
         }
 
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
