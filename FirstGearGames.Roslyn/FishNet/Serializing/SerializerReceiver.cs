@@ -83,6 +83,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             List<IParameterSymbol> parameters = methodSymbol.Parameters.ToList();
             int parametersCount = parameters.Count;
 
+            const bool metadataName = false;
+            
             foreach (RpcAttributeData item in results)
             {
                 //ServerRpc.
@@ -109,7 +111,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.
-                    if (parameters[0].Type.GetTypeSymbolFullName() == NetworkConnection_FullName)
+                    if (parameters[0].Type.GetTypeSymbolFullName(metadataName) == NetworkConnection_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
 
@@ -118,7 +120,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName() == NetworkConnection_FullName)
+                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == NetworkConnection_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
 
@@ -128,7 +130,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                     if (parametersCount == 0) return;
                     if (!parameters[parametersCount - 1].IsOptional) return;
                     //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName() == Channel_FullName)
+                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == Channel_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
             }
@@ -147,19 +149,21 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// </summary>
         public void FindNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol)
         {
+            const bool isMetadataName = false;
+            
             //Manually excluding serialization.
-            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return;
+            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName)) return;
 
             bool canSerialize = ImplementsPredictionInterface(namedTypeSymbol);
 
             if (!canSerialize)
-                canSerialize |= namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName);
+                canSerialize |= namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName, isMetadataName);
 
             //Nothing indicates value can be serialized.
             if (!canSerialize)
                 return;
 
-            Debugg.Log($"Found type to be serialized: {namedTypeSymbol.GetSymbolFullName()}");
+            Debugg.Log($"Found type to be serialized: {namedTypeSymbol.GetSymbolFullName(isMetadataName)}");
 
             /* FullNames added this iteration.
              * This is used to prevent endless loops. */
@@ -189,8 +193,10 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// </summary>
         private bool AddSerializableType(object context, INamedTypeSymbol namedTypeSymbol)
         {
+            const bool isMetadataName = false;
+            
             //Has exclude serialization attribute.
-            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName)) return false;
+            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName)) return false;
 
             //Check if already added.
             foreach (SerializableType st in SerializableTypes)
@@ -208,7 +214,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             }
 
             if (SerializableTypes.Add(new SerializableType(namedTypeSymbol)))
-                Debugg.Log($"   Added {namedTypeSymbol.GetSymbolFullName()} to serializable types.");
+                Debugg.Log($"   Added {namedTypeSymbol.GetSymbolFullName(isMetadataName)} to serializable types.");
 
             return true;
         }

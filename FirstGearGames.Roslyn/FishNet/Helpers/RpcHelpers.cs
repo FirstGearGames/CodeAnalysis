@@ -5,7 +5,6 @@ using FirstGearGames.Roslyn.FishNet.Constants;
 
 namespace FirstGearGames.Roslyn.FishNet.Helpers
 {
-
     public enum RPCType
     {
         Unset,
@@ -45,16 +44,16 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// </summary>
         public static bool HasRpcAttributes(this ISymbol symbol, out List<RpcAttributeData> results)
         {
+            const bool isMetadataName = false;
             results = new List<RpcAttributeData>();
-            if (symbol.HasAttribute(FishNetConstants.TargetRpcAttribute_FullName, out AttributeData a0))
+            if (symbol.HasAttribute(FishNetConstants.TargetRpcAttribute_FullName, isMetadataName, out AttributeData a0))
                 results.Add(new RpcAttributeData(a0, RPCType.Target));
-            if (symbol.HasAttribute(FishNetConstants.ServerRpcAttribute_FullName, out AttributeData a1))
+            if (symbol.HasAttribute(FishNetConstants.ServerRpcAttribute_FullName, isMetadataName, out AttributeData a1))
                 results.Add(new RpcAttributeData(a1, RPCType.Server));
-            if (symbol.HasAttribute(FishNetConstants.ObserversRpcAttribute_FullName, out AttributeData a2))
+            if (symbol.HasAttribute(FishNetConstants.ObserversRpcAttribute_FullName, isMetadataName, out AttributeData a2))
                 results.Add(new RpcAttributeData(a2, RPCType.Observers));
 
             return (results.Count > 0);
         }
-
     }
 }

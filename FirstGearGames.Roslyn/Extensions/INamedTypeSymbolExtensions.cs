@@ -10,11 +10,9 @@ namespace FirstGearGames.Roslyn.Extensions
         /// </summary>
         public static bool ImplementsInterface(this INamedTypeSymbol symbol, string interfaceFullName)
         {
-            foreach (INamedTypeSymbol? interfaceNamed in symbol.Interfaces)
+            foreach (INamedTypeSymbol interfaceNamed in symbol.Interfaces)
             {
-                if (interfaceNamed == null) continue;
-
-                if (interfaceNamed.GetSymbolFullName() == interfaceFullName)
+                if (interfaceNamed.GetSymbolFullName(metadataName: false) == interfaceFullName)
                     return true;
             }
 

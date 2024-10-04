@@ -38,14 +38,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         {
         }
 
-        public SerializerMethod CreateReadSerializerMethod(ITypeSymbol typeSymbol)
+        public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            if (typeSymbol == null)
-            {
-                Debugg.Log("NULL TYPE");
-                Debugg.Send();
-            }
-            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullName()}>");
+            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullName(metadataName: false)}>");
         }
     }
 }

@@ -91,7 +91,7 @@ namespace FirstGearGames.Roslyn.Extensions
                     if (typeArgument.TypeKind is TypeKind.TypeParameter)
                         results.Add(typeArgument.Name);
                     else
-                        results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments());
+                        results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
                 }
             }
 

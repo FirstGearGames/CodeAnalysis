@@ -176,15 +176,14 @@ namespace Roslyn.FishNet.CodeBuilding
                 //Call write for all members.
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
-                    ITypeSymbol typeSymbol = fieldSymbol!.Type;
-                    string typeFullName = typeSymbol.GetTypeSymbolFullName();
+                    ITypeSymbol typeSymbol = fieldSymbol.Type;
+                    string typeFullName = typeSymbol.GetTypeSymbolFullName(metadataName: false);
 
                     //Get delta writer method for the field.
                     DeltaSerializerMethod? dsm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
                     //Delta writer not found.
                     if (!dsm.IsValid())
                     {
-
                         SerializerMethod sm = GetFullWriter(typeFullName, out bool serializerFound);
                         if (!serializerFound)
                             sm = _generator.WriterBuilder.CreateSerializerMethod(typeSymbol);

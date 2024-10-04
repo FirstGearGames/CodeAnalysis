@@ -327,7 +327,7 @@ namespace FishNet.Serializing
         [DefaultDeltaWriter]
         public bool WriteDeltaUInt8Array(byte[] valueA, byte[] valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
         [DefaultDeltaWriter]
-        public bool WriteDeltaUArray<T>(T[] valueA, T[] valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
+        public bool WriteDeltaArray<T>(T[] valueA, T[] valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
 
         [DefaultDeltaWriter]
         public bool WriteDeltaArraySegment(ArraySegment<byte> valueA, ArraySegment<byte> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;

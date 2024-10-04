@@ -97,7 +97,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName)
         {
             TypeSymbol = typeSymbol;
-            TypeFullName = typeSymbol.GetTypeSymbolFullName();
+            TypeFullName = typeSymbol.GetTypeSymbolFullName(metadataName: false);
             GenericArguments = typeSymbol.GetGenericArgumentsString();
             MethodName = methodName;
             MethodContent = new();
@@ -107,36 +107,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody)
         {
             TypeSymbol = typeSymbol;
-            TypeFullName = typeSymbol.GetTypeSymbolFullName();
+            TypeFullName = typeSymbol.GetTypeSymbolFullName(metadataName: false);
             GenericArguments = typeSymbol.GetGenericArgumentsString();
             MethodName = methodName;
             MethodContent = new(methodSignature, methodBody);
         }
-        //
-        // public SerializerMethod(string typeFullName, string methodName, List<string> genericArguments)
-        // {
-        //     TypeFullName = typeFullName;
-        //     MethodName = methodName;
-        //     if (genericArguments == null)
-        //         genericArguments = new();
-        //     GenericArguments = genericArguments;
-        //     MethodContent = new();
-        // }
-        //
-        // public SerializerMethod(string typeFullName, string methodName, List<string> genericArguments, string methodSignature, string methodBody)
-        // {
-        //     TypeFullName = typeFullName;
-        //     MethodName = methodName;
-        //     GenericArguments = genericArguments;
-        //     MethodContent = new(methodSignature, methodBody);
-        // }
-        //
-        // public SerializerMethod(string typeFullName, string methodName, List<string> genericArguments,  MethodContent methodContent)
-        // {
-        //     TypeFullName = typeFullName;
-        //     MethodName = methodName;
-        //     MethodContent = methodContent;
-        // }
 
         /// <summary>
         /// True if is a generated serializer.

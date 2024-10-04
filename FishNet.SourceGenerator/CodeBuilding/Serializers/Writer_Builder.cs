@@ -51,7 +51,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// </summary>
         public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Writer_Write_Name}<{typeSymbol.GetTypeSymbolFullName()}>");
+            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Writer_Write_Name}<{typeSymbol.GetTypeSymbolFullName(metadataName: false)}>");
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
                     bool isArray = (typeSymbol is IArrayTypeSymbol arrayTypeSymbol);
                     
-                    string typeFullName = fieldSymbol.Type.GetTypeSymbolFullName();
+                    string typeFullName = fieldSymbol.Type.GetTypeSymbolFullName(metadataName: false);
                     
                     Debugg.Log($"Checking type full name {typeFullName}. IsArray {isArray}");
                     //Get delta writer method for the field.

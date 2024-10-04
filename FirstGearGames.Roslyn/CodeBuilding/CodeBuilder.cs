@@ -159,7 +159,7 @@ namespace FirstGearGames.Roslyn.CodeBuilding
                 if (typeSymbol.TypeKind is TypeKind.TypeParameter)
                     results.Add(typeSymbol.Name);
                 else
-                    results.Add(typeSymbol.GetTypeSymbolFullNameWithGenericArguments());
+                    results.Add(typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
             }
 
             return results.GetCombinedGenericArguments();

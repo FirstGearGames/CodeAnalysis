@@ -18,7 +18,7 @@ namespace FirstGearGames.Roslyn.Extensions
             else
             {
                 if (error)
-                    Debugg.Log($"Could not find {fullName} in {assemblySymbol.GetSymbolFullName()}");
+                    Debugg.Log($"Could not find {fullName} in {assemblySymbol.GetSymbolFullName(metadataName: false)}");
                 return false;
             }
         }
