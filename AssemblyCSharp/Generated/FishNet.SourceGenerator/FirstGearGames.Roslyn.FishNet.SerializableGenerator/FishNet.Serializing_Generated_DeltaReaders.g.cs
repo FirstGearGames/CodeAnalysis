@@ -14,10 +14,22 @@
 
 			if ((totalFlags & 4) == 4)
 // System.Byte[]
-			//Delta reader could not be found for type System.Byte[]. Please report this note.
-				result.Ehhhh = reader.Read<System.Byte[]>();
+				result.Ehhhh = reader.ReadDeltaUInt8Array(value0.Ehhhh);
 			else
 				result.Ehhhh = value0.Ehhhh;
+
+			if ((totalFlags & 8) == 8)
+// ClientAssembly.Player.NestedStruct[]
+			//Delta reader could not be found for type ClientAssembly.Player.NestedStruct[]. Please report this note.
+				result.NSARr = reader.Read<ClientAssembly.Player.NestedStruct[]>();
+			else
+				result.NSARr = value0.NSARr;
+
+			if ((totalFlags & 16) == 16)
+// System.Collections.Generic.List
+				result.NSLst = reader.ReadDeltaList<ClientAssembly.Player.NestedStruct>(value0.NSLst);
+			else
+				result.NSLst = value0.NSLst;
 
 			return result;
 		}

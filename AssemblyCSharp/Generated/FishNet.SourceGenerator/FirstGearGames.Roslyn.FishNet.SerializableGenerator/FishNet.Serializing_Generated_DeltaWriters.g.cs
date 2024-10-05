@@ -17,9 +17,15 @@ namespace FishNet.Serializing
 			System.UInt64 totalFlags = (ulong)options;
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			//Delta writer could not be found for type System.Byte[]. Please report this note.
-			pooledWriter.WriteUInt8ArrayAndSize(value1.Ehhhh);
-			totalFlags += 4;
+			if (pooledWriter.WriteDeltaUInt8Array(value0.Ehhhh, value1.Ehhhh))
+				totalFlags += 4;
+
+			//Delta writer could not be found for type ClientAssembly.Player.NestedStruct[]. Please report this note.
+			pooledWriter.Write<ClientAssembly.Player.NestedStruct[]>(value1.NSARr);
+			totalFlags += 8;
+
+			if (pooledWriter.WriteDeltaList<ClientAssembly.Player.NestedStruct>(value0.NSLst, value1.NSLst))
+				totalFlags += 16;
 
 			System.Boolean changed = (totalFlags != 0);
 			if (changed)
@@ -45,8 +51,9 @@ namespace FishNet.Serializing
 			System.UInt64 totalFlags = (ulong)options;
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDeltaBoolean(value0.Works, value1.Works))
-				totalFlags += 4;
+			//Delta writer could not be found for type System.Boolean. Please report this note.
+			pooledWriter.WriteBoolean(value1.Works);
+			totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0);
 			if (changed)

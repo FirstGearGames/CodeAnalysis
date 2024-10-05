@@ -247,7 +247,6 @@ namespace FishNet.Serializing
         public List<T> ReadDeltaList<T>(List<T> valueA) => default;
 
         [DefaultDeltaReader]
-
         public byte[] ReadDeltaUInt8Array(byte[] valueA) => default;
 
         [DefaultDeltaReader]
