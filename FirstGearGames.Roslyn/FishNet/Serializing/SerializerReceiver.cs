@@ -203,7 +203,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             //Has exclude serialization attribute.
             if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName)) return false;
 
-            string fullName = namedTypeSymbol.GetSymbolFullName(isMetadataName);
+            string fullName = namedTypeSymbol.GetTypeSymbolFullName(isMetadataName);
             //Few other checks for types we want to ignore.
             if (fullName == typeof(System.ValueType).FullName) return false;
             if (fullName == typeof(System.Object).FullName) return false;
@@ -224,7 +224,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             }
 
             if (TypesNeedingSerializers.Add(new SerializableType(namedTypeSymbol)))
-                Log($"Added {namedTypeSymbol.GetSymbolFullName(isMetadataName)} to types needing serializers.");
+                Log($"Added {namedTypeSymbol.GetTypeSymbolFullName(isMetadataName)} to types needing serializers.");
 
             return true;
         }

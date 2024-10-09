@@ -8,6 +8,6 @@
         public const string UInt64_FullName = "System.UInt64";
         public const string LineFeed = "\r\n";
         public const string GeneralParameter_Name = "T";
-        public const string GenericArray_FullName = $"{GeneralParameter_Name}}[]";
+        public const string GenericArray_FullName = $"{GeneralParameter_Name}[]";
     }
 }

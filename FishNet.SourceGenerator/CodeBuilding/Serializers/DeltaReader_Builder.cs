@@ -167,7 +167,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                         sb.AppendLine(bodyIndent, $"//Delta reader could not be found for type {typeFullName}. Please report this note.");
 
-                        string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                        string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
                         sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{sm.MethodName}{genericArguments}();");
                     }
                     //Delta reader found.
@@ -176,13 +176,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         //TODO get working to call method directly once delta serializers are fully supported.
                         if (dsm.IsGenerated())
                         {
-                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
                             sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod("ReadDelta", Generated_ReaderParameter_Name, true,
                                 $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                         }
                         else
                         {
-                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
                             sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{genericArguments}", Generated_ReaderParameter_Name, true,
                                 $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                         }

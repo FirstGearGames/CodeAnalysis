@@ -876,7 +876,7 @@ namespace FishNet.Serializing
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DefaultReader]
-        public N[] ReadArrayAllocated<N>()
+        public T[] ReadArrayAllocated<T>()
             => default;
 
         /// <summary>

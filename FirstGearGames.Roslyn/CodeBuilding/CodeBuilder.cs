@@ -124,7 +124,7 @@ namespace FirstGearGames.Roslyn.CodeBuilding
         /// </summary>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static string GetCombinedGenericArguments(this List<string> arguments)
+        public static string GetCombinedGenericArguments(this List<string> arguments, ITypeSymbol typeSymbol)
         {
             if (arguments.Count == 0) return string.Empty;
 
@@ -139,30 +139,11 @@ namespace FirstGearGames.Roslyn.CodeBuilding
                 _stringBuilder.Append(s);
             }
 
-            return $"<{_stringBuilder.ToString()}>";
+            if (typeSymbol is IArrayTypeSymbol)
+                return $"{_stringBuilder.ToString()}[]";
+            else
+                return $"<{_stringBuilder.ToString()}>";
         }
         
-        
-        /// <summary>
-        /// Combines generic argument strings into <str0, str1, str2 ...>
-        /// </summary>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
-        public static string CombineGenericArguments(this List<ITypeSymbol> arguments)
-        {
-            if (arguments.Count == 0) return string.Empty;
-
-            List<string> results = new();
-
-            foreach (ITypeSymbol typeSymbol in arguments)
-            {
-                if (typeSymbol.TypeKind is TypeKind.TypeParameter)
-                    results.Add(typeSymbol.Name);
-                else
-                    results.Add(typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
-            }
-
-            return results.GetCombinedGenericArguments();
-        }
     }
 }

@@ -145,12 +145,16 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
+                    Log($"<<<< Checking sub item {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}");
+
                     //Get information on which read method to call.
-                    string typeFullName = typeSymbol.GetTypeSymbolFullName(metadataName: false);
+                    string typeFullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
 
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
-                    
+                    string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
+
+                    Log($"SM valid: {sm.IsValid()}. Generics named? {sm.AreGenericsNamed}. Generic arguments: {genericArguments}. Fetched again {typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol)}");
                     //Serializer method is not valid/does not exist.
                     if (!sm.IsValid())
                     {
@@ -160,7 +164,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                         sb.AppendLine(bodyIndent, $"//Serializer could not be found for type {typeFullName}. Please report this note.");
 
-                        string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
                         Log($"//Checking  {typeFullName}");
                         if (typeFullName.Contains("ArraySegment") || typeFullName.Contains("ClientAssembly.Player.NestedStruct[]"))
                         {
@@ -169,12 +172,12 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                             foreach (var VARIABLE in resultszz)
                                 sb.AppendLine($"        //X >> {VARIABLE}");
 
-                            string fullName = typeSymbol.GetTypeSymbolFullName(false);
-                            string genericArgumentsZ = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
+                            string fullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(false);
+                            string genericArgumentsZ = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
 
-                            sb.AppendLine($"//????? {fullName} and {typeSymbol.GetSymbolFullName(false)}");
+                            sb.AppendLine($"//????? {fullName} and {typeSymbol.GetTypeSymbolFullName(false)}");
                             
-                            sb.AppendLine($"            //X {typeSymbol.GetSymbolFullNameWithGenerics(metadataName: false)}");
+                            sb.AppendLine($"            //X {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}");
                             sb.AppendLine($"            //Y {genericArguments}");
                         }
                         sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{newSm.MethodName}{genericArguments}();");
@@ -185,12 +188,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         bool closeCall = true;
                         if (sm.IsGenerated())
                         {
-                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
                             sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"Read{genericArguments}", Generated_ReaderParameter_Name, closeCall)}");
                         }
                         else
                         {
-                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
                             sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}{genericArguments}", Generated_ReaderParameter_Name, closeCall)}");
                         }
                     }

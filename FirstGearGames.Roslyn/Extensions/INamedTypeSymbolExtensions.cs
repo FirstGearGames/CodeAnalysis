@@ -12,7 +12,7 @@ namespace FirstGearGames.Roslyn.Extensions
         {
             foreach (INamedTypeSymbol interfaceNamed in symbol.Interfaces)
             {
-                if (interfaceNamed.GetSymbolFullName(metadataName: false) == interfaceFullName)
+                if (interfaceNamed.GetTypeSymbolFullName(metadataName: false) == interfaceFullName)
                     return true;
             }
 
