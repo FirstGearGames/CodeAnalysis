@@ -855,6 +855,7 @@ namespace FishNet.Serializing
         /// Reads a list with allocations.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DefaultReader]
         public List<T> ReadListAllocated<T>()
             => default;
 
@@ -874,7 +875,8 @@ namespace FishNet.Serializing
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T[] ReadArrayAllocated<T>()
+        [DefaultReader]
+        public N[] ReadArrayAllocated<N>()
             => default;
 
         /// <summary>

@@ -50,7 +50,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
         public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullName(metadataName: false)}>");
+            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}>");
         }
 
 //         
@@ -149,7 +149,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     string typeFullName = typeSymbol.GetTypeSymbolFullName(metadataName: false);
 
                     //Get serializer method for the field.
-                    SerializerMethod? sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
+                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
+                    
                     //Serializer method is not valid/does not exist.
                     if (!sm.IsValid())
                     {
@@ -160,12 +161,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         sb.AppendLine(bodyIndent, $"//Serializer could not be found for type {typeFullName}. Please report this note.");
 
                         string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();
-
-                        if (typeFullName.Contains("List") || typeFullName.Contains("ClientAssembly.Player.NestedStruct[]"))
+                        Log($"//Checking  {typeFullName}");
+                        if (typeFullName.Contains("ArraySegment") || typeFullName.Contains("ClientAssembly.Player.NestedStruct[]"))
                         {
+                            Log($"//yep");
                             List<string> resultszz = typeSymbol.GetGenericArgumentsString();
                             foreach (var VARIABLE in resultszz)
-                                sb.AppendLine($"        // >> {VARIABLE}");
+                                sb.AppendLine($"        //X >> {VARIABLE}");
 
                             string fullName = typeSymbol.GetTypeSymbolFullName(false);
                             string genericArgumentsZ = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments();

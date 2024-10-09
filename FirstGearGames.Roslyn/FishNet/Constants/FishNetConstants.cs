@@ -214,6 +214,10 @@
         /// </summary>
         public const string Reader_ReadUnsignedPackedWhole_Name = "ReadUnsignedPackedWhole";
         /// <summary>
+        /// Reader.ReadArrayAllocated method.
+        /// </summary>
+        public const string Reader_ReadArrayAllocated_Name = "ReadArrayAllocated";
+        /// <summary>
         /// [DefaultWriter] class.
         /// </summary>
         public const string DefaultReaderAttribute_FullName = $"{CodeGenerating_Namespace}.DefaultReaderAttribute";

@@ -8,18 +8,9 @@
 			ClientAssembly.Player.NestedStruct result = new();
 
 			result.ByteArr = reader.ReadUInt8ArrayAndSizeAllocated();
-			//Serializer could not be found for type ClientAssembly.Player.NestedStruct[]. Please report this note.
-//????? ClientAssembly.Player.NestedStruct[] and ClientAssembly.Player.NestedStruct[]
-            //X ClientAssembly.Player.NestedStruct[]
-            //Y 
-			result.StructArr = reader.Read<ClientAssembly.Player.NestedStruct[]>();
+			result.StructArr = reader.ReadArrayAllocated();
 			result.String = reader.ReadString();
-			//Serializer could not be found for type System.Collections.Generic.List. Please report this note.
-        // >> ClientAssembly.Player.NestedStruct
-//????? System.Collections.Generic.List and System.Collections.Generic.List
-            //X System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>
-            //Y <ClientAssembly.Player.NestedStruct>
-			result.LstStruct = reader.Read<System.Collections.Generic.List><ClientAssembly.Player.NestedStruct>();
+			result.LstStruct = reader.ReadListAllocated<ClientAssembly.Player.NestedStruct>();
 			result.ArrSegment = reader.ReadArraySegmentAndSize<System.Byte>();
 
 			return result;
