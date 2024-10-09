@@ -12,7 +12,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 {
     public class SerializableReceiver
     {
-        public enum TypeScope 
+        public enum TypeScope
         {
             Unset,
             Public,
@@ -23,7 +23,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
         public const string NetworkConnection_FullName = "FishNet.Connection.NetworkConnection";
         public const string Channel_FullName = "FishNet.Transporting.Channel";
-        public HashSet<SerializableType> SerializableTypes = new();
+        public readonly HashSet<SerializableType> TypesNeedingSerializers = new();
 
         public void FindStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
@@ -66,7 +66,6 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             FindRpcSerializables(null, methodSymbol);
         }
 
-
         public void FindRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
@@ -84,7 +83,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             int parametersCount = parameters.Count;
 
             const bool metadataName = false;
-            
+
             foreach (RpcAttributeData item in results)
             {
                 //ServerRpc.
@@ -150,12 +149,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         public void FindNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol)
         {
             const bool isMetadataName = false;
-            
-            //Manually excluding serialization.
-            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName)) return;
 
             bool canSerialize = ImplementsPredictionInterface(namedTypeSymbol);
-
             if (!canSerialize)
                 canSerialize |= namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName, isMetadataName);
 
@@ -163,19 +158,29 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             if (!canSerialize)
                 return;
 
-            Debugg.Log($"Found type to be serialized: {namedTypeSymbol.GetSymbolFullName(isMetadataName)}");
-
             /* FullNames added this iteration.
              * This is used to prevent endless loops. */
             HashSet<string> addedFullNames = new();
 
-            AddSerializableType(context, namedTypeSymbol);
-            while (namedTypeSymbol.BaseType is INamedTypeSymbol nestedNamedTypeSymbol)
-                /* The method indicated it could not add some reason.
-                 * Maybe the type had an attribute to not serialize or
-                 * its the previously checked type. */
-                if (!AddSerializableType(context, nestedNamedTypeSymbol))
+            while (true)
+            {
+                string fullName = namedTypeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                //Already added.
+                if (addedFullNames.Contains(fullName))
                     break;
+
+                /* The method indicated it could not add some reason.
+                 * Maybe the type had an attribute. */
+                if (!AddSerializableType(context, namedTypeSymbol))
+                    break;
+                else
+                    addedFullNames.Add(fullName);
+
+                if (namedTypeSymbol.BaseType is not INamedTypeSymbol nts)
+                    break;
+                else
+                    namedTypeSymbol = nts;
+            }
 
             //Returns if a symbol implements prediction interfaces.
             bool ImplementsPredictionInterface(INamedTypeSymbol theSymbol)
@@ -194,12 +199,17 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         private bool AddSerializableType(object context, INamedTypeSymbol namedTypeSymbol)
         {
             const bool isMetadataName = false;
-            
+
             //Has exclude serialization attribute.
             if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName)) return false;
 
+            string fullName = namedTypeSymbol.GetSymbolFullName(isMetadataName);
+            //Few other checks for types we want to ignore.
+            if (fullName == typeof(System.ValueType).FullName) return false;
+            if (fullName == typeof(System.Object).FullName) return false;
+
             //Check if already added.
-            foreach (SerializableType st in SerializableTypes)
+            foreach (SerializableType st in TypesNeedingSerializers)
             {
                 if (st.TypeSymbol == namedTypeSymbol)
                     return false;
@@ -213,8 +223,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 return false;
             }
 
-            if (SerializableTypes.Add(new SerializableType(namedTypeSymbol)))
-                Debugg.Log($"   Added {namedTypeSymbol.GetSymbolFullName(isMetadataName)} to serializable types.");
+            if (TypesNeedingSerializers.Add(new SerializableType(namedTypeSymbol)))
+                Log($"Added {namedTypeSymbol.GetSymbolFullName(isMetadataName)} to types needing serializers.");
 
             return true;
         }
@@ -245,6 +255,14 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             //Not partial.
             return TypeScope.Unset;
+        }
+
+        private void Log(string txt)
+        {
+            if (txt.Length == 0)
+                Debugg.Log(txt);
+            else
+                Debugg.Log($"   [SerializerReceiver] {txt}");
         }
     }
 }

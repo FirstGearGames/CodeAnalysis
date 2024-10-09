@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using FirstGearGames.Roslyn.Extensions;
@@ -31,6 +32,9 @@ namespace Roslyn.FishNet.CodeBuilding
 
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
         {
+            Log("");
+            Log("Initialize.");
+
             _context = context;
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
@@ -59,7 +63,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.SerializableTypes)
+            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
                 CreateEmptySerializerMethod(context, item);
         }
 
@@ -69,7 +73,7 @@ namespace Roslyn.FishNet.CodeBuilding
         private void CreateEmptySerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Debugg.Log($"Trying to create empty writer for {typeFullName}.");
+            Log($"Trying to create empty writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.Full).IsValid())
                 return;
@@ -85,7 +89,7 @@ namespace Roslyn.FishNet.CodeBuilding
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                Debugg.Log($"  Iterating recursively.");
+                Log($"  Iterating recursively.");
                 CreateEmptySerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
             }
 
@@ -95,7 +99,7 @@ namespace Roslyn.FishNet.CodeBuilding
 
             string GetMethodHeader(out string mName)
             {
-                Debugg.Log($"   GetMethodName");
+                Log($"   GetMethodName");
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
@@ -112,7 +116,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// </summary>
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
         {
-            //Iterate all serializers and if they are generated delta writers then complete them.
+            //Iterate all serializers and if they are generated then complete them.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 //Skip built in serializers.
@@ -129,16 +133,16 @@ namespace Roslyn.FishNet.CodeBuilding
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
                     bool isArray = (typeSymbol is IArrayTypeSymbol arrayTypeSymbol);
-                    
+
                     string typeFullName = fieldSymbol.Type.GetTypeSymbolFullName(metadataName: false);
-                    
-                    Debugg.Log($"Checking type full name {typeFullName}. IsArray {isArray}");
+
+                    Log($"Checking type full name {typeFullName}. IsArray {isArray}");
                     //Get delta writer method for the field.
                     SerializerMethod? sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
                     //Writer not found, call Write<T>.
                     if (!sm.IsValid())
                     {
-                        sm = _generator.WriterBuilder.CreateSerializerMethod(typeSymbol);
+                        sm = CreateSerializerMethod(typeSymbol);
 
                         sb.AppendLine(bodyIndent, $"//Writer could not be found for type {typeFullName}. Please report this note.");
 
@@ -194,7 +198,7 @@ namespace Roslyn.FishNet.CodeBuilding
             string fileName = $"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs";
             context.AddSource($"{fileName}", sb.ToString());
 
-            Debugg.Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
+            Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
         }
 
         /// <summary>
@@ -209,6 +213,14 @@ namespace Roslyn.FishNet.CodeBuilding
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();
+        }
+
+        private void Log(string txt)
+        {
+            if (txt.Length == 0)
+                Debugg.Log(txt);
+            else
+                Debugg.Log($"   [Write] {txt}");
         }
     }
 }

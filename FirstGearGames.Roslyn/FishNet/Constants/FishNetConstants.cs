@@ -97,6 +97,10 @@
         /// </summary>
         public const string GenericDeltaWriter_FullName = $"{Serializing_Namespace}.GenericDeltaWriter";
         /// <summary>
+        /// GenericWriter class.
+        /// </summary>
+        public const string GenericWriter_FullName = $"{Serializing_Namespace}.GenericWriter";
+        /// <summary>
         /// GenericDeltaWriter.SetWrite method.
         /// </summary>
         public const string GenericDeltaWriter_SetWrite_Name = $"SetWrite";
@@ -105,9 +109,17 @@
         /// </summary>
         public const string GenericDeltaReader_FullName = $"{Serializing_Namespace}.GenericDeltaReader";
         /// <summary>
-        /// GenericDeltaWriter.SetRead method.
+        /// GenericReader class.
+        /// </summary>
+        public const string GenericReader_FullName = $"{Serializing_Namespace}.GenericReader";
+        /// <summary>
+        /// GenericDeltaReader.SetRead method.
         /// </summary>
         public const string GenericDeltaReader_SetRead_Name = $"SetRead";
+        /// <summary>
+        /// GenericReader.SetRead method.
+        /// </summary>
+        public const string GenericReader_SetRead_Name = $"SetRead";
 
         #endregion
 

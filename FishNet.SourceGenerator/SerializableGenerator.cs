@@ -26,6 +26,7 @@ namespace FirstGearGames.Roslyn.FishNet
 
         public void Execute(GeneratorExecutionContext context)
         {
+            Log("");
             string assemblyName = context.Compilation.AssemblyName;
             //Ignore unity assemblies.
             if (assemblyName.StartsWith("Unity.", StringComparison.OrdinalIgnoreCase))
@@ -35,17 +36,19 @@ namespace FirstGearGames.Roslyn.FishNet
 
             if (context.SyntaxContextReceiver is not GeneratorSyntaxReceiver syntaxReceiver)
             {
-                Debugg.Log($"Failing for assembly.");
+                Log($"Excepted receiver to be our own, it was not.");
                 Debugg.Send();
                 return;
             }
-
-            Debugg.Log($"- Execute Start for {context.Compilation.AssemblyName}.");
+            else
+            {
+                Log($"Iteration begin for assembly {context.Compilation.AssemblyName}.");
+            }
 
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
             if (fishnetRuntimeAssemblySymbol == null)
             {
-                Debugg.Log($"Assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
+                Debugg.Log($"FishNet assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
                 Debugg.Send();
                 return;
             }
@@ -55,12 +58,12 @@ namespace FirstGearGames.Roslyn.FishNet
              default serializers for types native to fishnet. */
             Serializers = new();
             Serializers.Initialize(fishnetRuntimeAssemblySymbol);
-
-            DeltaWriterBuilder = new();
-            DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
-
-            DeltaReaderBuilder = new();
-            DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+            //
+            // DeltaWriterBuilder = new();
+            // DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
+            //
+            // DeltaReaderBuilder = new();
+            // DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
 
             WriterBuilder = new();
             WriterBuilder.Initialize(context, syntaxReceiver, this);
@@ -68,12 +71,12 @@ namespace FirstGearGames.Roslyn.FishNet
             ReaderBuilder = new();
             ReaderBuilder.Initialize(context, syntaxReceiver, this);
 
-            DeltaWriterBuilder.Execute();
-            DeltaReaderBuilder.Execute();
+//            DeltaWriterBuilder.Execute();
+//            DeltaReaderBuilder.Execute();
             WriterBuilder.Execute();
             ReaderBuilder.Execute();
 
-            Debugg.Log($"- Execute End for {context.Compilation.AssemblyName}.");
+            Debugg.Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
         }
@@ -93,6 +96,14 @@ namespace FirstGearGames.Roslyn.FishNet
             }
 
             return fishNetSymbol;
+        }
+
+        private void Log(string txt)
+        {
+            if (txt.Length == 0)
+                Debugg.Log(txt);
+            else
+                Debugg.Log($"[SerializableGenerator] {txt}");
         }
     }
 }

@@ -24,6 +24,7 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetSymbolFullName(this ISymbol? symbol, bool metadataName)
         {
             if (symbol == null) return string.Empty;
+            if (symbol is ITypeSymbol typeSymbol) return typeSymbol.GetTypeSymbolFullName(metadataName);
 
             string containingNamespace = symbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();

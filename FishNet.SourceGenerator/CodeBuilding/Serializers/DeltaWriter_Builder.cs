@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet;
@@ -29,9 +30,11 @@ namespace Roslyn.FishNet.CodeBuilding
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        
+
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
         {
+            Log("");
+            Log($"Initialize.");
             _context = context;
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
@@ -39,12 +42,13 @@ namespace Roslyn.FishNet.CodeBuilding
 
         public void Execute()
         {
+            return;
             //Create all stub(empty) delta methods.
             CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
             //Create all bodies for delta methods.
-            CreateDeltaSerializerBodies(_context, _rootSyntaxReceiver);
+            CreateSerializerBodies(_context, _rootSyntaxReceiver);
             //Create delta serializers class adding generated serializers.
-            CreateGeneratedDeltaSerializersClass(_context);
+            CreateGeneratedSerializersClass(_context);
         }
 
         /// <summary>
@@ -52,7 +56,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.SerializableTypes)
+            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
                 CreateEmptyDeltaSerializerMethod(context, item);
         }
 
@@ -131,9 +135,9 @@ namespace Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Creates bodies for empty delta serializer methods.
         /// </summary>
-        private void CreateDeltaSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
+        private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
         {
-            //Iterate all serializers and if they are generated delta writers then complete them.
+            //Iterate all serializers and if they are generated then complete them.
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetWriteDeltaMethods())
             {
                 //Skip built in serializers.
@@ -155,7 +159,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     SerializerMethod sm = GetFullWriter(item.Key, out bool serializerFound);
                     if (!serializerFound)
                         sm = _generator.WriterBuilder.CreateSerializerMethod(item.Value.TypeSymbol);
-                    
+
                     StringBuilder ifBody = new();
 
                     ifBody.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{sm.MethodName}({_serializers.GetValueParameterName(1)});");
@@ -189,7 +193,7 @@ namespace Roslyn.FishNet.CodeBuilding
                             sm = _generator.WriterBuilder.CreateSerializerMethod(typeSymbol);
 
                         sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullName}. Please report this note.");
-                        
+
                         string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString());
                         sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod($"{sm.MethodName}{genericArguments}", tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
                         AppendIncreaseTotalFlags(3);
@@ -258,7 +262,7 @@ namespace Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Creates a class containing generated delta writers.
         /// </summary>
-        private void CreateGeneratedDeltaSerializersClass(GeneratorExecutionContext context)
+        private void CreateGeneratedSerializersClass(GeneratorExecutionContext context)
         {
             StringBuilder sb = new();
 
@@ -312,13 +316,21 @@ namespace Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Returns a SerializerMethod for a DefaultWriter of a type. Optionally returns a call to Write<T> if a DefaultWriter is not found.
         /// </summary>
-        private SerializerMethod GetFullWriter(string typeFullName,  out bool found)
+        private SerializerMethod GetFullWriter(string typeFullName, out bool found)
         {
             SerializerMethod sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
-            
+
             found = sm.IsValid();
 
             return sm;
+        }
+
+        private void Log(string txt)
+        {
+            if (txt.Length == 0)
+                Debugg.Log(txt);
+            else
+                Debugg.Log($"   [DeltaWrite] {txt}");
         }
     }
 }
