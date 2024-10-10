@@ -63,6 +63,7 @@ namespace ClientAssembly
             public string String;
             public List<NestedStruct> LstStruct;
             public ArraySegment<byte> ArrSegment;
+            public System.Object ObjectType;
         }
 
         //[IncludeSerialization]

@@ -146,10 +146,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
                     Log($"<<<< Checking sub item {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}");
-
-                    //Get information on which read method to call.
-                    string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
-
+                    
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
                     //string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
@@ -159,11 +156,17 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     //Serializer method is not valid/does not exist.
                     if (!sm.IsValid())
                     {
+                        //Get information on which read method to call.
+                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
                         SerializerMethod newSm = GetFullReader(typeFullNameWithGenerics, out bool serializerFound);
                         if (!serializerFound)
+                        {
+                            Log("uuhhhhhhh  " + typeFullNameWithGenerics);
                             newSm = _generator.ReaderBuilder.CreateSerializerMethod(typeSymbol);
-                        
-                        sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{newSm.MethodName}{genericArguments}();");
+                        }
+
+                        string readCall = $"{Generated_ReaderParameter_Name}.{FishNetConstants.Reader_Read_Name}<{typeFullNameWithGenerics}>();";
+                        sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {readCall}");
                     }
                     //Serializer found.
                     else
