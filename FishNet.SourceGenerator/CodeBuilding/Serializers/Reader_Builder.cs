@@ -148,38 +148,20 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     Log($"<<<< Checking sub item {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}");
 
                     //Get information on which read method to call.
-                    string typeFullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                    string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
 
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
-                    string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
+                    string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
 
                     Log($"SM valid: {sm.IsValid()}. Generics named? {sm.AreGenericsNamed}. Generic arguments: {genericArguments}. Fetched again {typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol)}");
                     //Serializer method is not valid/does not exist.
                     if (!sm.IsValid())
                     {
-                        SerializerMethod newSm = GetFullReader(typeFullName, out bool serializerFound);
+                        SerializerMethod newSm = GetFullReader(typeFullNameWithGenerics, out bool serializerFound);
                         if (!serializerFound)
                             newSm = _generator.ReaderBuilder.CreateSerializerMethod(typeSymbol);
-
-                        sb.AppendLine(bodyIndent, $"//Serializer could not be found for type {typeFullName}. Please report this note.");
-
-                        Log($"//Checking  {typeFullName}");
-                        if (typeFullName.Contains("ArraySegment") || typeFullName.Contains("ClientAssembly.Player.NestedStruct[]"))
-                        {
-                            Log($"//yep");
-                            List<string> resultszz = typeSymbol.GetGenericArgumentsString();
-                            foreach (var VARIABLE in resultszz)
-                                sb.AppendLine($"        //X >> {VARIABLE}");
-
-                            string fullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(false);
-                            string genericArgumentsZ = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
-
-                            sb.AppendLine($"//????? {fullName} and {typeSymbol.GetTypeSymbolFullName(false)}");
-                            
-                            sb.AppendLine($"            //X {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}");
-                            sb.AppendLine($"            //Y {genericArguments}");
-                        }
+                        
                         sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{newSm.MethodName}{genericArguments}();");
                     }
                     //Serializer found.

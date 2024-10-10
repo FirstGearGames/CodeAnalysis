@@ -119,6 +119,13 @@ namespace FirstGearGames.Roslyn.CodeBuilding
             return _stringBuilder.ToString();
         }
 
+        public static string CreateMethodCallArguments(this List<string> arguments, ITypeSymbol typeSymbol, bool includeFullName)
+        {
+          Make it so when creating the serializer method it also creates information on how to call it
+              //.error intentional.
+              
+        }
+
         /// <summary>
         /// Combines generic argument strings into <str0, str1, str2 ...>
         /// </summary>
@@ -144,6 +151,5 @@ namespace FirstGearGames.Roslyn.CodeBuilding
             else
                 return $"<{_stringBuilder.ToString()}>";
         }
-        
     }
 }

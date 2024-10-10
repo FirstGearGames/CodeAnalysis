@@ -21,10 +21,13 @@ namespace FirstGearGames.Roslyn.Extensions
             if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
                 typeSymbol = arrayTypeSymbol.ElementType;
 
+            //If generic then just return our consts for generic.
+            if (typeSymbol.TypeKind is TypeKind.TypeParameter)
+                return NativeConstants.GeneralParameter_Name;
+            
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
-
-
+            
             string fullyQualifiedName = string.Empty;
             string joiningChar = (metadataName) ? "+" : ".";
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
@@ -44,11 +47,12 @@ namespace FirstGearGames.Roslyn.Extensions
         public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol, bool metadataName)
         {
             string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
-            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
+
+            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
 
             return $"{fullName}{genericArguments}";
         }
-        
+
         /// <summary>
         /// Returns if all generic arguments are named.
         /// If there are no generic arguments, returns true.
@@ -67,16 +71,15 @@ namespace FirstGearGames.Roslyn.Extensions
             {
                 return (arrayTypeSymbol.ElementType.TypeKind is not TypeKind.TypeParameter);
             }
-        
+
             return true;
         }
-        
 
         public static List<string> GetGenericArgumentsString(this ITypeSymbol symbol)
         {
             List<string> results = new();
             int typeParameterCount = 0;
-        
+
             if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
             {
                 foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
@@ -94,10 +97,10 @@ namespace FirstGearGames.Roslyn.Extensions
                 else
                     results.Add(arrayTypeSymbol.ElementType.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
             }
-            
+
             return results;
         }
-        
+
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
