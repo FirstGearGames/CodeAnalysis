@@ -152,7 +152,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
-                    string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
+                    //string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
+                    string genericArguments = sm.ToReturnArguments(typeSymbol);
 
                     Log($"SM valid: {sm.IsValid()}. Generics named? {sm.AreGenericsNamed}. Generic arguments: {genericArguments}. Fetched again {typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol)}");
                     //Serializer method is not valid/does not exist.

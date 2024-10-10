@@ -96,6 +96,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         public readonly MethodContent MethodContent;
 
+        /// <summary>
+        /// True if TypeSymbol is IArrayType.
+        /// </summary>
+        private readonly bool _isArrayType;
+
         public SerializerMethod() { }
 
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName)
@@ -106,6 +111,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             GenericArguments = typeSymbol.GetGenericArgumentsString();
             MethodName = methodName;
             MethodContent = new();
+
+            _isArrayType = (typeSymbol is IArrayTypeSymbol);
         }
 
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody) : this(typeSymbol, methodName)
@@ -125,9 +132,32 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public virtual bool IsDeltaSerializer() => false;
 
         /// <summary>
-        /// Returns GenericArguments combined as <arg0, arg1, ...>.
+        /// Creates arguments to be passed in when returning this type.
         /// </summary>
-        public string GetCombinedGenericArguments() => GenericArguments.GetCombinedGenericArguments(TypeSymbol);
+        /// <returns></returns>
+        public string ToReturnArguments(ITypeSymbol returnedTypeSymbol)
+        {
+            const bool metadataName = false;
+            
+            if (returnedTypeSymbol is IArrayTypeSymbol arrayTypeSymbol)
+            {
+                //Named arguments do not need to be specified.
+                if (AreGenericsNamed)
+                    return string.Empty;
+                else
+                    return $"<{arrayTypeSymbol.ElementType.GetSymbolFullName(metadataName)}>";
+            }
+            else
+            {
+                //Not generic.
+                if (returnedTypeSymbol is not INamedTypeSymbol { IsGenericType: true } namedTypeSymbol) return string.Empty;
+
+                if (AreGenericsNamed)
+                    return string.Empty;
+                else
+                    return returnedTypeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(returnedTypeSymbol);
+            }
+        }
     }
 
     public class DeltaSerializerMethod : SerializerMethod

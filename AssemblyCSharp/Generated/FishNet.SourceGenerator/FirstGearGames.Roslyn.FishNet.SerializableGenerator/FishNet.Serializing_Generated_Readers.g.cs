@@ -8,9 +8,9 @@
 			ClientAssembly.Player.NestedStruct result = new();
 
 			result.ByteArr = reader.ReadUInt8ArrayAndSizeAllocated();
-			result.StructArr = reader.ReadArrayAllocated();
+			result.StructArr = reader.ReadArrayAllocated<ClientAssembly.Player.NestedStruct>();
 			result.String = reader.ReadString();
-			result.LstStruct = reader.Read<System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>>();
+			result.LstStruct = reader.ReadListAllocated<ClientAssembly.Player.NestedStruct>();
 			result.ArrSegment = reader.ReadArraySegmentAndSize();
 
 			return result;
