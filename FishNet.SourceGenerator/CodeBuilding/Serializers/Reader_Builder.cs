@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Text;
 using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.Extensions;
@@ -31,7 +29,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
         {
             Log("");
-            Log("Initialize.");
+            Log("Initialize");
+            Log("");
 
             _context = context;
             _rootSyntaxReceiver = rootSyntaxReceiver;
@@ -40,10 +39,19 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
         public void Execute()
         {
+            Log("");
+            Log("############ CreateEmptySerializerMethods.");
+            Log("");
             //Create all stub(empty) methods.
             CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+            Log("");
+            Log("############ CreateSerializerBodies.");
+            Log("");
             //Create all bodies for methods.
             CreateSerializerBodies(_context, _rootSyntaxReceiver);
+            Log("");
+            Log("############ CreateSerializersClass.");
+            Log("");
             //Create serializers class adding generated serializers.
             CreateGeneratedSerializersClass(_context);
         }
@@ -74,31 +82,43 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
             foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
+            {
+                Log("//////////////////////////");
+                Log($"Processing root serializable type {item.FullName}.");
+                Log("//////////////////////////");
                 CreateEmptySerializerMethod(context, item);
+            }
         }
 
         /// <summary>
         /// Creates an empty serializer method for a type.
         /// </summary>
-        private void CreateEmptySerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
+        private void CreateEmptySerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
         {
             string typeFullName = serializableType.FullName;
-            Log($"{recursiveCount.ToIndent()}Creating a reader for {typeFullName}.");
+            Log($"Checking to create a reader for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetReadMethod(typeFullName, GetSerializerType.Full).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
+            {
+                Log($"NamedTypeSymbol is null for fullMetaName {serializableType.FullMetadataName}");
                 return;
+            }
             if (!_serializers.CanCreateSerializer(namedTypeSymbol))
+            {
+                Log($"Cannot create serializer.");
                 return;
+            }
 
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                CreateEmptySerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
+                Log($"Checking serializable field {item.Name}.");
+                CreateEmptySerializerMethod(context, new SerializableType(typeSymbol));
             }
 
             string header = GetMethodHeader(out string methodName);
@@ -129,9 +149,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
                     continue;
-
-                Log($"<<<< Checking item {item.Key}");
-
+                
+                Log($"Creating serializer body for {item.Value.TypeFullName}.");
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
 
@@ -145,32 +164,29 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
-                    Log($"<<<< Checking sub item {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}");
-                    
+
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
                     //string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
                     string genericArguments = sm.ToReturnArguments(typeSymbol);
 
-                    Log($"SM valid: {sm.IsValid()}. Generics named? {sm.AreGenericsNamed}. Generic arguments: {genericArguments}. Fetched again {typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol)}");
                     //Serializer method is not valid/does not exist.
                     if (!sm.IsValid())
                     {
                         //Get information on which read method to call.
                         string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
-                        SerializerMethod newSm = GetFullReader(typeFullNameWithGenerics, out bool serializerFound);
-                        if (!serializerFound)
-                        {
-                            Log("uuhhhhhhh  " + typeFullNameWithGenerics);
-                            newSm = _generator.ReaderBuilder.CreateSerializerMethod(typeSymbol);
-                        }
-
+                        if (!SerializeMethodExists(typeFullNameWithGenerics))
+                            Log($"   *** Serializer not found for {typeFullNameWithGenerics}. This is normal if not a supported type. Generic will be called.");
+                        
                         string readCall = $"{Generated_ReaderParameter_Name}.{FishNetConstants.Reader_Read_Name}<{typeFullNameWithGenerics}>();";
                         sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {readCall}");
                     }
                     //Serializer found.
                     else
                     {
+                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                        Log($"Serializer found for {typeFullNameWithGenerics}.");
+
                         bool closeCall = true;
                         if (sm.IsGenerated())
                         {
@@ -182,7 +198,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         }
                     }
                 }
-                
+
                 sb.AppendLine();
                 sb.Append(bodyIndent, $"return {resultVariableName};");
 
@@ -239,13 +255,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// <summary>
         /// Returns a SerializerMethod for a DefaultWriter of a type. Optionally returns a call to Write<T> if a DefaultWriter is not found.
         /// </summary>
-        private SerializerMethod GetFullReader(string typeFullName, out bool found)
+        private bool SerializeMethodExists(string typeFullName)
         {
             SerializerMethod sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full);
-
-            found = sm.IsValid();
-
-            return sm;
+            return sm.IsValid();
         }
 
         private void Log(string txt)
@@ -253,7 +266,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             if (txt.Length == 0)
                 Debugg.Log(txt);
             else
-                Debugg.Log($"   [Read] {txt}");
+                Debugg.Log($"   [ReaderBuilder] {txt}");
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using FirstGearGames.Roslyn.CodeBuilding;
-using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.Native.Constants;
 
 namespace FirstGearGames.Roslyn.Extensions

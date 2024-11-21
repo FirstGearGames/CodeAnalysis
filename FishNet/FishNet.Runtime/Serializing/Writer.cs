@@ -113,14 +113,6 @@ namespace FishNet.Serializing
         public void WriteDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict)
         {
         }
-
-        /// <summary>
-        /// Writes a dictionary.
-        /// </summary>
-        [DefaultWriter]
-        public void WriteList<T>(List<T> valueA)
-        {
-        }
         
         /// <summary>
         /// Ensures the buffer Capacity is of minimum count.
@@ -791,7 +783,6 @@ namespace FishNet.Serializing
         {
         }
 
-        public void Write<T>(T value) { }
 
         #region Packed writers.
         /// <summary>
@@ -812,6 +803,19 @@ namespace FishNet.Serializing
         public void WriteUnsignedPackedWhole(ulong value)
         {
         }
+
+        #endregion
+        
+        #region Generators
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DefaultWriter]
+        public void WriteList<T>(List<T> value) { }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DefaultWriter]
+        public void WriteArray<T>(T[] value) { }
+
+        public void Write<T>(T value) { }
 
         #endregion
     }
