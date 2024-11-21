@@ -122,7 +122,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             }
 
             string header = GetMethodHeader(out string methodName);
-
             //Add to readers.
             _serializers.AddReadMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
 
@@ -149,7 +148,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
                     continue;
-                
+
                 Log($"Creating serializer body for {item.Value.TypeFullName}.");
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
@@ -176,8 +175,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         //Get information on which read method to call.
                         string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
                         if (!SerializeMethodExists(typeFullNameWithGenerics))
-                            Log($"   *** Serializer not found for {typeFullNameWithGenerics}. This is normal if not a supported type. Generic will be called.");
-                        
+                            sb.AppendLine(bodyIndent, $"//Serializer not found for {typeFullNameWithGenerics}. This will cause failure at runtime.");
+
                         string readCall = $"{Generated_ReaderParameter_Name}.{FishNetConstants.Reader_Read_Name}<{typeFullNameWithGenerics}>();";
                         sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {readCall}");
                     }
@@ -188,14 +187,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         Log($"Serializer found for {typeFullNameWithGenerics}.");
 
                         bool closeCall = true;
-                        if (sm.IsGenerated())
-                        {
-                            sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"Read{genericArguments}", Generated_ReaderParameter_Name, closeCall)}");
-                        }
-                        else
-                        {
-                            sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}{genericArguments}", Generated_ReaderParameter_Name, closeCall)}");
-                        }
+                        string prefix = sm.IsGenerated() ? "Read" : sm.MethodName;
+                        sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{prefix}{genericArguments}", Generated_ReaderParameter_Name, closeCall)}");
                     }
                 }
 
@@ -214,11 +207,14 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             StringBuilder sb = new();
 
             string clsText = RoslynCodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+            sb.AppendLine($"//FishNet generated file.");
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
             MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
+            int addedSerializers = 0;
+            
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetReadMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
@@ -230,12 +226,17 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     initializeMethod.Body.AppendLine();
 
                 initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
+                
+                addedSerializers++;
             }
 
             sb.Append(initializeMethod.ToString(initializeIndent));
             sb.AppendLine(footer);
 
-            context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
+            string fileName = $"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs";
+            context.AddSource($"{fileName}", sb.ToString());
+            
+            Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
         }
 
         /// <summary>

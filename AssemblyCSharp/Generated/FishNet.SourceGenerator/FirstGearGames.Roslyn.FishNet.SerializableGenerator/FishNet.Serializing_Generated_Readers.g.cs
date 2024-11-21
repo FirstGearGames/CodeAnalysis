@@ -1,4 +1,5 @@
-﻿namespace FishNet.Serializing
+﻿//FishNet generated file.
+namespace FishNet.Serializing
 {
 	public static class Generated_Readers
 	{
@@ -12,6 +13,7 @@
 			result.String = reader.ReadString();
 			result.LstStruct = reader.ReadListAllocated<ClientAssembly.Player.NestedStruct>();
 			result.ArrSegment = reader.ReadArraySegmentAndSize();
+			//Serializer not found for System.Object. This will cause failure at runtime.
 			result.ObjectType = reader.Read<System.Object>();
 
 			return result;
