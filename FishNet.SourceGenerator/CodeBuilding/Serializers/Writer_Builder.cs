@@ -162,12 +162,12 @@ namespace Roslyn.FishNet.CodeBuilding
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
                     string genericArguments = sm.ToReturnArguments(typeSymbol);
+                    string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
 
                     //Serializer not found, call Read/Write<T>.
                     if (!sm.IsValid())
                     {
                         //Get information on which read method to call.
-                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
                         if (!SerializeMethodExists(typeFullNameWithGenerics))
                             sb.AppendLine(bodyIndent, $"//Serializer not found for {typeFullNameWithGenerics}. This will cause failure at runtime.");
 
@@ -177,7 +177,6 @@ namespace Roslyn.FishNet.CodeBuilding
                     //writer found.
                     else
                     {
-                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
                         Log($"Serializer found for {typeFullNameWithGenerics}.");
 
                         bool closeCall = true;

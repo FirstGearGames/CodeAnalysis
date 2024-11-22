@@ -47,7 +47,7 @@ namespace Roslyn.FishNet.CodeBuilding
             //Create all bodies for delta methods.
             CreateSerializerBodies(_context, _rootSyntaxReceiver);
             //Create delta serializers class adding generated serializers.
-            CreateGeneratedSerializersClass(_context);
+            // CreateGeneratedSerializersClass(_context);
         }
 
         /// <summary>
@@ -155,8 +155,9 @@ namespace Roslyn.FishNet.CodeBuilding
 
                 void CreateWriteFullIf()
                 {
-                    SerializerMethod sm = GetFullWriter(item.Key, out bool serializerFound);
-                    if (!serializerFound)
+                    SerializerMethod sm = _serializers.GetWriteMethod(item.Key, GetSerializerType.Full) as SerializerMethod;
+                    if (!sm.IsValid())
+                        This is the problem line. See Writer_Builder for how this is done.
                         sm = _generator.WriterBuilder.CreateSerializerMethod(item.Value.TypeSymbol);
 
                     StringBuilder ifBody = new();
@@ -166,6 +167,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     sb.AppendLine(CreateFullSerializeCheck(bodyIndent, Generated_DeltaSerializerOption_Name, ifBody.ToString()));
                 }
 
+                return;
                 //Starting flag for each modified field.
                 ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
 
@@ -310,18 +312,6 @@ namespace Roslyn.FishNet.CodeBuilding
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns a SerializerMethod for a DefaultWriter of a type. Optionally returns a call to Write<T> if a DefaultWriter is not found.
-        /// </summary>
-        private SerializerMethod GetFullWriter(string typeFullName, out bool found)
-        {
-            SerializerMethod sm = _serializers.GetWriteMethod(typeFullName, GetSerializerType.Full) as SerializerMethod;
-
-            found = sm.IsValid();
-
-            return sm;
         }
 
         private void Log(string txt)
