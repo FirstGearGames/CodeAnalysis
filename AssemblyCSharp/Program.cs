@@ -53,17 +53,23 @@ namespace ClientAssembly
     // {
     //        public string C;
     //    }
+    
+    public class AnyType<T>
+    {
+        public List<T> Lst;
+    }
     public class Player : NetworkBehaviour
     {
         [IncludeSerialization]
         public struct NestedStruct : IReplicateData
         {
-            public byte[] ByteArr;
-            public NestedStruct[] StructArr;
-            public string String;
-            public List<NestedStruct> LstStruct;
-            public ArraySegment<byte> ArrSegment;
-            public System.Object ObjectType;
+            // public byte[] ByteArr;
+            // public NestedStruct[] StructArr;
+            // public string String;
+            // public List<NestedStruct> LstStruct;
+            // public ArraySegment<byte> ArrSegment;
+            // public System.Object ObjectType;
+            public AnyType<bool> GenericObjectType;
         }
 
         //[IncludeSerialization]

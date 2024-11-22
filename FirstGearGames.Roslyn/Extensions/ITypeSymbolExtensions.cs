@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using FirstGearGames.Roslyn.CodeBuilding;
+using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.Native.Constants;
 
 namespace FirstGearGames.Roslyn.Extensions
@@ -23,10 +24,10 @@ namespace FirstGearGames.Roslyn.Extensions
             //If generic then just return our consts for generic.
             if (typeSymbol.TypeKind is TypeKind.TypeParameter)
                 return NativeConstants.GeneralParameter_Name;
-            
+
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
-            
+
             string fullyQualifiedName = string.Empty;
             string joiningChar = (metadataName) ? "+" : ".";
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
@@ -34,7 +35,7 @@ namespace FirstGearGames.Roslyn.Extensions
 
             //fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}{arraySuffix}";
             fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
-
+            
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
@@ -144,6 +145,14 @@ namespace FirstGearGames.Roslyn.Extensions
             }
 
             return false;
+        }
+
+        private static void Log(string txt)
+        {
+            if (txt.Length == 0)
+                Debugg.Log(txt);
+            else
+                Debugg.Log($"   [ITypeSymbolExtensions] {txt}");
         }
     }
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

@@ -58,27 +58,27 @@ namespace FirstGearGames.Roslyn.FishNet
              default serializers for types native to fishnet. */
             Serializers = new();
             Serializers.Initialize(fishnetRuntimeAssemblySymbol);
-            
+            //
             //DeltaWriter.
             DeltaWriterBuilder = new();
             DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
             DeltaWriterBuilder.Execute();
+            //
+            // //DeltaReader.
+            // DeltaReaderBuilder = new();
+            // DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+            // DeltaReaderBuilder.Execute();
 
-            //DeltaReader.
-            DeltaReaderBuilder = new();
-            DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
-            //DeltaReaderBuilder.Execute();
-
-            //Writer.
-            WriterBuilder = new();
-            WriterBuilder.Initialize(context, syntaxReceiver, this);
-            WriterBuilder.Execute();
-
-            //Reader.
-            ReaderBuilder = new();
-            ReaderBuilder.Initialize(context, syntaxReceiver, this);
-            ReaderBuilder.Execute();
-            
+            // //Writer.
+            // WriterBuilder = new();
+            // WriterBuilder.Initialize(context, syntaxReceiver, this);
+            // WriterBuilder.Execute();
+            //
+            // //Reader.
+            // ReaderBuilder = new();
+            // ReaderBuilder.Initialize(context, syntaxReceiver, this);
+            // ReaderBuilder.Execute();
+            //
             Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
