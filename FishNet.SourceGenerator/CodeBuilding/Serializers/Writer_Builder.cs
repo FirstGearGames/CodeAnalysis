@@ -172,7 +172,7 @@ namespace Roslyn.FishNet.CodeBuilding
                             sb.AppendLine(bodyIndent, $"//Serializer not found for {typeFullNameWithGenerics}. This will cause failure at runtime.");
 
                         sm = CreateSerializerMethod(typeSymbol);
-                        sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod($"{sm.MethodName}{genericArguments}", Generated_WriterParameter_Name, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
+                        sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod($"{sm.MethodName}{genericArguments}", Generated_WriterParameter_Name, true, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}"));
                     }
                     //writer found.
                     else
@@ -182,7 +182,7 @@ namespace Roslyn.FishNet.CodeBuilding
 
                         bool closeCall = true;
                         string prefix = sm.IsGenerated() ? "Write" : sm.MethodName;
-                        sb.AppendLine(bodyIndent, $"{RoslynCodeBuilder.CallMethod($"{prefix}{genericArguments}", Generated_WriterParameter_Name, closeCall, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}")}");
+                        sb.AppendLine(bodyIndent, $"{RoslynCodeBuilder.CallMethod($"{prefix}{genericArguments}", Generated_WriterParameter_Name, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                     }
                 }
                 
@@ -237,8 +237,8 @@ namespace Roslyn.FishNet.CodeBuilding
         {
             StringBuilder sb = new();
             //GenericSerializer<Type>.SetWrite(
-            sb.Append($"{FishNetConstants.GenericDeltaWriter_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaWriter_SetWrite_Name}(");
-            sb.Append($"{RoslynCodeBuilder.CreateFunction(NativeConstants.Boolean_FullName, FishNetConstants.Writer_FullName, dsm.TypeFullName, dsm.TypeFullName, FishNetConstants.DeltaSerializerOption_FullName)}");
+            sb.Append($"{FishNetConstants.GenericWriter_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericDeltaWriter_SetWrite_Name}(");
+            sb.Append($"{RoslynCodeBuilder.CreateAction(FishNetConstants.Writer_FullName, dsm.TypeFullName)}");
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();
@@ -258,7 +258,7 @@ namespace Roslyn.FishNet.CodeBuilding
             if (txt.Length == 0)
                 Debugg.Log(txt);
             else
-                Debugg.Log($"   [WriterBuilder] {txt}");
+                Debugg.Log($"   [Writer_Builder] {txt}");
         }
     }
 }

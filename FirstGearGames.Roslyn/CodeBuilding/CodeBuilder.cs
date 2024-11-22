@@ -119,6 +119,25 @@ namespace FirstGearGames.Roslyn.CodeBuilding
             return _stringBuilder.ToString();
         }
 
+        
+        public static string CreateAction(params string[] types)
+        {
+            _stringBuilder.Clear();
+
+            _stringBuilder.Append($"new {NativeConstants.Action_FullName}<");
+            for (int i = 0; i < types.Length; i++)
+            {
+                _stringBuilder.Append($"{types[i]}");
+                if (i < (types.Length - 1))
+                    _stringBuilder.Append(", ");
+            }
+
+            _stringBuilder.Append($">");
+
+            return _stringBuilder.ToString();
+        }
+
+        
         /// <summary>
         /// Combines generic argument strings into <str0, str1, str2 ...>
         /// </summary>

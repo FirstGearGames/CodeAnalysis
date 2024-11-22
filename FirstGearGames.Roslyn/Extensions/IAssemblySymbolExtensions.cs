@@ -18,9 +18,18 @@ namespace FirstGearGames.Roslyn.Extensions
             else
             {
                 if (error)
-                    Debugg.Log($"Could not find {fullName} in {assemblySymbol.GetSymbolFullName(metadataName: false)}");
+                    Log($"Could not find {fullName} in {assemblySymbol.GetSymbolFullName(metadataName: false)}");
                 return false;
             }
+        }
+        
+        
+        private static void Log(string txt)
+        {
+            if (txt.Length == 0)
+                Log(txt);
+            else
+                Log($"   [DeltaWriter_Builder] {txt}");
         }
     }
 }

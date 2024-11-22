@@ -42,7 +42,6 @@ namespace Roslyn.FishNet.CodeBuilding
 
         public void Execute()
         {
-            return;
             //Create all stub(empty) delta methods.
             CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
             //Create all bodies for delta methods.
@@ -66,25 +65,25 @@ namespace Roslyn.FishNet.CodeBuilding
         private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Debugg.Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
+            Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta).IsValid())
             {
-                Debugg.Log($"{recursiveCount.ToIndent()}   Serializer already exists.");
+                Log($"{recursiveCount.ToIndent()}   Serializer already exists.");
                 return;
             }
-            Debugg.Log($"{recursiveCount.ToIndent()}    A   {serializableType.FullMetadataName}");
-            //Debugg.Log("Meta name is " + serializableType.FullMetadataName);
+            Log($"{recursiveCount.ToIndent()}    A   {serializableType.FullMetadataName}");
+            //Log("Meta name is " + serializableType.FullMetadataName);
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
             {
-                Debugg.Log($"{recursiveCount.ToIndent()}   Named symbol is null.");
+                Log($"{recursiveCount.ToIndent()}   Named symbol is null.");
                 return;
             }
-            Debugg.Log($"{recursiveCount.ToIndent()}    B");
+            Log($"{recursiveCount.ToIndent()}    B");
             if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol))
                 return;
-            Debugg.Log($"{recursiveCount.ToIndent()}    C");
+            Log($"{recursiveCount.ToIndent()}    C");
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
@@ -92,12 +91,12 @@ namespace Roslyn.FishNet.CodeBuilding
                 CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
             }
 
-            Debugg.Log($"{recursiveCount.ToIndent()}    Creating header and footer.");
+            Log($"{recursiveCount.ToIndent()}    Creating header and footer.");
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
 
             _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
-            Debugg.Log($"{recursiveCount.ToIndent()}Added for type {typeFullName}.");
+            Log($"{recursiveCount.ToIndent()}Added for type {typeFullName}.");
 
             string GetMethodHeader(out string mName)
             {
@@ -296,7 +295,7 @@ namespace Roslyn.FishNet.CodeBuilding
             string fileName = $"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs";
             context.AddSource($"{fileName}", sb.ToString());
 
-            Debugg.Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
+            Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
         }
 
         /// <summary>
@@ -330,7 +329,7 @@ namespace Roslyn.FishNet.CodeBuilding
             if (txt.Length == 0)
                 Debugg.Log(txt);
             else
-                Debugg.Log($"   [DeltaWrite] {txt}");
+                Debugg.Log($"   [DeltaWriter_Builder] {txt}");
         }
     }
 }

@@ -48,7 +48,7 @@ namespace FirstGearGames.Roslyn.FishNet
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
             if (fishnetRuntimeAssemblySymbol == null)
             {
-                Debugg.Log($"FishNet assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
+                Log($"FishNet assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
                 Debugg.Send();
                 return;
             }
@@ -58,25 +58,28 @@ namespace FirstGearGames.Roslyn.FishNet
              default serializers for types native to fishnet. */
             Serializers = new();
             Serializers.Initialize(fishnetRuntimeAssemblySymbol);
-            //
-            // DeltaWriterBuilder = new();
-            // DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
-            //
-            // DeltaReaderBuilder = new();
-            // DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+            
+            //DeltaWriter.
+            DeltaWriterBuilder = new();
+            DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
+            DeltaWriterBuilder.Execute();
 
+            //DeltaReader.
+            DeltaReaderBuilder = new();
+            DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+            //DeltaReaderBuilder.Execute();
+
+            //Writer.
             WriterBuilder = new();
             WriterBuilder.Initialize(context, syntaxReceiver, this);
+            WriterBuilder.Execute();
 
+            //Reader.
             ReaderBuilder = new();
             ReaderBuilder.Initialize(context, syntaxReceiver, this);
-
-//            DeltaWriterBuilder.Execute();
-//            DeltaReaderBuilder.Execute();
-            WriterBuilder.Execute();
             ReaderBuilder.Execute();
-
-            Debugg.Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
+            
+            Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
         }

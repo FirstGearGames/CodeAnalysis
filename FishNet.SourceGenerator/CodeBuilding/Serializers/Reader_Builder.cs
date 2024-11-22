@@ -131,7 +131,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 StringBuilder sb = new();
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
                 inText = "";
-                sb.Append(2, $"public static {typeFullName} {mName}" + $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," + $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");
+                sb.Append(2, $"public static {typeFullName} {mName}" + $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name})");
 
                 return sb.ToString();
             }
@@ -246,8 +246,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         {
             StringBuilder sb = new();
             //GenericSerializer<Type>.SetWrite(
-            sb.Append($"//{FishNetConstants.GenericReader_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericReader_SetRead_Name}(");
-            sb.Append($"{RoslynCodeBuilder.CreateFunction(dsm.TypeFullName, FishNetConstants.Reader_FullName, dsm.TypeFullName)}");
+            sb.Append($"{FishNetConstants.GenericReader_FullName}<{dsm.TypeFullName}>.{FishNetConstants.GenericReader_SetRead_Name}(");
+            sb.Append($"{RoslynCodeBuilder.CreateFunction(dsm.TypeFullName, FishNetConstants.Reader_FullName)}");
             sb.Append($"({dsm.MethodName}));");
 
             return sb.ToString();
@@ -267,7 +267,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             if (txt.Length == 0)
                 Debugg.Log(txt);
             else
-                Debugg.Log($"   [ReaderBuilder] {txt}");
+                Debugg.Log($"   [Reader_Builder] {txt}");
         }
     }
 }

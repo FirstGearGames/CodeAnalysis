@@ -1,4 +1,5 @@
-﻿namespace FishNet.Serializing
+﻿
+namespace FishNet.Serializing
 {
 
     /// <summary>
@@ -6,15 +7,10 @@
     /// </summary>
     public static class GenericDeltaReader<T>
     {
-        public static Func<Reader, T, T> Read { get; private set; }
-        /// <summary>
-        /// True if this type has a custom writer.
-        /// </summary>
-        private static bool _hasCustomSerializer;
+        public static Func<Reader, T, T> Read { get; internal set; }
 
         public static void SetRead(Func<Reader, T, T> value)
         {
-            Read = value;
         }
     }
 

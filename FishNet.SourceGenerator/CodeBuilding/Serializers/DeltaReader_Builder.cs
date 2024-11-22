@@ -41,7 +41,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
         public void Execute()
         {
-            return;
             //Create all stub(empty) delta methods.
             CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
             //Create all bodies for delta methods.
@@ -65,7 +64,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Debugg.Log($"{recursiveCount.ToIndent()}Trying to create reader for {typeFullName}.");
+            Log($"{recursiveCount.ToIndent()}Trying to create reader for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetReadMethod(typeFullName, GetSerializerType.Delta).IsValid())
                 return;
@@ -265,7 +264,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             if (txt.Length == 0)
                 Debugg.Log(txt);
             else
-                Debugg.Log($"   [DeltaRead] {txt}");
+                Debugg.Log($"   [DeltaReader_Builder] {txt}");
         }
     }
 }
