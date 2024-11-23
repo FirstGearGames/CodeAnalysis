@@ -40,12 +40,13 @@ namespace FishNet.Serializing
 
 			//Serializer not found for type ClientAssembly.AnyType<System.Boolean>. Type will not be serialized.
 
-			System.Boolean changed = (totalFlags != 0);
+			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
 			if (changed)
 			{
 				writer.WriteUnsignedPackedWhole(totalFlags);
 				writer.WriteArraySegment(pooledWriter.GetArraySegment());
 			}
+			
 			pooledWriter.Store();
 
 			return changed;
@@ -68,7 +69,7 @@ namespace FishNet.Serializing
 			pooledWriter.WriteBoolean(value0.Works);
 				totalFlags += 4;
 
-			System.Boolean changed = (totalFlags != 0);
+			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
 			if (changed)
 			{
 				writer.WriteUnsignedPackedWhole(totalFlags);

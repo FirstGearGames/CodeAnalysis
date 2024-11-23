@@ -222,7 +222,7 @@ namespace Roslyn.FishNet.CodeBuilding
 
                 string changedVariable = "changed";
                 //System.Boolean changed = (totalFlags != 0) || rootSerializer;
-                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariableName} != 0);");
+                sb.AppendLine(bodyIndent, $"{NativeConstants.Boolean_FullName} {changedVariable} = ({totalFlagsVariableName} != 0 || {Generated_DeltaSerializerOption_Name} == {FishNetConstants.DeltaSerializeOption_RootSerialize_FullName});");
 
                 /* if (changed)
                  {
