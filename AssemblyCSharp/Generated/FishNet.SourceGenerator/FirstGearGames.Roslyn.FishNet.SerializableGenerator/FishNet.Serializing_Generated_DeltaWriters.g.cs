@@ -27,15 +27,19 @@ namespace FishNet.Serializing
 				totalFlags += 16;
 
 			//Delta serializer not found for type System.String. Full serializer will be used.
-//Do something with regular writer to call to full.
-			if (pooledWriter.WriteDeltaList(value0.LstStruct, value1.LstStruct))
+			pooledWriter.WriteString(value0.String);
 				totalFlags += 32;
 
-			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
+			if (pooledWriter.WriteDeltaList(value0.LstStruct, value1.LstStruct))
 				totalFlags += 64;
 
+			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
+				totalFlags += 128;
+
 			//Serializer not found for type System.Object. Type will not be serialized.
+
 			//Serializer not found for type ClientAssembly.AnyType<System.Boolean>. Type will not be serialized.
+
 			System.Boolean changed = (totalFlags != 0);
 			if (changed)
 			{
@@ -61,7 +65,9 @@ namespace FishNet.Serializing
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
 			//Delta serializer not found for type System.Boolean. Full serializer will be used.
-//Do something with regular writer to call to full.
+			pooledWriter.WriteBoolean(value0.Works);
+				totalFlags += 4;
+
 			System.Boolean changed = (totalFlags != 0);
 			if (changed)
 			{
@@ -76,8 +82,8 @@ namespace FishNet.Serializing
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
-			
-			
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.Player.NestedStruct>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.Player.NestedStruct, ClientAssembly.Player.NestedStruct, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_Player_NestedStruct));
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.Player.MyStructC>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.Player.MyStructC, ClientAssembly.Player.MyStructC, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_Player_MyStructC));
 		}
 	}
 }
