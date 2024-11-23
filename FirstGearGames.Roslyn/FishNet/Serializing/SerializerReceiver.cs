@@ -164,7 +164,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             while (true)
             {
-                string fullName = namedTypeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                string fullName = namedTypeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
                 //Already added.
                 if (addedFullNames.Contains(fullName))
                     break;

@@ -117,6 +117,7 @@ namespace Roslyn.FishNet.CodeBuilding
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
             _serializers.AddWriteMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
+            Log($"Added for type {namedTypeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}");
 
             string GetMethodHeader(out string mName)
             {
@@ -156,8 +157,8 @@ namespace Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
-                    string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string nameUsed);
+                    string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
 
                     //Serializer not found, call Read/Write<T>.
                     if (!sm.IsValid())

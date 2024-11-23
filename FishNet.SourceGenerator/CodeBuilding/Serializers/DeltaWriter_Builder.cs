@@ -71,22 +71,16 @@ namespace Roslyn.FishNet.CodeBuilding
             Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
             if (_serializers.GetWriteMethod(typeFullName, GetSerializerType.Delta).IsValid())
-            {
-                Log($"{recursiveCount.ToIndent()}   Serializer already exists.");
                 return;
-            }
-            Log($"{recursiveCount.ToIndent()}    A   {serializableType.FullMetadataName}");
+
             //Log("Meta name is " + serializableType.FullMetadataName);
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
-            {
-                Log($"{recursiveCount.ToIndent()}   Named symbol is null.");
                 return;
-            }
-            Log($"{recursiveCount.ToIndent()}    B");
+
             if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol))
                 return;
-            Log($"{recursiveCount.ToIndent()}    C");
+
             List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
@@ -94,12 +88,9 @@ namespace Roslyn.FishNet.CodeBuilding
                 CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
             }
 
-            Log($"{recursiveCount.ToIndent()}    Creating header and footer.");
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
-
             _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
-            Log($"{recursiveCount.ToIndent()}Added for type {typeFullName}.");
 
             string GetMethodHeader(out string mName)
             {
@@ -162,9 +153,9 @@ namespace Roslyn.FishNet.CodeBuilding
                 {
                     ITypeSymbol typeSymbol = item.Value.TypeSymbol;
 
-                    SerializerMethod sm = _serializers.GetFullWriteSerializerMethod(typeSymbol, out bool fullSerializerMethodFound);
-                    if (!fullSerializerMethodFound)
-                        sb.AppendLine(bodyIndent, $"//Serializer not found for {typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}. This will cause failure at runtime.");
+                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string nameUsed);
+                    if (!sm.IsValid())
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. This will cause failure at runtime.");
 
                     StringBuilder ifBody = new();
 
@@ -187,68 +178,37 @@ namespace Roslyn.FishNet.CodeBuilding
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
-                    string typeFullNameWithGenericArguments = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out string nameUsed);
 
-
-                    string genericCollectionName = _serializers.GetGenericCollectionName(typeSymbol, out bool isGenericCollection);
-                    DeltaSerializerMethod? dsm;
-                    sb.AppendLine($"//>>>  GenericName {genericCollectionName}. IsGeneric {isGenericCollection} TypeFullNameWithGenericArguments {typeFullNameWithGenericArguments} ");
-                    if (isGenericCollection)
+                    //Neither delta nor full could be found.
+                    if (!sm.IsValid())
                     {
-                        Try to get method for named generic serializer method.
-                        //EG: if field is public byte[] MyBytes try to get serializer for byte[], if that fails try generic array such as WriteDeltaArray<byte>.
-                        //Perhaps eliminate GetGenericCollectionName and make a new retrieval that searches for literal (WriteNestedStructArray(NestedStruct[] valueA), then generic
-                        //such as WriteArray<T>. 
-                        dsm = _serializers.GetWriteMethod(genericCollectionName, GetSerializerType.Delta) as DeltaSerializerMethod;
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.");
+                        continue;
                     }
+
+                    //If is a full serializer.
+                    if (!sm.IsDeltaSerializer())
+                    {
+                        sb.AppendLine(bodyIndent, $"//Delta serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Full serializer will be used.");
+                        sb.AppendLine("//Do something with regular writer to call to full.");
+                        continue;
+                    }
+
+                    //If here then is a delta serializer.
+                    DeltaSerializerMethod dsm = sm as DeltaSerializerMethod;
+                    
+                    /* if (writer.WriteDeltaXYZ(p0, p1))
+                        totalFlags += x */
+                    string writeDeltaText;
+                    if (dsm.IsGenerated())
+                        writeDeltaText = RoslynCodeBuilder.CallMethod($"WriteDelta", tmpWriterVariable, false, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
                     else
-                    {
-                        dsm = _serializers.GetWriteMethod(typeFullNameWithGenericArguments, GetSerializerType.Delta) as DeltaSerializerMethod;
-                    }
+                        writeDeltaText = RoslynCodeBuilder.CallMethod($"{dsm.MethodName}", tmpWriterVariable, false, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
 
-                    sb.AppendLine($"//typeFullName {typeFullNameWithGenericArguments}. Valid? {dsm.IsValid()}. MethodName {dsm?.MethodName}");
-                    //Delta writer not found.
-                    if (!dsm.IsValid())
-                    {
-                        sb.AppendLine(bodyIndent, $"//Delta writer could not be found for type {typeFullNameWithGenericArguments}. A full serializer will be used. Please report this note.");
+                    sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
+                    AppendIncreaseTotalFlags(4);
 
-                        SerializerMethod sm = _serializers.GetFullWriteSerializerMethod(typeSymbol, out bool fullSerializerMethodFound);
-                        if (!fullSerializerMethodFound)
-                            sb.AppendLine(bodyIndent, $"//Full serializer not found for {typeFullNameWithGenericArguments}. This will cause failure at runtime.");
-
-                        string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString(), typeSymbol);
-                        sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod($"{sm.MethodName}", tmpWriterVariable, true, $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}"));
-                        AppendIncreaseTotalFlags(3);
-                    }
-                    //Delta writer found.
-                    else
-                    {
-                        /* if (writer.WriteDeltaXYZ(p0, p1))
-                            totalFlags += x */
-
-                        string writeDeltaText;
-                        sb.AppendLine($"//Generated? {dsm.IsGenerated()}");
-
-                        if (dsm.IsGenerated())
-                        {
-                            string genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString(), typeSymbol);
-                            writeDeltaText = RoslynCodeBuilder.CallMethod($"WriteDelta{genericArguments}", tmpWriterVariable, false, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
-                        }
-                        else
-                        {
-                            string genericArguments;
-                            if (isGenericCollection)
-                                genericArguments = typeSymbol.GetTypeSymbolFullNameAsGenericArgument(metadataName: false);
-                            else
-                                genericArguments = RoslynCodeBuilder.GetCombinedGenericArguments(typeSymbol.GetGenericArgumentsString(), typeSymbol);
-                            
-                            writeDeltaText = RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{genericArguments}", tmpWriterVariable, false, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}", $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}");
-                        }
-                        // ifBody.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.WriteDelta<{fullSerializerMethod.TypeFullName}>({_serializers.GetValueParameterName(1)});");
-
-                        sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
-                        AppendIncreaseTotalFlags(4);
-                    }
                     sb.AppendLine();
 
                     void AppendIncreaseTotalFlags(int indent)

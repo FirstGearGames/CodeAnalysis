@@ -809,13 +809,13 @@ namespace FishNet.Serializing
         #region Generators
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DefaultWriter]
-        public void WriteList<T>(List<T> value) { }
+        public void WriteList<T0>(List<T0> value) { }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DefaultWriter]
-        public void WriteArray<T>(T[] value) { }
+        public void WriteArray<T0>(T0[] value) { }
 
-        public void Write<T>(T value) { }
+        public void Write<T0>(T0 value) { }
 
         #endregion
     }

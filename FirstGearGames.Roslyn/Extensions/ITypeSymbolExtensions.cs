@@ -44,7 +44,7 @@ namespace FirstGearGames.Roslyn.Extensions
         /// </summary>
         /// <param name="metadataName">True to return name as metadata.</param>
         /// <returns></returns>
-        public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol, bool metadataName)
+        public static string GetTypeSymbolFullNameWithTypedArguments(this ITypeSymbol typeSymbol, bool metadataName)
         {
             string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
 
@@ -87,7 +87,7 @@ namespace FirstGearGames.Roslyn.Extensions
                     if (typeArgument.TypeKind is TypeKind.TypeParameter)
                         results.Add($"T{typeParameterCount++}");
                     else
-                        results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
+                        results.Add(typeArgument.GetTypeSymbolFullNameWithTypedArguments(metadataName: false));
                 }
             }
             else if (symbol is IArrayTypeSymbol arrayTypeSymbol)
@@ -95,7 +95,7 @@ namespace FirstGearGames.Roslyn.Extensions
                 if (arrayTypeSymbol.ElementType.TypeKind is TypeKind.TypeParameter)
                     results.Add($"T{typeParameterCount++}");
                 else
-                    results.Add(arrayTypeSymbol.ElementType.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
+                    results.Add(arrayTypeSymbol.ElementType.GetTypeSymbolFullNameWithTypedArguments(metadataName: false));
             }
 
             return results;

@@ -58,7 +58,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
         public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false)}>");
+            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}>");
         }
 
 //         
@@ -165,7 +165,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false) as SerializerMethod;
+                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string nameUsed);
                     //string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
                     string genericArguments = sm.ToReturnArguments(typeSymbol);
 
@@ -173,7 +173,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     if (!sm.IsValid())
                     {
                         //Get information on which read method to call.
-                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
                         if (!SerializeMethodExists(typeFullNameWithGenerics))
                             sb.AppendLine(bodyIndent, $"//Serializer not found for {typeFullNameWithGenerics}. This will cause failure at runtime.");
 
@@ -183,7 +183,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     //Serializer found.
                     else
                     {
-                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
                         Log($"Serializer found for {typeFullNameWithGenerics}.");
 
                         bool closeCall = true;

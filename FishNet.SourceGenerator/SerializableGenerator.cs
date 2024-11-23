@@ -83,9 +83,9 @@ namespace FirstGearGames.Roslyn.FishNet
 
             /* Complete bodies and class generation. */
             DeltaWriterBuilder.Execute();
-            DeltaReaderBuilder.Execute();
-            WriterBuilder.Execute();
-            ReaderBuilder.Execute();
+            // DeltaReaderBuilder.Execute();
+            // WriterBuilder.Execute();
+            // ReaderBuilder.Execute();
 
             Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
 

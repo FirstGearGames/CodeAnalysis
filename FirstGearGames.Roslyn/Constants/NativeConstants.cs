@@ -10,7 +10,7 @@ namespace FirstGearGames.Roslyn.Native.Constants
         public const string NonSerializedAttribute_FullName = "System.NonSerializedAttribute";
         public const string UInt64_FullName = "System.UInt64";
         public const string LineFeed = "\r\n";
-        public const string GeneralParameter_Name = "T";
+        public const string GeneralParameter_Name = "T0";
         public const string GenericArray_FullName = $"{GeneralParameter_Name}[]";
 
         public const string List_FullName = "System.Collections.Generic.List";

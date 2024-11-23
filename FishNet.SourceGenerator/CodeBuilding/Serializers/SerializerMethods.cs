@@ -106,7 +106,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName)
         {
             TypeSymbol = typeSymbol;
-            TypeFullName = typeSymbol.GetTypeSymbolFullNameWithGenericArguments(metadataName: false);
+            TypeFullName = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
             AreGenericsNamed = typeSymbol.AreGenericArgumentsNamed();
             GenericArguments = typeSymbol.GetGenericArgumentsString();
             MethodName = methodName;
