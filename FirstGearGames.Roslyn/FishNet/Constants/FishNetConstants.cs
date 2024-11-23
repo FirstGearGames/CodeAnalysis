@@ -159,6 +159,11 @@
         public const string Writer_Length_Name = "Length";
 
         /// <summary>
+        /// Writer.Position property.
+        /// </summary>
+        public const string Writer_Position_Name = "Position";
+        
+        /// <summary>
         /// PooledWriter.Store method.
         /// </summary>
         public const string PooledWriter_Store_Name = "Store";

@@ -63,12 +63,13 @@ namespace ClientAssembly
         [IncludeSerialization]
         public struct NestedStruct : IReplicateData
         {
-            // public byte[] ByteArr;
-            // public NestedStruct[] StructArr;
-            // public string String;
-            // public List<NestedStruct> LstStruct;
-            // public ArraySegment<byte> ArrSegment;
-            // public System.Object ObjectType;
+            public byte[] ByteArr;
+            public NestedStruct[] StructArr;
+            public List<NestedStruct> StructLst;
+            public string String;
+            public List<NestedStruct> LstStruct;
+            public ArraySegment<byte> ArrSegment;
+            public System.Object ObjectType;
             public AnyType<bool> GenericObjectType;
         }
 

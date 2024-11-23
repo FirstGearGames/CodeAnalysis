@@ -37,13 +37,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _generator = generator;
         }
 
+        public void CreateEmptySerializerMethods()
+        {
+            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        }
+        
         public void Execute()
         {
-            Log("");
-            Log("############ CreateEmptySerializerMethods.");
-            Log("");
-            //Create all stub(empty) methods.
-            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
             Log("");
             Log("############ CreateSerializerBodies.");
             Log("");

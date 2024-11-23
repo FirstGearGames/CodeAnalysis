@@ -39,13 +39,17 @@ namespace Roslyn.FishNet.CodeBuilding
             _generator = generator;
         }
 
-        public void Execute()
+        public void CreateEmptySerializerMethods()
         {
             Log("");
             Log("############ CreateEmptySerializerMethods.");
             Log("");
-            //Create all stub(empty) methods.
             CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        }
+
+        public void Execute()
+        {
+            //Create all stub(empty) methods.
             Log("");
             Log("############ CreateSerializerBodies.");
             Log("");
@@ -57,7 +61,6 @@ namespace Roslyn.FishNet.CodeBuilding
             //Create serializers class adding generated serializers.
             CreateGeneratedSerializersClass(_context);
         }
-
 
         /// <summary>
         /// Creates SerializerMethod for each type in need.
@@ -177,7 +180,7 @@ namespace Roslyn.FishNet.CodeBuilding
                         sb.AppendLine(bodyIndent, $"{RoslynCodeBuilder.CallMethod($"{prefix}{genericArguments}", Generated_WriterParameter_Name, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
                     }
                 }
-                
+
                 gsm.MethodContent.Body = sb;
             }
         }
@@ -209,7 +212,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     initializeMethod.Body.AppendLine();
 
                 initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
-                
+
                 addedSerializers++;
             }
 
@@ -235,7 +238,7 @@ namespace Roslyn.FishNet.CodeBuilding
 
             return sb.ToString();
         }
-        
+
         private void Log(string txt)
         {
             if (txt.Length == 0)

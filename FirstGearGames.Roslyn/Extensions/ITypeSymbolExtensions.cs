@@ -101,6 +101,12 @@ namespace FirstGearGames.Roslyn.Extensions
             return results;
         }
 
+        /// <summary>
+        /// Returns fullName wrapped as in generic arguments.
+        /// For example: System.Byte returns <System.Byte>.
+        /// </summary>
+        public static string GetTypeSymbolFullNameAsGenericArgument(this ITypeSymbol typeSymbol, bool metadataName) => $"<{typeSymbol.GetTypeSymbolFullName(metadataName)}>";
+
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };

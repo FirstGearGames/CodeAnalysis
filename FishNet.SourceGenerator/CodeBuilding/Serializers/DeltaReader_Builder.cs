@@ -39,10 +39,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _generator = generator;
         }
 
+        public void CreateEmptySerializerMethods()
+        {
+            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        }
+
         public void Execute()
         {
-            //Create all stub(empty) delta methods.
-            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
             //Create all bodies for delta methods.
             CreateSerializerBodies(_context, _rootSyntaxReceiver);
             //Create delta serializers class adding generated serializers.

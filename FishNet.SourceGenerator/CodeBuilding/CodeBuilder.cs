@@ -39,6 +39,20 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             return _stringBuilder.ToString();
         }
 
+        public static string CallWriterPosition(string writerName, bool closeCall = true)
+        {
+            _stringBuilder.Clear();
+
+            //writer.WriteArraySegment(otherWriteA.GetArraySegment())
+            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_Position_Name}");
+            
+            if (closeCall)
+                _stringBuilder.Append(';');
+
+            return _stringBuilder.ToString();
+        }
+
+
         public static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();

@@ -1,4 +1,6 @@
-﻿namespace FirstGearGames.Roslyn.Native.Constants
+﻿using System.Collections.Generic;
+
+namespace FirstGearGames.Roslyn.Native.Constants
 {
     public static class NativeConstants
     {
@@ -10,5 +12,8 @@
         public const string LineFeed = "\r\n";
         public const string GeneralParameter_Name = "T";
         public const string GenericArray_FullName = $"{GeneralParameter_Name}[]";
+
+        public const string List_FullName = "System.Collections.Generic.List";
+        public const string GenericList_FullName = $"{List_FullName}<{GeneralParameter_Name}>";
     }
 }

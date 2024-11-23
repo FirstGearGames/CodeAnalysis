@@ -53,32 +53,40 @@ namespace FirstGearGames.Roslyn.FishNet
                 return;
             }
 
-            /* All objects which might be referenced need to be found
-             first. The serialization generation process will rely on
-             default serializers for types native to fishnet. */
+            /* Initialize the serializers class which finds
+             * default serializers and is used by most builders. */
             Serializers = new();
             Serializers.Initialize(fishnetRuntimeAssemblySymbol);
-            //
-            //DeltaWriter.
+
+
+            /* Initialize each builder. This mostly
+             * just sets references. */
             DeltaWriterBuilder = new();
             DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
-            DeltaWriterBuilder.Execute();
-            //
-            // //DeltaReader.
-            // DeltaReaderBuilder = new();
-            // DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
-            // DeltaReaderBuilder.Execute();
 
-            // //Writer.
-            // WriterBuilder = new();
-            // WriterBuilder.Initialize(context, syntaxReceiver, this);
-            // WriterBuilder.Execute();
-            //
-            // //Reader.
-            // ReaderBuilder = new();
-            // ReaderBuilder.Initialize(context, syntaxReceiver, this);
-            // ReaderBuilder.Execute();
-            //
+            DeltaReaderBuilder = new();
+            DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+
+            WriterBuilder = new();
+            WriterBuilder.Initialize(context, syntaxReceiver, this);
+
+            ReaderBuilder = new();
+            ReaderBuilder.Initialize(context, syntaxReceiver, this);
+
+            /* Create the method template of each generated serializer. These need
+             * to be done before any bodies are generated so that
+             * generated bodies can call stubs. */
+            DeltaWriterBuilder.CreateEmptySerializerMethods();
+            DeltaReaderBuilder.CreateEmptySerializerMethods();
+            WriterBuilder.CreateEmptySerializerMethods();
+            ReaderBuilder.CreateEmptySerializerMethods();
+
+            /* Complete bodies and class generation. */
+            DeltaWriterBuilder.Execute();
+            DeltaReaderBuilder.Execute();
+            WriterBuilder.Execute();
+            ReaderBuilder.Execute();
+
             Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
 
             Debugg.Send();
