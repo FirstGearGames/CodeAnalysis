@@ -38,29 +38,10 @@ namespace Roslyn.FishNet.CodeBuilding
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
         }
-
-        public void CreateEmptySerializerMethods()
-        {
-            Log("");
-            Log("############ CreateEmptySerializerMethods.");
-            Log("");
-            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
-        }
-
-        public void Execute()
-        {
-            //Create all stub(empty) methods.
-            Log("");
-            Log("############ CreateSerializerBodies.");
-            Log("");
-            //Create all bodies for methods.
-            CreateSerializerBodies(_context, _rootSyntaxReceiver);
-            Log("");
-            Log("############ CreateSerializersClass.");
-            Log("");
-            //Create serializers class adding generated serializers.
-            CreateGeneratedSerializersClass(_context);
-        }
+        
+        public void CreateEmptySerializerMethods()=>CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
+        public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
         /// <summary>
         /// Creates SerializerMethod for each type in need.
@@ -142,27 +123,14 @@ namespace Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string nameUsed);
-                    string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
+                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string _);
 
                     //Serializer not found, call Read/Write<T>.
                     if (!sm.IsValid())
-                    {
-                        //Get information on which read method to call.
-                        if (!_serializers.GetWriteMethodExists(typeFullNameWithGenerics, GetSerializerType.Full))
-                            sb.AppendLine(bodyIndent, $"//Serializer not found for {typeFullNameWithGenerics}. This will cause failure at runtime.");
-
-                        sm = _serializers.CreateWriteSerializerMethod(typeSymbol, metadataName: false);
-                        sb.AppendLine(bodyIndent, RoslynCodeBuilder.CallMethod($"{sm.MethodName}", Generated_WriterParameter_Name, true, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}"));
-                    }
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
                     //writer found.
                     else
-                    {
-                        bool closeCall = true;
-                        string prefix = sm.IsGenerated() ? "Write" : sm.MethodName;
-                        string genericArguments = sm.ToReturnArguments(typeSymbol);
-                        sb.AppendLine(bodyIndent, $"{RoslynCodeBuilder.CallMethod($"{prefix}{genericArguments}", Generated_WriterParameter_Name, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
-                    }
+                        sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol.Name, closeCall: true));
                 }
 
                 gsm.MethodContent.Body = sb;

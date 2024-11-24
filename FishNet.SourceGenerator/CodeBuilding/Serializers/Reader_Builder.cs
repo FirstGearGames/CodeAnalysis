@@ -6,6 +6,7 @@ using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 using Roslyn.FishNet.CodeBuilding;
 using RoslynCodeBuilder = FirstGearGames.Roslyn.CodeBuilding.CodeBuilder;
@@ -36,45 +37,15 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
         }
-
-        public void CreateEmptySerializerMethods()
-        {
-            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
-        }
-        
-        public void Execute()
-        {
-            Log("");
-            Log("############ CreateSerializerBodies.");
-            Log("");
-            //Create all bodies for methods.
-            CreateSerializerBodies(_context, _rootSyntaxReceiver);
-            Log("");
-            Log("############ CreateSerializersClass.");
-            Log("");
-            //Create serializers class adding generated serializers.
-            CreateGeneratedSerializersClass(_context);
-        }
+            
+        public void CreateEmptySerializerMethods()=>CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
+        public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
         public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
             return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}>");
         }
-
-//         
-//                 private const string InitializeOnLoad_Method_Name = DeltaWriter_Builder.InitializeOnLoad_Method_Name;
-//         private const string Generated_Class_Name = "Generated_DeltaReaders";
-//         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedReaderPrefix}ReadDelta";
-//         private const string Generated_ReaderParameter_Name = "reader";
-//         private const string Generated_DeltaSerializerOption_Name = DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
-//
-// #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-//         private Serializers _serializers => _generator.Serializers;
-//         private SerializableGenerator _generator;
-//         private GeneratorExecutionContext _context;
-//         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
-// #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-//         
 
         /// <summary>
         /// Creates SerializerMethod for each type in need.
@@ -155,8 +126,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                 //Make a new instance of the type to return.
                 const string resultVariableName = "result";
-                sb.AppendLine(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
-                sb.AppendLine();
+                sb.AppendLine(bodyIndent, $"{RoslynCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()")}{NativeConstants.LineFeed}");
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
 

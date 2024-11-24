@@ -46,7 +46,6 @@ namespace FishNet.Serializing
 				writer.WriteUnsignedPackedWhole(totalFlags);
 				writer.WriteArraySegment(pooledWriter.GetArraySegment());
 			}
-			
 			pooledWriter.Store();
 
 			return changed;

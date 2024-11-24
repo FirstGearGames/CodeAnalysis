@@ -38,19 +38,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
         }
-
-        public void CreateEmptySerializerMethods()
-        {
-            CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
-        }
-
-        public void Execute()
-        {
-            //Create all bodies for delta methods.
-            CreateSerializerBodies(_context, _rootSyntaxReceiver);
-            //Create delta serializers class adding generated serializers.
-            CreateGeneratedSerializersClass(_context);
-        }
+        
+        public void CreateEmptySerializerMethods()=>CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
+        public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
         /// <summary>
         /// Creates SerializerMethod for each type in need.
@@ -123,8 +114,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                 string totalFlagsVariable = "totalFlags";
                 sb.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
-                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}");
-                sb.AppendLine();
+                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}{NativeConstants.LineFeed}");
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
                  * if (options.FastContains(DeltaSerializerOption.FullSerializer))
@@ -141,8 +131,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         sm = _generator.ReaderBuilder.CreateSerializerMethod(item.Value.TypeSymbol);
 
                     sb.AppendLine(bodyIndent, $"if ({optionsVariable}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
-                    sb.AppendLine(bodyIndent + 1, $"return {Generated_ReaderParameter_Name}.{sm.MethodName}();");
-                    sb.AppendLine();
+                    sb.AppendLine(bodyIndent + 1, $"return {Generated_ReaderParameter_Name}.{sm.MethodName}();{NativeConstants.LineFeed}{NativeConstants.LineFeed}");
                 }
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
@@ -193,8 +182,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     /* else
                      *      result.FieldName = previousResult.FieldName; */
                     sb.AppendLine(bodyIndent, ("else"));
-                    sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {_serializers.GetValueParameterName(0)}.{fieldSymbol.Name};");
-                    sb.AppendLine();
+                    sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {_serializers.GetValueParameterName(0)}.{fieldSymbol.Name};{NativeConstants.LineFeed}{NativeConstants.LineFeed}");
                     fieldFlag *= 2;
                 }
 
