@@ -6,15 +6,15 @@ namespace FishNet.Serializing
 
 		public static bool GWrite___WriteDeltaClientAssembly_Player_NestedStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.NestedStruct value0, ClientAssembly.Player.NestedStruct value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
 		{
+			System.UInt64 totalFlags = (ulong)options;
+
 			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 			{
-				System.UInt64 optionsFlags = (System.UInt64)options;
-				writer.WriteUnsignedPackedWhole(optionsFlags);
+				writer.WriteUnsignedPackedWhole(totalFlags);
 				writer.GWrite___WriteClientAssembly_Player_NestedStruct(value1);
 				return true;
 			}
 
-			System.UInt64 totalFlags = (ulong)options;
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
 			if (pooledWriter.WriteDeltaUInt8Array(value0.ByteArr, value1.ByteArr))
@@ -53,15 +53,15 @@ namespace FishNet.Serializing
 
 		public static bool GWrite___WriteDeltaClientAssembly_Player_MyStructC(this FishNet.Serializing.Writer writer, ClientAssembly.Player.MyStructC value0, ClientAssembly.Player.MyStructC value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
 		{
+			System.UInt64 totalFlags = (ulong)options;
+
 			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 			{
-				System.UInt64 optionsFlags = (System.UInt64)options;
-				writer.WriteUnsignedPackedWhole(optionsFlags);
+				writer.WriteUnsignedPackedWhole(totalFlags);
 				writer.GWrite___WriteClientAssembly_Player_MyStructC(value1);
 				return true;
 			}
 
-			System.UInt64 totalFlags = (ulong)options;
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
 			//Delta serializer not found for type System.Boolean. Full serializer will be used.

@@ -110,6 +110,10 @@ namespace Roslyn.FishNet.CodeBuilding
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
 
+                //totalFlags and pooledWriter local variables.
+                string totalFlagsVariableName = "totalFlags";
+                sb.AppendLine(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariableName, $"(ulong){Generated_DeltaSerializerOption_Name};{NativeConstants.LineFeed}", closeLine: false));
+                
                 /* If (options.FastContains(DeltaSerializerOption.FullSerialize))
                  * {
                  *      writer.Write(type);
@@ -140,12 +144,8 @@ namespace Roslyn.FishNet.CodeBuilding
 
                         _stringBuilder.AppendLine(indent, $"if ({optionsVariableName}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
                         _stringBuilder.AppendLine(indent, "{");
-                        /* ulong flags = (ulong)options;
-                         * writer.WriteUnsignedPackedWhole(flags); */
-                        string flagsVariable = "optionsFlags";
-                        _stringBuilder.Append(indent + 1, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, flagsVariable, string.Empty, false));
-                        _stringBuilder.AppendLine($" = ({NativeConstants.UInt64_FullName}){Generated_DeltaSerializerOption_Name};");
-                        _stringBuilder.AppendLine(indent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, flagsVariable));
+                        //writer.WriteUnsignedPackedWhole(flags); */
+                        _stringBuilder.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariableName));
                         _stringBuilder.AppendLine(body);
                         _stringBuilder.AppendLine(indent, "}");
 
@@ -155,10 +155,8 @@ namespace Roslyn.FishNet.CodeBuilding
 
                 //Starting flag for each modified field.
                 ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
-
-                //totalFlags and pooledWriter local variables.
-                string totalFlagsVariableName = "totalFlags";
-                sb.AppendLine(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariableName, $"(ulong){Generated_DeltaSerializerOption_Name}"));
+                
+                //PooledWriter local variable.
                 sb.AppendLine(bodyIndent, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariableName) + NativeConstants.LineFeed);
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
