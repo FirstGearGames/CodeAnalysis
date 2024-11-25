@@ -4,10 +4,16 @@ namespace FishNet.Serializing
 	public static class Generated_Writers
 	{
 
+		public static void GWrite___WriteClientAssembly_Player_EmptyStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.EmptyStruct value0)
+		{
+
+		}
+
 		public static void GWrite___WriteClientAssembly_Player_NestedStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.NestedStruct value0)
 		{
+			writer.GWrite___WriteClientAssembly_Player_EmptyStruct(value0.Struct);
 			writer.WriteUInt8ArrayAndSize(value0.ByteArr);
-			writer.Write(value0.StructArr);
+			writer.WriteArray(value0.StructArr);
 			writer.WriteList(value0.StructLst);
 			writer.WriteDictionary(value0.StructDict);
 			writer.WriteArraySegmentAndSize(value0.ArrSegment);
@@ -28,6 +34,7 @@ namespace FishNet.Serializing
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
+			FishNet.Serializing.GenericWriter<ClientAssembly.Player.EmptyStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.EmptyStruct>(GWrite___WriteClientAssembly_Player_EmptyStruct));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.NestedStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.NestedStruct>(GWrite___WriteClientAssembly_Player_NestedStruct));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.MyStructC>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.MyStructC>(GWrite___WriteClientAssembly_Player_MyStructC));
 		}

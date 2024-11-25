@@ -204,7 +204,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         {
             if (!sm.IsValid())
                 return string.Empty;
-            
+
             ITypeSymbol fieldSymbolType = fieldSymbol.Type;
             string fieldName = fieldSymbol.Name;
 
@@ -214,10 +214,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             else
                 arguments = string.Empty;
 
-            if (sm.IsGenerated())
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"Read{arguments}", readerVariableName, closeCall)}";
-            else
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall)}";
+            // if (sm.IsGenerated())
+            //     return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"Read{arguments}", readerVariableName, closeCall)}";
+            // else
+            return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall)}";
         }
 
         private void Log(string txt)

@@ -250,7 +250,7 @@ namespace FishNet.Serializing
         public byte[] ReadDeltaUInt8ArrayAllocated(byte[] valueA) => default;
 
         [DefaultDeltaReader]
-        public T[] ReadDeltaUArrayAllocated<T>(T[] valueA) => default;
+        public T[] ReadDeltaArrayAllocated<T>(T[] valueA) => default;
 
         [DefaultDeltaReader]
         public ArraySegment<byte> ReadDeltaArraySegment(ArraySegment<byte> valueA) => default;

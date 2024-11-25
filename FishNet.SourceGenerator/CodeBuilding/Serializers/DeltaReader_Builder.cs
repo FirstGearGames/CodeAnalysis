@@ -150,6 +150,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
+                    Log($"Getting reader for field name {fieldSymbol.Name}");
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out _);
 
                     //Neither delta nor full could be found.
@@ -253,19 +254,19 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
             ITypeSymbol fieldSymbolType = fieldSymbol.Type;
             string fieldName = fieldSymbol.Name;
-            
+
             string arguments;
             if (!dsm.AreGenericsNamed && dsm.GenericArguments.Count > 0)
                 arguments = $"{fieldSymbolType.GetGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments(fieldSymbolType)}";
             else
                 arguments = string.Empty;
 
-            if (dsm.IsGenerated())
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"ReadDelta{arguments}", readerVariableName, closeCall,
-                    $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
-            else
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{arguments}", readerVariableName, closeCall,
-                    $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
+            // if (dsm.IsGenerated())
+            //     return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"ReadDelta{arguments}", readerVariableName, closeCall,
+            //         $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
+            // else
+            return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{arguments}", readerVariableName, closeCall,
+                $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
         }
 
         private void Log(string txt)

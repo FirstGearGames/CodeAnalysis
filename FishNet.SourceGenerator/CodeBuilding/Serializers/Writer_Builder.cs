@@ -38,8 +38,8 @@ namespace Roslyn.FishNet.CodeBuilding
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
         }
-        
-        public void CreateEmptySerializerMethods()=>CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+
+        public void CreateEmptySerializerMethods() => CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
         public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
         public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
@@ -195,11 +195,11 @@ namespace Roslyn.FishNet.CodeBuilding
         {
             if (!sm.IsValid())
                 return string.Empty;
-            
-            if (sm.IsGenerated())
-                return RoslynCodeBuilder.CallMethod($"Write", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}");
-            else
-                return RoslynCodeBuilder.CallMethod($"{sm.MethodName}", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}");
+
+            // if (sm.IsGenerated())
+            //     return RoslynCodeBuilder.CallMethod($"Write", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}");
+            // else
+            return RoslynCodeBuilder.CallMethod($"{sm.MethodName}", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}");
         }
 
         private void Log(string txt)

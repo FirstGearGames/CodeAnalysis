@@ -60,9 +60,12 @@ namespace ClientAssembly
     }
     public class Player : NetworkBehaviour
     {
+        public struct EmptyStruct { }
+
         [IncludeSerialization]
         public struct NestedStruct : IReplicateData
         {
+            public EmptyStruct Struct;
             public byte[] ByteArr;
             public NestedStruct[] StructArr;
             public List<NestedStruct> StructLst;

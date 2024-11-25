@@ -271,11 +271,17 @@ namespace Roslyn.FishNet.CodeBuilding
         {
             if (!dsm.IsValid())
                 return string.Empty;
+
+            Make this specify arguments like the reader. While this is not needed since type is assumed when
+            /* Make this specify arguments like the reader. While this is not needed since type is assumed when
+             * its used as a parameter doing so will show the serializers are generating properly. Code can be taken from
+             * GetReadCall. */
             
-            if (dsm.IsGenerated())
-                return RoslynCodeBuilder.CallMethod($"WriteDelta", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
-            else
-                return RoslynCodeBuilder.CallMethod($"{dsm.MethodName}", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}");
+            
+            // if (dsm.IsGenerated())
+            //     return RoslynCodeBuilder.CallMethod($"WriteDelta", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
+            // else
+            return RoslynCodeBuilder.CallMethod($"{dsm.MethodName}", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}");
         }
 
         private void Log(string txt)

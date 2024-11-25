@@ -4,6 +4,30 @@ namespace FishNet.Serializing
 	public static class Generated_DeltaWriters
 	{
 
+		public static bool GWrite___WriteDeltaClientAssembly_Player_EmptyStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.EmptyStruct value0, ClientAssembly.Player.EmptyStruct value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
+		{
+			System.UInt64 totalFlags = (ulong)options;
+
+			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
+			{
+				writer.WriteUnsignedPackedWhole(totalFlags);
+				writer.GWrite___WriteClientAssembly_Player_EmptyStruct(value1);
+				return true;
+			}
+
+			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
+
+			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
+			if (changed)
+			{
+				writer.WriteUnsignedPackedWhole(totalFlags);
+				writer.WriteArraySegment(pooledWriter.GetArraySegment());
+			}
+			pooledWriter.Store();
+
+			return changed;
+		}
+
 		public static bool GWrite___WriteDeltaClientAssembly_Player_NestedStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.NestedStruct value0, ClientAssembly.Player.NestedStruct value1, FishNet.Serializing.DeltaSerializerOption options = FishNet.Serializing.DeltaSerializerOption.Unset)
 		{
 			System.UInt64 totalFlags = (ulong)options;
@@ -17,24 +41,27 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDeltaUInt8Array(value0.ByteArr, value1.ByteArr))
+			if (pooledWriter.GWrite___WriteDeltaClientAssembly_Player_EmptyStruct(value0.Struct, value1.Struct))
 				totalFlags += 4;
 
-			if (pooledWriter.WriteDelta(value0.StructArr, value1.StructArr, FishNet.Serializing.DeltaSerializerOption.Unset))
+			if (pooledWriter.WriteDeltaUInt8Array(value0.ByteArr, value1.ByteArr))
 				totalFlags += 8;
 
-			if (pooledWriter.WriteDeltaList(value0.StructLst, value1.StructLst))
+			if (pooledWriter.WriteDeltaArray(value0.StructArr, value1.StructArr))
 				totalFlags += 16;
 
-			if (pooledWriter.WriteDeltaDictionary(value0.StructDict, value1.StructDict))
+			if (pooledWriter.WriteDeltaList(value0.StructLst, value1.StructLst))
 				totalFlags += 32;
 
-			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
+			if (pooledWriter.WriteDeltaDictionary(value0.StructDict, value1.StructDict))
 				totalFlags += 64;
+
+			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
+				totalFlags += 128;
 
 			//Delta serializer not found for type System.String. Full serializer will be used.
 			pooledWriter.WriteString(value0.String);
-				totalFlags += 128;
+				totalFlags += 256;
 
 			//Serializer not found for type System.Object. Type will not be serialized.
 
@@ -82,6 +109,7 @@ namespace FishNet.Serializing
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
+			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.Player.EmptyStruct>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.Player.EmptyStruct, ClientAssembly.Player.EmptyStruct, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_Player_EmptyStruct));
 			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.Player.NestedStruct>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.Player.NestedStruct, ClientAssembly.Player.NestedStruct, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_Player_NestedStruct));
 			FishNet.Serializing.GenericDeltaWriter<ClientAssembly.Player.MyStructC>.SetWrite(new System.Func<FishNet.Serializing.Writer, ClientAssembly.Player.MyStructC, ClientAssembly.Player.MyStructC, FishNet.Serializing.DeltaSerializerOption, System.Boolean>(GWrite___WriteDeltaClientAssembly_Player_MyStructC));
 		}
