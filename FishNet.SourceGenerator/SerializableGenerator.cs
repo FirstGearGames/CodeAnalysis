@@ -88,7 +88,7 @@ namespace FirstGearGames.Roslyn.FishNet
             DeltaWriterBuilder.CreateSerializerBodies();
             DeltaReaderBuilder.CreateSerializerBodies();
             WriterBuilder.CreateSerializerBodies();
-            // ReaderBuilder.CreateSerializerBodies();
+            ReaderBuilder.CreateSerializerBodies();
             
             /* Create the class containing generated serializers. */
             DeltaWriterBuilder.CreateGeneratedSerializersClass();

@@ -37,8 +37,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
         }
-            
-        public void CreateEmptySerializerMethods()=>CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+
+        public void CreateEmptySerializerMethods() => CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
         public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
         public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
@@ -53,12 +53,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
             foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
-            {
-                Log("//////////////////////////");
-                Log($"Processing root serializable type {item.FullName}.");
-                Log("//////////////////////////");
                 CreateEmptySerializerMethod(context, item);
-            }
         }
 
         /// <summary>
@@ -135,34 +130,16 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string nameUsed);
-                    //string genericArguments = (sm.AreGenericsNamed) ? string.Empty : typeSymbol.GetGenericArgumentsString().CreateMethodCallArguments(typeSymbol, !sm.AreGenericsNamed);
-                    string genericArguments = sm.ToReturnArguments(typeSymbol);
+                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
-                    //Serializer method is not valid/does not exist.
+                    //Serializer not found.
                     if (!sm.IsValid())
-                    {
-                        //Get information on which read method to call.
-                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
-                        if (!SerializeMethodExists(typeFullNameWithGenerics))
-                            sb.AppendLine(bodyIndent, $"//Serializer not found for {typeFullNameWithGenerics}. This will cause failure at runtime.");
-
-                        string readCall = $"{Generated_ReaderParameter_Name}.{FishNetConstants.Reader_Read_Name}<{typeFullNameWithGenerics}>();";
-                        sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {readCall}");
-                    }
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
                     //Serializer found.
                     else
-                    {
-                        string typeFullNameWithGenerics = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
-                        Log($"Serializer found for {typeFullNameWithGenerics}.");
-
-                        bool closeCall = true;
-                        string prefix = sm.IsGenerated() ? "Read" : sm.MethodName;
-                        sb.AppendLine(bodyIndent, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{prefix}{genericArguments}", Generated_ReaderParameter_Name, closeCall)}");
-                    }
+                        sb.AppendLine(bodyIndent, GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol.Name, closeCall: true));
                 }
 
-                sb.AppendLine();
                 sb.Append(bodyIndent, $"return {resultVariableName};");
 
                 gsm.MethodContent.Body = sb;
@@ -184,7 +161,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             int addedSerializers = 0;
-            
+
             foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetReadMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
@@ -196,7 +173,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     initializeMethod.Body.AppendLine();
 
                 initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
-                
+
                 addedSerializers++;
             }
 
@@ -205,7 +182,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
             string fileName = $"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs";
             context.AddSource($"{fileName}", sb.ToString());
-            
+
             Log($"Added class {fileName}. Added serializer count is {addedSerializers}.");
         }
 
@@ -223,13 +200,15 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Returns a SerializerMethod for a DefaultWriter of a type. Optionally returns a call to Write<T> if a DefaultWriter is not found.
-        /// </summary>
-        private bool SerializeMethodExists(string typeFullName)
+        public string GetReadCall(SerializerMethod sm, string resultVariableName, string readerVariableName, string fieldName, bool closeCall)
         {
-            SerializerMethod sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full);
-            return sm.IsValid();
+            if (!sm.IsValid())
+                return string.Empty;
+
+            if (sm.IsGenerated())
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod("ReadDelta", readerVariableName, closeCall)}";
+            else
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}", readerVariableName, closeCall)}";
         }
 
         private void Log(string txt)

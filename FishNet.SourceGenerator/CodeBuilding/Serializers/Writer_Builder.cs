@@ -125,10 +125,10 @@ namespace Roslyn.FishNet.CodeBuilding
                     //Get serializer method for the field.
                     SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
-                    //Serializer not found, call Read/Write<T>.
+                    //Serializer not found.
                     if (!sm.IsValid())
                         sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
-                    //writer found.
+                    //Serializer found.
                     else
                         sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol.Name, closeCall: true));
                 }
