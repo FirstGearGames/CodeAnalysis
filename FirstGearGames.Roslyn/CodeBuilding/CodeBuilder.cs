@@ -158,9 +158,9 @@ namespace FirstGearGames.Roslyn.CodeBuilding
                 _stringBuilder.Append(s);
             }
 
-            if (typeSymbol is IArrayTypeSymbol)
-                return $"{_stringBuilder.ToString()}[]";
-            else
+            // if (typeSymbol is IArrayTypeSymbol)
+            //     return $"{_stringBuilder.ToString()}[]";
+            // else
                 return $"<{_stringBuilder.ToString()}>";
         }
     }

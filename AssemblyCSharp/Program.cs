@@ -66,9 +66,9 @@ namespace ClientAssembly
             public byte[] ByteArr;
             public NestedStruct[] StructArr;
             public List<NestedStruct> StructLst;
-            public string String;
-            public List<NestedStruct> LstStruct;
+            public Dictionary<NestedStruct, string> StructDict;
             public ArraySegment<byte> ArrSegment;
+            public string String;
             public System.Object ObjectType;
             public AnyType<bool> GenericObjectType;
         }

@@ -137,7 +137,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                         sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
                     //Serializer found.
                     else
-                        sb.AppendLine(bodyIndent, GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol.Name, closeCall: true));
+                        sb.AppendLine(bodyIndent, GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
                 }
 
                 sb.Append(bodyIndent, $"return {resultVariableName};");
@@ -200,15 +200,24 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             return sb.ToString();
         }
 
-        public string GetReadCall(SerializerMethod sm, string resultVariableName, string readerVariableName, string fieldName, bool closeCall)
+        public string GetReadCall(SerializerMethod sm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
         {
             if (!sm.IsValid())
                 return string.Empty;
+            
+            ITypeSymbol fieldSymbolType = fieldSymbol.Type;
+            string fieldName = fieldSymbol.Name;
+
+            string arguments;
+            if (!sm.AreGenericsNamed && sm.GenericArguments.Count > 0)
+                arguments = $"{fieldSymbolType.GetGenericArgumentsString().GetCombinedGenericArguments(fieldSymbolType)}";
+            else
+                arguments = string.Empty;
 
             if (sm.IsGenerated())
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod("ReadDelta", readerVariableName, closeCall)}";
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"Read{arguments}", readerVariableName, closeCall)}";
             else
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}", readerVariableName, closeCall)}";
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall)}";
         }
 
         private void Log(string txt)

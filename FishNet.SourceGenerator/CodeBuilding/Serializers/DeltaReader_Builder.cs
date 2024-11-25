@@ -166,13 +166,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     if (!sm.IsDeltaSerializer())
                     {
                         sb.AppendLine(bodyIndent, $"//Delta serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Full serializer will be used.");
-                        sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{sm.MethodName}();");
+                        sb.AppendLine(bodyIndent + 1, _generator.ReaderBuilder.GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
                     }
                     else
                     {
                         //If here then is a delta serializer.
                         DeltaSerializerMethod dsm = sm as DeltaSerializerMethod;
-                        sb.AppendLine(bodyIndent + 1, GetReadDeltaCall(dsm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol.Name, closeCall: true));
+                        sb.AppendLine(bodyIndent + 1, GetReadDeltaCall(dsm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
                     }
 
                     /* else
@@ -246,16 +246,25 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             return sm;
         }
 
-        private string GetReadDeltaCall(DeltaSerializerMethod dsm, string resultVariableName, string readerVariableName, string fieldName, bool closeCall)
+        private string GetReadDeltaCall(DeltaSerializerMethod dsm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
         {
             if (!dsm.IsValid())
                 return string.Empty;
+
+            ITypeSymbol fieldSymbolType = fieldSymbol.Type;
+            string fieldName = fieldSymbol.Name;
+            
+            string arguments;
+            if (!dsm.AreGenericsNamed && dsm.GenericArguments.Count > 0)
+                arguments = $"{fieldSymbolType.GetGenericArgumentsString().GetCombinedGenericArguments(fieldSymbolType)}";
+            else
+                arguments = string.Empty;
             
             if (dsm.IsGenerated())
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod("ReadDelta", readerVariableName, closeCall,
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"ReadDelta{arguments}", readerVariableName, closeCall,
                     $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
             else
-                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}", readerVariableName, closeCall,
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{arguments}", readerVariableName, closeCall,
                     $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
         }
 

@@ -110,7 +110,7 @@ namespace FishNet.Serializing
         /// Writes a dictionary.
         /// </summary>
         [DefaultWriter]
-        public void WriteDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict)
+        public void WriteDictionary<T0, T1>(Dictionary<T0, T1> dict)
         {
         }
         

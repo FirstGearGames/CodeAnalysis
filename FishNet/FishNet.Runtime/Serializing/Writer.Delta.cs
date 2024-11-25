@@ -320,7 +320,7 @@ namespace FishNet.Serializing
         #endregion
  
         [DefaultDeltaWriter]
-        public bool WriteDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA, Dictionary<TKey, TValue> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
+        public bool WriteDeltaDictionary<T0, T1>(Dictionary<T0, T1> valueA, Dictionary<T0, T1> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
         [DefaultDeltaWriter]
         public bool WriteDeltaList<T0>(List<T0> valueA, List<T0> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
 
@@ -334,7 +334,7 @@ namespace FishNet.Serializing
 
 
         #region Generic.
-        public bool WriteDelta<T>(T prev, T next, DeltaSerializerOption option = DeltaSerializerOption.Unset)
+        public bool WriteDelta<T0>(T0 prev, T0 next, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
             return default;
         }

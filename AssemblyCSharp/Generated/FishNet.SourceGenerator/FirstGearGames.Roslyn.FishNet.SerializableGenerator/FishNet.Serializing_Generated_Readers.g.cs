@@ -9,11 +9,12 @@ namespace FishNet.Serializing
 			ClientAssembly.Player.NestedStruct result = new();
 
 			result.ByteArr = reader.ReadUInt8ArrayAndSizeAllocated();
-			result.StructArr = reader.ReadArrayAllocated();
-			result.StructLst = reader.ReadListAllocated();
-			result.String = reader.ReadString();
-			result.LstStruct = reader.ReadListAllocated();
+			result.StructArr = reader.ReadArrayAllocated<ClientAssembly.Player.NestedStruct>();
+			result.StructLst = reader.ReadListAllocated<ClientAssembly.Player.NestedStruct>();
+			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
+
 			result.ArrSegment = reader.ReadArraySegmentAndSize();
+			result.String = reader.ReadString();
 			//Serializer not found for type System.Object. Type will not be serialized.
 
 			//Serializer not found for type ClientAssembly.AnyType<System.Boolean>. Type will not be serialized.

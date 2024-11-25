@@ -9,9 +9,10 @@ namespace FishNet.Serializing
 			writer.WriteUInt8ArrayAndSize(value0.ByteArr);
 			writer.WriteArray(value0.StructArr);
 			writer.WriteList(value0.StructLst);
-			writer.WriteString(value0.String);
-			writer.WriteList(value0.LstStruct);
+			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
+
 			writer.WriteArraySegmentAndSize(value0.ArrSegment);
+			writer.WriteString(value0.String);
 			//Serializer not found for type System.Object. Type will not be serialized.
 
 			//Serializer not found for type ClientAssembly.AnyType<System.Boolean>. Type will not be serialized.
