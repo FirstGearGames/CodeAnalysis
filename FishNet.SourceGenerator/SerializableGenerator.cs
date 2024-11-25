@@ -86,13 +86,13 @@ namespace FirstGearGames.Roslyn.FishNet
              * so it is easier to debug sections of code where one builder
              * might be causing problems with another. */
             DeltaWriterBuilder.CreateSerializerBodies();
-            // DeltaReaderBuilder.CreateSerializerBodies();
+            DeltaReaderBuilder.CreateSerializerBodies();
             WriterBuilder.CreateSerializerBodies();
             // ReaderBuilder.CreateSerializerBodies();
             
             /* Create the class containing generated serializers. */
             DeltaWriterBuilder.CreateGeneratedSerializersClass();
-            //DeltaReaderBuilder.CreateGeneratedSerializersClass();
+            DeltaReaderBuilder.CreateGeneratedSerializersClass();
             WriterBuilder.CreateGeneratedSerializersClass();
             ReaderBuilder.CreateGeneratedSerializersClass();
 

@@ -22,6 +22,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         private const string Generated_ReaderParameter_Name = "reader";
         private const string Generated_DeltaSerializerOption_Name = DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
 
+        private static readonly StringBuilder _stringBuilder = new();
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private Serializers _serializers => _generator.Serializers;
         private SerializableGenerator _generator;
@@ -38,8 +40,8 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _rootSyntaxReceiver = rootSyntaxReceiver;
             _generator = generator;
         }
-        
-        public void CreateEmptySerializerMethods()=>CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+
+        public void CreateEmptySerializerMethods() => CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
         public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
         public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
@@ -53,14 +55,14 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         }
 
         /// <summary>
-        /// Creates an empty delta serializer method for a type.
+        /// Creates an empty serializer method for a type.
         /// </summary>
         private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Log($"{recursiveCount.ToIndent()}Trying to create reader for {typeFullName}.");
+            Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
-            if (_serializers.GetReadMethod(typeFullName, GetSerializerType.Delta).IsValid())
+            if (_serializers.GetReadMethod(serializableType.TypeSymbol, GetSerializerType.Delta, metadataName: false, out _).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
@@ -77,7 +79,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             }
 
             string header = GetMethodHeader(out string methodName);
-
             //Add to readers.
             _serializers.AddReadMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
 
@@ -85,9 +86,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             {
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
-                string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
-                inText = "";
-                sb.Append(2, $"public static {typeFullName} {mName}" + $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," + $" {inText}{typeFullName} {_serializers.GetValueParameterName(0)})");
+                sb.Append(2, $"public static {typeFullName} {mName}" + $"(this {FishNetConstants.Reader_FullName} {Generated_ReaderParameter_Name}," + $" {typeFullName} {_serializers.GetValueParameterName(0)})");
 
                 return sb.ToString();
             }
@@ -105,16 +104,19 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
 
+                Log($"Creating serializer body for {item.Value.TypeFullName}.");
+
                 const int bodyIndent = 3;
-                StringBuilder sb = new();
+                _stringBuilder.Clear();
 
                 //Make a new instance of the type to return.
                 const string resultVariableName = "result";
-                sb.AppendLine(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
+                _stringBuilder.AppendLine(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()"));
 
-                string totalFlagsVariable = "totalFlags";
-                sb.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariable, string.Empty, false));
-                sb.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}{NativeConstants.LineFeed}");
+                /* ulong totalFlags = reader.ReadPackedWhole(); */
+                string totalFlagsVariableName = "totalFlags";
+                _stringBuilder.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(NativeConstants.UInt64_FullName, totalFlagsVariableName, string.Empty, false));
+                _stringBuilder.AppendLine($" = {RoslynCodeBuilder.CallMethod(FishNetConstants.Reader_ReadUnsignedPackedWhole_Name, Generated_ReaderParameter_Name)}{NativeConstants.LineFeed}");
 
                 /* DeltaSerializerOption options = (DeltaSerializerOption)totalFlags;
                  * if (options.FastContains(DeltaSerializerOption.FullSerializer))
@@ -123,15 +125,23 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                 void CreateReadFullIf()
                 {
-                    string optionsVariable = Generated_DeltaSerializerOption_Name;
-                    sb.AppendLine(bodyIndent, $"{FishNetConstants.DeltaSerializerOption_FullName} {optionsVariable} = ({FishNetConstants.DeltaSerializerOption_FullName}){totalFlagsVariable};");
+                    ITypeSymbol typeSymbol = item.Value.TypeSymbol;
+                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
-                    SerializerMethod sm = GetFullReader(item.Key, out bool serializerFound);
-                    if (!serializerFound)
-                        sm = _generator.ReaderBuilder.CreateSerializerMethod(item.Value.TypeSymbol);
+                    string optionsVariableName = $"options";
+                    _stringBuilder.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(FishNetConstants.DeltaSerializerOption_FullName, optionsVariableName, closeLine: false));
+                    _stringBuilder.AppendLine($" = ({FishNetConstants.DeltaSerializerOption_FullName}){totalFlagsVariableName};");
 
-                    sb.AppendLine(bodyIndent, $"if ({optionsVariable}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
-                    sb.AppendLine(bodyIndent + 1, $"return {Generated_ReaderParameter_Name}.{sm.MethodName}();{NativeConstants.LineFeed}{NativeConstants.LineFeed}");
+                    _stringBuilder.AppendLine(bodyIndent, $"if ({optionsVariableName}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
+                    _stringBuilder.AppendLine(bodyIndent, "{");
+
+                    if (!sm.IsValid())
+                        _stringBuilder.AppendLine(bodyIndent + 1, $"//Serializer not found for {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                    else
+                        _stringBuilder.AppendLine(bodyIndent + 1, $"{resultVariableName} = {Generated_ReaderParameter_Name}.{sm.MethodName}();{NativeConstants.LineFeed}");
+
+                    _stringBuilder.AppendLine(bodyIndent + 1, $"return {resultVariableName};");
+                    _stringBuilder.AppendLine(bodyIndent, "}" + NativeConstants.LineFeed);
                 }
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
@@ -139,56 +149,43 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
-                    //if ((totalFlags & flag) == flag)
-                    sb.AppendLine(bodyIndent, ($"if (({totalFlagsVariable} & {fieldFlag}) == {fieldFlag})"));
-
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
-                    //Get information on which read method to call.
-                    string typeFullName = typeSymbol.GetTypeSymbolFullName(metadataName: false);
+                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out _);
 
-                    sb.AppendLine($"// {typeFullName}");
-                    //Get delta writer method for the field.
-                    DeltaSerializerMethod? dsm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Delta) as DeltaSerializerMethod;
-                    //Delta reader not found.
-                    if (!dsm.IsValid())
+                    //Neither delta nor full could be found.
+                    if (!sm.IsValid())
                     {
-                        SerializerMethod sm = GetFullReader(typeFullName, out bool serializerFound);
-                        if (!serializerFound)
-                            sm = _generator.ReaderBuilder.CreateSerializerMethod(typeSymbol);
-
-                        sb.AppendLine(bodyIndent, $"//Delta reader could not be found for type {typeFullName}. Please report this note.");
-
-                        string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
-                        sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{sm.MethodName}{genericArguments}();");
+                        _stringBuilder.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                        continue;
                     }
-                    //Delta reader found.
+
+                    //if ((totalFlags & flag) == flag)
+                    _stringBuilder.AppendLine(bodyIndent, ($"if (({totalFlagsVariableName} & {fieldFlag}) == {fieldFlag})"));
+
+                    //If is a full serializer.
+                    if (!sm.IsDeltaSerializer())
+                    {
+                        _stringBuilder.AppendLine(bodyIndent, $"//Delta serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Full serializer will be used.");
+                        //_stringBuilder.AppendLine(bodyIndent, _generator.WriterBuilder.GetWriteCall(sm, tmpWriterVariableName, fieldSymbol.Name, closeCall: true));
+                        _stringBuilder.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {Generated_ReaderParameter_Name}.{sm.MethodName}();");
+                    }
                     else
                     {
-                        //TODO get working to call method directly once delta serializers are fully supported.
-                        if (dsm.IsGenerated())
-                        {
-                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
-                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod("ReadDelta", Generated_ReaderParameter_Name, true,
-                                $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
-                        }
-                        else
-                        {
-                            string genericArguments = typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
-                            sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}{genericArguments}", Generated_ReaderParameter_Name, true,
-                                $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}")}");
-                        }
+                        //If here then is a delta serializer.
+                        DeltaSerializerMethod dsm = sm as DeltaSerializerMethod;
+                        _stringBuilder.AppendLine(bodyIndent + 1, GetReadDeltaCall(dsm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol.Name, closeCall: true));
                     }
 
                     /* else
                      *      result.FieldName = previousResult.FieldName; */
-                    sb.AppendLine(bodyIndent, ("else"));
-                    sb.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {_serializers.GetValueParameterName(0)}.{fieldSymbol.Name};{NativeConstants.LineFeed}{NativeConstants.LineFeed}");
+                    _stringBuilder.AppendLine(bodyIndent, ("else"));
+                    _stringBuilder.AppendLine(bodyIndent + 1, $"{resultVariableName}.{fieldSymbol.Name} = {_serializers.GetValueParameterName(0)}.{fieldSymbol.Name};{NativeConstants.LineFeed}");
                     fieldFlag *= 2;
                 }
 
-                sb.Append(bodyIndent, $"return {resultVariableName};");
+                _stringBuilder.Append(bodyIndent, $"return {resultVariableName};");
 
-                gsm.MethodContent.Body = sb;
+                gsm.MethodContent.Body = new StringBuilder(_stringBuilder.ToString());
             }
         }
 
@@ -248,6 +245,25 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             found = sm.IsValid();
 
             return sm;
+        }
+
+        private string GetReadDeltaCall(DeltaSerializerMethod dsm, string resultVariableName, string readerVariableName, string fieldName, bool closeCall)
+        {
+            if (dsm.IsGenerated())
+            {
+                // if (dsm.IsGenerated())
+                //     return RoslynCodeBuilder.CallMethod($"WriteDelta", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
+                // else
+                //     return RoslynCodeBuilder.CallMethod($"{dsm.MethodName}", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}");
+
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod("ReadDelta", readerVariableName, closeCall,
+                    $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
+            }
+            else
+            {
+                return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"{dsm.MethodName}", readerVariableName, closeCall,
+                    $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
+            }
         }
 
         private void Log(string txt)

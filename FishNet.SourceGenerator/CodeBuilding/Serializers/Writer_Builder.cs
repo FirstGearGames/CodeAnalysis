@@ -123,7 +123,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out string _);
+                    SerializerMethod sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     //Serializer not found, call Read/Write<T>.
                     if (!sm.IsValid())
