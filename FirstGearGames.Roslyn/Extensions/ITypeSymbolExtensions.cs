@@ -2,13 +2,24 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.Native.Constants;
 
 namespace FirstGearGames.Roslyn.Extensions
 {
+    public enum GenericArgumentType
+    {
+        /// <summary>
+        /// Will return arguments as named when possible (bool, string).
+        /// </summary>
+        PreferNamed,
+        /// <summary>
+        /// Returns arguments as generic (T0, T1).
+        /// </summary>
+        ForceGeneric,
+    }
+
     public static class ITypeSymbolExtensions
     {
         /// <summary>
@@ -35,27 +46,44 @@ namespace FirstGearGames.Roslyn.Extensions
 
             //fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}{arraySuffix}";
             fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}";
-            
+
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
         /// <summary>
-        /// 
+        /// Returns a full name with named arguments (System.Collection.Generic.List<System.String>).
         /// </summary>
         /// <param name="metadataName">True to return name as metadata.</param>
         /// <returns></returns>
-        public static string GetTypeSymbolFullNameWithTypedArguments(this ITypeSymbol typeSymbol, bool metadataName)
+        public static string GetTypeSymbolFullNameWithNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName, GenericArgumentType.PreferNamed);
+
+        /// <summary>
+        /// Returns a full name with generic arguments (System.Collection.Generic.List<T0>).
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName, GenericArgumentType.ForceGeneric);
+
+        /// <summary>
+        /// Returns a full name with arguments.
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolFullNameWithArguments(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType argumentType)
         {
             string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
 
-            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(typeSymbol);
+            string arguments;
+            if (typeSymbol is IArrayTypeSymbol)
+                arguments = "[]";
+            else
+                arguments = typeSymbol.GetGenericArgumentsString(argumentType).GetCombinedGenericArguments(typeSymbol);
 
-            return $"{fullName}{genericArguments}";
+            return $"{fullName}{arguments}";
         }
 
-        
         /// <summary>
-        /// Returns if all generic arguments are named.
+        /// Returns if all generic arguments are named (bool, string).
         /// If there are no generic arguments, returns true.
         /// </summary>
         public static bool AreGenericArgumentsNamed(this ITypeSymbol symbol)
@@ -76,29 +104,47 @@ namespace FirstGearGames.Roslyn.Extensions
             return true;
         }
 
-        public static List<string> GetGenericArgumentsString(this ITypeSymbol symbol)
+        public static List<string> GetGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType)
         {
+            bool log = (symbol.Name == "Byte");
+
             List<string> results = new();
             int typeParameterCount = 0;
 
+            bool forceGeneric = (argumentType == GenericArgumentType.ForceGeneric);
+
+            if (log)
+                Log(symbol.Name);
+
             if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
             {
+                if (log)
+                    Log("A");
                 foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
                 {
-                    if (typeArgument.TypeKind is TypeKind.TypeParameter)
+                    if (forceGeneric || typeArgument.TypeKind is TypeKind.TypeParameter)
                         results.Add($"T{typeParameterCount++}");
                     else
-                        results.Add(typeArgument.GetTypeSymbolFullNameWithTypedArguments(metadataName: false));
+                        results.Add(typeArgument.GetTypeSymbolFullNameWithNamedArguments(metadataName: false));
                 }
             }
             else if (symbol is IArrayTypeSymbol arrayTypeSymbol)
             {
-                if (arrayTypeSymbol.ElementType.TypeKind is TypeKind.TypeParameter)
+                if (log)
+                    Log("B");
+                if (forceGeneric || arrayTypeSymbol.ElementType.TypeKind is TypeKind.TypeParameter)
                     results.Add($"T{typeParameterCount++}");
                 else
-                    results.Add(arrayTypeSymbol.ElementType.GetTypeSymbolFullNameWithTypedArguments(metadataName: false));
+                    results.Add(arrayTypeSymbol.ElementType.GetTypeSymbolFullNameWithNamedArguments(metadataName: false));
+            }
+            else
+            {
+                if (log)
+                    Log("C");
             }
 
+            if (log)
+                Log($"results count {results.Count}");
             return results;
         }
 
