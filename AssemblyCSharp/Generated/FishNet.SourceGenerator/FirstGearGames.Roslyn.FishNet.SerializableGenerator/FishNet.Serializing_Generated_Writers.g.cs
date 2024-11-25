@@ -8,7 +8,8 @@ namespace FishNet.Serializing
 		{
 			writer.WriteUInt8ArrayAndSize(value0.ByteArr);
 			writer.WriteArray(value0.StructArr);
-			writer.WriteList(value0.StructLst);
+			//Serializer not found for type System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>. Type will not be serialized.
+
 			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
 
 			writer.WriteArraySegmentAndSize(value0.ArrSegment);

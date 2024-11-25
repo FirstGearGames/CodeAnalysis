@@ -194,7 +194,7 @@ namespace FishNet.Serializing
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DefaultReader]
-        public Dictionary<T0, T1> ReadDictionaryAllocated<T0, T1>()
+        public Dictionary<TKey, TValue> ReadDictionaryAllocated<TKey, TValue>()
             => default;
 
         /// <summary>
@@ -856,7 +856,7 @@ namespace FishNet.Serializing
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DefaultReader]
-        public List<T0> ReadListAllocated<T0>()
+        public List<T> ReadListAllocated<T>()
             => default;
 
         /// <summary>
@@ -866,7 +866,7 @@ namespace FishNet.Serializing
         /// <param name="allowNullification">True to allow the referenced collection to be nullified when receiving a null collection read.</param>
         /// <returns>Number of values read into the collection. UNSET is returned if the collection were read as null.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ReadList<T0>(ref List<T0> collection, bool allowNullification = false)
+        public int ReadList<T>(ref List<T> collection, bool allowNullification = false)
             => default;
 
         /// <summary>
@@ -876,7 +876,7 @@ namespace FishNet.Serializing
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DefaultReader]
-        public T0[] ReadArrayAllocated<T0>()
+        public T[] ReadArrayAllocated<T>()
             => default;
 
         /// <summary>
@@ -886,14 +886,15 @@ namespace FishNet.Serializing
         /// <param name="collection"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ReadArray<T0>(ref T0[] collection)
+        public int ReadArray<T>(ref T[] collection)
             => default;
 
         /// <summary>
         /// Reads any supported type as packed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T0 Read<T0>() => default;
+        public T Read<T>() => default;
+
         #endregion
     }
 }

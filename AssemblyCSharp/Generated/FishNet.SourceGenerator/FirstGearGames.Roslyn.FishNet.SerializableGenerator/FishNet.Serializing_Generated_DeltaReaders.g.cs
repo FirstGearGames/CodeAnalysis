@@ -17,28 +17,25 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.ByteArr = reader.ReadDeltaUInt8Array(value0.ByteArr);
+				result.ByteArr = reader.ReadDeltaUInt8ArrayAllocated(value0.ByteArr);
 			else
 				result.ByteArr = value0.ByteArr;
 
 			if ((totalFlags & 8) == 8)
-				result.StructArr = reader.ReadDeltaArrayAllocated<ClientAssembly.Player.NestedStruct>(value0.StructArr);
+				result.StructArr = reader.ReadDeltaUArrayAllocated<ClientAssembly.Player.NestedStruct>(value0.StructArr);
 			else
 				result.StructArr = value0.StructArr;
 
-			if ((totalFlags & 16) == 16)
-				result.StructLst = reader.ReadDeltaListAllocated<ClientAssembly.Player.NestedStruct>(value0.StructLst);
-			else
-				result.StructLst = value0.StructLst;
+			//Serializer not found for type System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>. Type will not be serialized.
 
 			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
 
-			if ((totalFlags & 32) == 32)
+			if ((totalFlags & 16) == 16)
 				result.ArrSegment = reader.ReadDeltaArraySegment(value0.ArrSegment);
 			else
 				result.ArrSegment = value0.ArrSegment;
 
-			if ((totalFlags & 64) == 64)
+			if ((totalFlags & 32) == 32)
 			//Delta serializer not found for type System.String. Full serializer will be used.
 				result.String = reader.ReadString();
 			else

@@ -53,6 +53,7 @@ namespace FirstGearGames.Roslyn.Extensions
             return $"{fullName}{genericArguments}";
         }
 
+        
         /// <summary>
         /// Returns if all generic arguments are named.
         /// If there are no generic arguments, returns true.
@@ -100,12 +101,6 @@ namespace FirstGearGames.Roslyn.Extensions
 
             return results;
         }
-
-        /// <summary>
-        /// Returns fullName wrapped as in generic arguments.
-        /// For example: System.Byte returns <System.Byte>.
-        /// </summary>
-        public static string GetTypeSymbolFullNameAsGenericArgument(this ITypeSymbol typeSymbol, bool metadataName) => $"<{typeSymbol.GetTypeSymbolFullName(metadataName)}>";
 
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {

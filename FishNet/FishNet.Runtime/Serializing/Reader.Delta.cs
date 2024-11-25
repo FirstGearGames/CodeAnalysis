@@ -244,13 +244,13 @@ namespace FishNet.Serializing
         public Dictionary<TKey, TValue> ReadDeltaDictionaryAllocated<TKey, TValue>(Dictionary<TKey, TValue> valueA) => default;
 
         [DefaultDeltaReader]
-        public List<T0> ReadDeltaListAllocated<T0>(List<T0> valueA) => default;
+        public List<T> ReadDeltaListAllocated<T>(List<T> valueA) => default;
 
         [DefaultDeltaReader]
-        public byte[] ReadDeltaUInt8Array(byte[] valueA) => default;
+        public byte[] ReadDeltaUInt8ArrayAllocated(byte[] valueA) => default;
 
         [DefaultDeltaReader]
-        public T0[] ReadDeltaArrayAllocated<T0>(T0[] valueA) => default;
+        public T[] ReadDeltaUArrayAllocated<T>(T[] valueA) => default;
 
         [DefaultDeltaReader]
         public ArraySegment<byte> ReadDeltaArraySegment(ArraySegment<byte> valueA) => default;
@@ -261,7 +261,7 @@ namespace FishNet.Serializing
         /// <summary>
         /// Reads a delta of any time.
         /// </summary>
-        public T0 ReadDelta<T0>(T0 prev)
+        public T ReadDelta<T>(T prev)
         {
             return default;
         }

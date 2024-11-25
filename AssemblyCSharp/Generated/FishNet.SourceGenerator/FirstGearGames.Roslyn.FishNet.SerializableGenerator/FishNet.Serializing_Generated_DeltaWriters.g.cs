@@ -23,17 +23,16 @@ namespace FishNet.Serializing
 			if (pooledWriter.WriteDeltaArray(value0.StructArr, value1.StructArr))
 				totalFlags += 8;
 
-			if (pooledWriter.WriteDeltaList(value0.StructLst, value1.StructLst))
-				totalFlags += 16;
+			//Serializer not found for type System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>. Type will not be serialized.
 
 			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
 
 			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
-				totalFlags += 32;
+				totalFlags += 16;
 
 			//Delta serializer not found for type System.String. Full serializer will be used.
 			pooledWriter.WriteString(value0.String);
-				totalFlags += 64;
+				totalFlags += 32;
 
 			//Serializer not found for type System.Object. Type will not be serialized.
 
