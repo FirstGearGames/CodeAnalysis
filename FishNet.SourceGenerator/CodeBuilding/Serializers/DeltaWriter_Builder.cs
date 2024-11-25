@@ -131,7 +131,7 @@ namespace Roslyn.FishNet.CodeBuilding
                     sb.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariableName));
 
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent + 1, $"//Serializer not found for {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                        sb.AppendLine(bodyIndent + 1, $"//Serializer not found for {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
                     else
                         sb.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{sm.MethodName}({_serializers.GetValueParameterName(1)});");
 
@@ -156,14 +156,14 @@ namespace Roslyn.FishNet.CodeBuilding
                     //Neither delta nor full could be found.
                     if (!sm.IsValid())
                     {
-                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
                         continue;
                     }
 
                     //If is a full serializer.
                     if (!sm.IsDeltaSerializer())
                     {
-                        sb.AppendLine(bodyIndent, $"//Delta serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Full serializer will be used.");
+                        sb.AppendLine(bodyIndent, $"//Delta serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Full serializer will be used.");
                         sb.AppendLine(bodyIndent, _generator.WriterBuilder.GetWriteCall(sm, tmpWriterVariableName, fieldSymbol.Name, closeCall: true));
                     }
                     else

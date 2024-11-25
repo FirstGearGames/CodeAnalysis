@@ -44,7 +44,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
         public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}>");
+            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
                     //Serializer not found.
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
                     //Serializer found.
                     else
                         sb.AppendLine(bodyIndent, GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
@@ -210,7 +210,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
             string arguments;
             if (!sm.AreGenericsNamed && sm.GenericArguments.Count > 0)
-                arguments = $"{fieldSymbolType.GetGenericArgumentsString().GetCombinedGenericArguments(fieldSymbolType)}";
+                arguments = $"{fieldSymbolType.GetGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments(fieldSymbolType)}";
             else
                 arguments = string.Empty;
 

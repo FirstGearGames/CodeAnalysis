@@ -7,11 +7,9 @@ namespace FishNet.Serializing
 		public static void GWrite___WriteClientAssembly_Player_NestedStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.NestedStruct value0)
 		{
 			writer.WriteUInt8ArrayAndSize(value0.ByteArr);
-			writer.WriteArray(value0.StructArr);
-			//Serializer not found for type System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>. Type will not be serialized.
-
-			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
-
+			writer.Write(value0.StructArr);
+			writer.WriteList(value0.StructLst);
+			writer.WriteDictionary(value0.StructDict);
 			writer.WriteArraySegmentAndSize(value0.ArrSegment);
 			writer.WriteString(value0.String);
 			//Serializer not found for type System.Object. Type will not be serialized.

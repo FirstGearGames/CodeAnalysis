@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using System.Text;
 using FirstGearGames.Roslyn.CodeBuilding;
@@ -88,6 +89,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         public readonly List<string> GenericArguments;
         /// <summary>
+        /// True if there are any generic arguments.
+        /// </summary>
+        public bool HasGenericArguments => (GenericArguments.Count > 0);
+        /// <summary>
         /// True if generic arguments are named.
         /// </summary>
         public bool AreGenericsNamed;
@@ -96,23 +101,16 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         public readonly MethodContent MethodContent;
 
-        /// <summary>
-        /// True if TypeSymbol is IArrayType.
-        /// </summary>
-        private readonly bool _isArrayType;
-
         public SerializerMethod() { }
 
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName)
         {
             TypeSymbol = typeSymbol;
-            TypeFullName = typeSymbol.GetTypeSymbolFullNameWithTypedArguments(metadataName: false);
+            TypeFullName = typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
             AreGenericsNamed = typeSymbol.AreGenericArgumentsNamed();
-            GenericArguments = typeSymbol.GetGenericArgumentsString();
+            GenericArguments = typeSymbol.GetGenericArgumentsString(GenericArgumentType.PreferNamed);
             MethodName = methodName;
             MethodContent = new();
-
-            _isArrayType = (typeSymbol is IArrayTypeSymbol);
         }
 
         public SerializerMethod(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody) : this(typeSymbol, methodName)
@@ -130,34 +128,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         /// </summary>
         /// <returns></returns>
         public virtual bool IsDeltaSerializer() => false;
-
-        /// <summary>
-        /// Creates arguments to be passed in when returning this type.
-        /// </summary>
-        /// <returns></returns>
-        public string ToReturnArguments(ITypeSymbol returnedTypeSymbol)
-        {
-            const bool metadataName = false;
-            
-            if (returnedTypeSymbol is IArrayTypeSymbol arrayTypeSymbol)
-            {
-                //Named arguments do not need to be specified.
-                if (AreGenericsNamed)
-                    return string.Empty;
-                else
-                    return $"<{arrayTypeSymbol.ElementType.GetSymbolFullName(metadataName)}>";
-            }
-            else
-            {
-                //Not generic.
-                if (returnedTypeSymbol is not INamedTypeSymbol { IsGenericType: true } namedTypeSymbol) return string.Empty;
-
-                if (AreGenericsNamed)
-                    return string.Empty;
-                else
-                    return returnedTypeSymbol.GetGenericArgumentsString().GetCombinedGenericArguments(returnedTypeSymbol);
-            }
-        }
     }
 
     public class DeltaSerializerMethod : SerializerMethod

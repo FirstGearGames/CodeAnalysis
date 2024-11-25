@@ -11,6 +11,7 @@
 			FishNet.Serializing.DeltaSerializerOption options = (FishNet.Serializing.DeltaSerializerOption)totalFlags;
 			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
 			{
+				
 				result = reader.GRead___ReadClientAssembly_Player_NestedStruct();
 
 				return result;
@@ -22,20 +23,26 @@
 				result.ByteArr = value0.ByteArr;
 
 			if ((totalFlags & 8) == 8)
-				result.StructArr = reader.ReadDeltaUArrayAllocated<ClientAssembly.Player.NestedStruct>(value0.StructArr);
+				result.StructArr = reader.ReadDelta(value0.StructArr);
 			else
 				result.StructArr = value0.StructArr;
 
-			//Serializer not found for type System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>. Type will not be serialized.
-
-			//Serializer not found for type System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>. Type will not be serialized.
-
 			if ((totalFlags & 16) == 16)
+				result.StructLst = reader.ReadDeltaListAllocated<ClientAssembly.Player.NestedStruct>(value0.StructLst);
+			else
+				result.StructLst = value0.StructLst;
+
+			if ((totalFlags & 32) == 32)
+				result.StructDict = reader.ReadDeltaDictionaryAllocated<ClientAssembly.Player.NestedStruct, System.String>(value0.StructDict);
+			else
+				result.StructDict = value0.StructDict;
+
+			if ((totalFlags & 64) == 64)
 				result.ArrSegment = reader.ReadDeltaArraySegment(value0.ArrSegment);
 			else
 				result.ArrSegment = value0.ArrSegment;
 
-			if ((totalFlags & 32) == 32)
+			if ((totalFlags & 128) == 128)
 			//Delta serializer not found for type System.String. Full serializer will be used.
 				result.String = reader.ReadString();
 			else
