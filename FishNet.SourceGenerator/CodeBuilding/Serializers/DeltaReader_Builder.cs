@@ -136,7 +136,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     sb.AppendLine(bodyIndent, "{");
 
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent + 1, $"//Serializer not found for {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                        sb.AppendLine(bodyIndent + 1, $"//Serializer not found for {typeSymbol.ToReadable()}. Type will not be serialized.{NativeConstants.LineFeed}");
                     else
                         sb.AppendLine(bodyIndent + 1, $"{resultVariableName} = {Generated_ReaderParameter_Name}.{sm.MethodName}();{NativeConstants.LineFeed}");
 
@@ -149,14 +149,17 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                 ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
+                    string toReadable = item.Value.TypeSymbol.ToReadable(fieldSymbol);
+                    
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
+                    Debugg.Log("");
                     Log($"Getting reader for field name {fieldSymbol.Name}");
                     SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out _);
 
                     //Neither delta nor full could be found.
                     if (!sm.IsValid())
                     {
-                        sb.AppendLine(bodyIndent, $"//Serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Type will not be serialized.{NativeConstants.LineFeed}");
+                        sb.AppendLine(bodyIndent, $"//Serializer not found for {toReadable}. Value will not be serialized.{NativeConstants.LineFeed}");
                         continue;
                     }
 
@@ -166,7 +169,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     //If is a full serializer.
                     if (!sm.IsDeltaSerializer())
                     {
-                        sb.AppendLine(bodyIndent, $"//Delta serializer not found for type {typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}. Full serializer will be used.");
+                        sb.AppendLine(bodyIndent, $"//Delta serializer not found for {toReadable}. Full serializer will be used.");
                         sb.AppendLine(bodyIndent + 1, _generator.ReaderBuilder.GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
                     }
                     else

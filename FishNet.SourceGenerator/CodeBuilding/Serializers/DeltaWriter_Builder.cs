@@ -272,7 +272,7 @@ namespace Roslyn.FishNet.CodeBuilding
             if (!dsm.IsValid())
                 return string.Empty;
 
-            Make this specify arguments like the reader. While this is not needed since type is assumed when
+            //Make this specify arguments like the reader. While this is not needed since type is assumed when
             /* Make this specify arguments like the reader. While this is not needed since type is assumed when
              * its used as a parameter doing so will show the serializers are generating properly. Code can be taken from
              * GetReadCall. */

@@ -85,10 +85,10 @@ namespace FirstGearGames.Roslyn.FishNet
              * creating the class with the empty serializer methods
              * so it is easier to debug sections of code where one builder
              * might be causing problems with another. */
-            DeltaWriterBuilder.CreateSerializerBodies();
+            //DeltaWriterBuilder.CreateSerializerBodies();
             DeltaReaderBuilder.CreateSerializerBodies();
-            WriterBuilder.CreateSerializerBodies();
-            ReaderBuilder.CreateSerializerBodies();
+            //WriterBuilder.CreateSerializerBodies();
+            //ReaderBuilder.CreateSerializerBodies();
             
             /* Create the class containing generated serializers. */
             DeltaWriterBuilder.CreateGeneratedSerializersClass();

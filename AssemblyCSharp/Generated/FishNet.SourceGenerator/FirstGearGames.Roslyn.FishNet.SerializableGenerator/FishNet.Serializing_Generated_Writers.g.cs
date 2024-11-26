@@ -11,23 +11,11 @@ namespace FishNet.Serializing
 
 		public static void GWrite___WriteClientAssembly_Player_NestedStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.NestedStruct value0)
 		{
-			writer.GWrite___WriteClientAssembly_Player_EmptyStruct(value0.Struct);
-			writer.WriteUInt8ArrayAndSize(value0.ByteArr);
-			writer.WriteArray(value0.StructArr);
-			writer.WriteList(value0.StructLst);
-			writer.WriteDictionary(value0.StructDict);
-			writer.WriteArraySegmentAndSize(value0.ArrSegment);
-			writer.WriteString(value0.String);
-			//Serializer not found for type System.Object. Type will not be serialized.
-
-			//Serializer not found for type ClientAssembly.AnyType<System.Boolean>. Type will not be serialized.
-
 
 		}
 
 		public static void GWrite___WriteClientAssembly_Player_MyStructC(this FishNet.Serializing.Writer writer, ClientAssembly.Player.MyStructC value0)
 		{
-			writer.WriteBoolean(value0.Works);
 
 		}
 

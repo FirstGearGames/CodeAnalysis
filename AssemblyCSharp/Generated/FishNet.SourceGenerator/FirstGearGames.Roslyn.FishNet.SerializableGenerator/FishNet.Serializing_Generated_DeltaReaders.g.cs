@@ -47,30 +47,39 @@
 			else
 				result.StructArr = value0.StructArr;
 
+			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrMultiDimensional. Value will not be serialized.
+
+			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrJagged. Value will not be serialized.
+
 			if ((totalFlags & 32) == 32)
 				result.StructLst = reader.ReadDeltaListAllocated<ClientAssembly.Player.NestedStruct>(value0.StructLst);
 			else
 				result.StructLst = value0.StructLst;
 
 			if ((totalFlags & 64) == 64)
+				result.TupleLst = reader.ReadDeltaListAllocated<System.ValueTuple<System.Boolean, System.String>>(value0.TupleLst);
+			else
+				result.TupleLst = value0.TupleLst;
+
+			if ((totalFlags & 128) == 128)
 				result.StructDict = reader.ReadDeltaDictionaryAllocated<ClientAssembly.Player.NestedStruct, System.String>(value0.StructDict);
 			else
 				result.StructDict = value0.StructDict;
 
-			if ((totalFlags & 128) == 128)
+			if ((totalFlags & 256) == 256)
 				result.ArrSegment = reader.ReadDeltaArraySegment(value0.ArrSegment);
 			else
 				result.ArrSegment = value0.ArrSegment;
 
-			if ((totalFlags & 256) == 256)
-			//Delta serializer not found for type System.String. Full serializer will be used.
+			if ((totalFlags & 512) == 512)
+			//Delta serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.String. Full serializer will be used.
 				result.String = reader.ReadString();
 			else
 				result.String = value0.String;
 
-			//Serializer not found for type System.Object. Type will not be serialized.
+			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.ObjectType. Value will not be serialized.
 
-			//Serializer not found for type ClientAssembly.AnyType<System.Boolean>. Type will not be serialized.
+			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.GenericObjectType. Value will not be serialized.
 
 			return result;
 		}

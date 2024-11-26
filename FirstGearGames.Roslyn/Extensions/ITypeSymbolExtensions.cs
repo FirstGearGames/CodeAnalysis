@@ -2,7 +2,9 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.Native.Constants;
@@ -23,6 +25,8 @@ namespace FirstGearGames.Roslyn.Extensions
 
     public static class ITypeSymbolExtensions
     {
+        private static StringBuilder _stringBuilder = new();
+        
         /// <summary>
         /// 
         /// </summary>
@@ -35,7 +39,7 @@ namespace FirstGearGames.Roslyn.Extensions
 
             //If generic then just return our consts for generic.
             if (typeSymbol.TypeKind is TypeKind.TypeParameter)
-                return NativeConstants.GeneralParameter_Name;
+                return NativeConstants.FirstGenericParameter_Name;
 
             string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
@@ -79,6 +83,43 @@ namespace FirstGearGames.Roslyn.Extensions
             return $"{fullName}{genericArguments}";
         }
 
+        
+        
+        /// <summary>
+        /// Returns type as a generic array, if an array (T0[], T0[][]). If not an array empty is returned. 
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolAsGenericArray(this ITypeSymbol typeSymbol, bool metadataName)
+        {
+            if (typeSymbol is not IArrayTypeSymbol arrayTypeSymbol)
+                return string.Empty;
+
+            _stringBuilder.Clear();
+            _stringBuilder.Append($"{NativeConstants.FirstGenericParameter_Name}[");
+
+            AppendMultidimensionalAndJagged(arrayTypeSymbol);
+            
+            void AppendMultidimensionalAndJagged(IArrayTypeSymbol arrSym)
+            {
+                for (int i = 1; i < arrSym.Rank; i++)
+                    _stringBuilder.Append(",");
+
+                if (arrSym.ElementType is IArrayTypeSymbol jaggedElement)
+                {
+                    _stringBuilder.Append("][");
+                    AppendMultidimensionalAndJagged(jaggedElement);
+                }
+            }
+
+            _stringBuilder.Append("]");
+
+            Debugg.Log($"Tuple? {arrayTypeSymbol.IsTupleType}. Element type? {arrayTypeSymbol.ElementType.TypeKind}");
+            
+            return _stringBuilder.ToString();
+        }
+
+        
         public static List<string> GetGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType)
         {
             List<string> results = new();
@@ -143,6 +184,25 @@ namespace FirstGearGames.Roslyn.Extensions
         public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
+        }
+
+        /// <summary>
+        /// Returns a string as readable context (UserStruct.SomeField).
+        /// </summary>
+        public static string ToReadable(this ITypeSymbol typeSymbol) => ToReadable(typeSymbol, fieldSymbol: null);
+
+        /// <summary>
+        /// Returns a string as readable context (UserStruct.SomeField).
+        /// </summary>
+        public static string ToReadable(this ITypeSymbol typeSymbol, IFieldSymbol? fieldSymbol)
+        {
+            bool metadataName = false;
+            _stringBuilder.Clear();
+            _stringBuilder.Append(typeSymbol.GetTypeSymbolFullName(metadataName));
+            if (fieldSymbol != null)
+                _stringBuilder.Append($".{fieldSymbol.GetSymbolFullName(metadataName)}");
+
+            return _stringBuilder.ToString();
         }
 
         public static IEnumerable<ITypeSymbol> EnumerateTypeHierarchy(this ITypeSymbol thisTypeSymbol)
