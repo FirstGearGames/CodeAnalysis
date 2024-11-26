@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.Native.Constants;
+using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 {
@@ -8,18 +10,26 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
     {
         private static StringBuilder _stringBuilder = new();
 
-    
+        /// <summary>
+        /// Appends a line to stringBuilder indicating a serializer could not be found.
+        /// </summary>
+        public static string GetMissingSerializerComment(bool deltaSerializer, ITypeSymbol typeSymbol, IFieldSymbol? fieldSymbol = null)
+        {
+            if (deltaSerializer)
+                return $"//Delta serializer not found for {typeSymbol.ToReadable(fieldSymbol)}; full serializer will be used.";
+            else
+                return $"//Serializer not found for {typeSymbol.ToReadable(fieldSymbol)}. Value will not be serialized.";
+        }
+
         /// <summary>
         /// Calls WriterPool to return a pooled writer.
         /// </summary>
         /// <param name="writerVariableName">Variable name result of </param>
-        public static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "",
-            bool closeCall = true)
+        public static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "", bool closeCall = true)
         {
             _stringBuilder.Clear();
             writerVariableName = $"{variablePrefix}pooledWriter";
-            _stringBuilder.Append(
-                $"{_stringBuilder.ToString()}{FishNetConstants.PooledWriter_FullName} {writerVariableName} = {FishNetConstants.WriterPool_Retrieve_Name}()");
+            _stringBuilder.Append($"{_stringBuilder.ToString()}{FishNetConstants.PooledWriter_FullName} {writerVariableName} = {FishNetConstants.WriterPool_Retrieve_Name}()");
             if (closeCall)
                 _stringBuilder.Append(';');
 
@@ -45,21 +55,19 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
             //writer.WriteArraySegment(otherWriteA.GetArraySegment())
             _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_Position_Name}");
-            
+
             if (closeCall)
                 _stringBuilder.Append(';');
 
             return _stringBuilder.ToString();
         }
 
-
         public static string CallWriteArraySegment(string writerName, string otherWriterA, bool closeCall = true)
         {
             _stringBuilder.Clear();
 
             //writer.WriteArraySegment(otherWriteA.GetArraySegment())
-            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteArraySegment_Name}(" +
-                                  $"{otherWriterA}.{FishNetConstants.Writer_GetArraySegment_Name}())");
+            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteArraySegment_Name}(" + $"{otherWriterA}.{FishNetConstants.Writer_GetArraySegment_Name}())");
             if (closeCall)
                 _stringBuilder.Append(';');
 
@@ -71,15 +79,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             _stringBuilder.Clear();
 
             //writer.WriteArraySegment(otherWriteA.GetArraySegmentAndSize())
-            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteArraySegmentAndSize_Name}(" +
-                                  $"{otherWriterA}.{FishNetConstants.Writer_GetArraySegment_Name}())");
+            _stringBuilder.Append($"{writerName}.{FishNetConstants.Writer_WriteArraySegmentAndSize_Name}(" + $"{otherWriterA}.{FishNetConstants.Writer_GetArraySegment_Name}())");
             if (closeCall)
                 _stringBuilder.Append(';');
 
             return _stringBuilder.ToString();
         }
 
-        
         public static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
         {
             StringBuilder sb = new();
@@ -88,6 +94,5 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
             return new MethodContent(sb);
         }
-
     }
 }

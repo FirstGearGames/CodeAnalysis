@@ -253,6 +253,9 @@ namespace FishNet.Serializing
         public T[] ReadDeltaArrayAllocated<T>(T[] valueA) => default;
 
         [DefaultDeltaReader]
+        public T[][] ReadDeltaJaggedArrayAllocated<T>(T[][] valueA) => default;
+        
+        [DefaultDeltaReader]
         public ArraySegment<byte> ReadDeltaArraySegment(ArraySegment<byte> valueA) => default;
 
 
