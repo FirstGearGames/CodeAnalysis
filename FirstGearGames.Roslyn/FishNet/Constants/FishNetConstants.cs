@@ -20,6 +20,10 @@
         /// FishNet.Object.Prediction namespace.
         /// </summary>
         public const string Prediction_Namespace = "FishNet.Object.Prediction";
+        /// <summary>
+        /// FishNet.Broadcast namespace.
+        /// </summary>
+        public const string Broadcast_Namespace = "FishNet.Broadcast";
 
         #endregion
 
@@ -27,11 +31,11 @@
         /// <summary>
         /// IReplicate interface.
         /// </summary>
-        public const string IReplicate_FullName = $"{Prediction_Namespace}.IReplicateData";
+        public const string IReplicateInterface_FullName = $"{Prediction_Namespace}.IReplicateData";
         /// <summary>
         /// IReplicate interface.
         /// </summary>
-        public const string IReconcile_FullName = $"{Prediction_Namespace}.IReconcileData";
+        public const string IReconcileInterface_FullName = $"{Prediction_Namespace}.IReconcileData";
         #endregion
 
         #region Codegenerating special.
@@ -64,6 +68,13 @@
         /// </summary>
         public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";
 
+        #endregion
+        
+        #region Broadcasts.
+        /// <summary>
+        /// IBroadcast interface.
+        /// </summary>
+        public const string BroadcastsInterface_FullName = $"{Broadcast_Namespace}.IBroadcast";
         #endregion
 
         #region DeltaSerializing.

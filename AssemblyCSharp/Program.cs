@@ -1,4 +1,5 @@
-﻿using FishNet.CodeGenerating;
+﻿using FishNet.Broadcast;
+using FishNet.CodeGenerating;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using FishNet.Runtime.Unity_Stuff;
@@ -62,7 +63,11 @@ namespace ClientAssembly
     {
         public struct EmptyStruct { }
 
-        [IncludeSerialization]
+        public struct BroadcastStruct : IBroadcast
+        {
+            public bool IsBroadcast;
+        }
+
         public struct NestedStruct : IReplicateData
         {
             public EmptyStruct Struct;

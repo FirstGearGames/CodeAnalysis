@@ -30,7 +30,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(null, namedTypeSymbol);
+            FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
 
         public void FindStructSerializables(SyntaxNodeAnalysisContext context, StructDeclarationSyntax structDeclaration)
@@ -46,7 +46,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(null, namedTypeSymbol);
+            FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
 
         public void FindClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
@@ -61,16 +61,14 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
             if (symbol is not IMethodSymbol methodSymbol) return;
-            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
 
-            FindRpcSerializables(null, methodSymbol);
+            FindRpcSerializables(context, methodSymbol);
         }
 
         public void FindRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
             if (symbol is not IMethodSymbol methodSymbol) return;
-            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
 
             FindRpcSerializables(context, methodSymbol);
         }
@@ -148,14 +146,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// </summary>
         public void FindNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol)
         {
-            const bool isMetadataName = false;
-
-            bool canSerialize = ImplementsPredictionInterface(namedTypeSymbol);
-            if (!canSerialize)
-                canSerialize |= namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName, isMetadataName);
-
-            //Nothing indicates value can be serialized.
-            if (!canSerialize)
+            if (!namedTypeSymbol.HasAnySerializable())
                 return;
 
             /* FullNames added this iteration.
@@ -180,15 +171,6 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                     break;
                 else
                     namedTypeSymbol = nts;
-            }
-
-            //Returns if a symbol implements prediction interfaces.
-            bool ImplementsPredictionInterface(INamedTypeSymbol theSymbol)
-            {
-                if (theSymbol.ImplementsInterface(FishNetConstants.IReplicate_FullName)) return true;
-                if (theSymbol.ImplementsInterface(FishNetConstants.IReconcile_FullName)) return true;
-
-                return false;
             }
         }
 

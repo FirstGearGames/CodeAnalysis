@@ -25,7 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Constants\FishNetConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Constants\UnityConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\DebugHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\RpcHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\RpcHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializableType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializerReceiver.cs" />
   </ItemGroup>
