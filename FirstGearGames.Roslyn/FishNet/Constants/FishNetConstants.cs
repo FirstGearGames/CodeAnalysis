@@ -3,7 +3,10 @@
     public class FishNetConstants
     {
         #region Namespaces and assemblies.
-
+        /// <summary>
+        /// FishNet.Object.Synchronizing namespace.
+        /// </summary>
+        public const string Object_Synchronizing_Namespace = "FishNet.Object.Synchronizing";
         /// <summary>
         /// FishNet.Serializing namespace.
         /// </summary>
@@ -77,6 +80,29 @@
         public const string BroadcastsInterface_FullName = $"{Broadcast_Namespace}.IBroadcast";
         #endregion
 
+        #region SyncTypes.
+        /// <summary>
+        /// SyncBase class.
+        /// </summary>
+        public const string SyncBase_FullName = $"{Object_Synchronizing_Namespace}.SyncBase";
+        /// <summary>
+        /// SyncDictionary class.
+        /// </summary>
+        public const string SyncDictionary_FullName =$"{Object_Synchronizing_Namespace}.SyncDictionary";
+        /// <summary>
+        /// SyncHashSet class.
+        /// </summary>
+        public const string SyncHashSet_FullName =$"{Object_Synchronizing_Namespace}.SyncHashSet";
+        /// <summary>
+        /// SyncList class.
+        /// </summary>
+        public const string SyncList_FullName =$"{Object_Synchronizing_Namespace}.SyncList";
+        /// <summary>
+        /// SyncVar class.
+        /// </summary>
+        public const string SyncVar_FullName =$"{Object_Synchronizing_Namespace}.SyncVar";
+        #endregion
+        
         #region DeltaSerializing.
 
         /// <summary>

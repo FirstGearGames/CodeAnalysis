@@ -28,6 +28,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         public void FindStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
+            if (symbol == null) return;
+
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
             FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
@@ -36,6 +38,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         public void FindStructSerializables(SyntaxNodeAnalysisContext context, StructDeclarationSyntax structDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
+            if (symbol == null) return;
+
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
             FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
@@ -44,6 +48,8 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         public void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
+            if (symbol == null) return;
+
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
             FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
@@ -52,14 +58,48 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         public void FindClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
+            if (symbol == null) return;
+
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
             FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
+        }
+        
+        public void FindSyncTypeSerializables(GeneratorSyntaxContext context, FieldDeclarationSyntax fieldDeclaration)
+        {
+            IFieldSymbol? fieldSymbol = context.SemanticModel.GetFieldSymbol(fieldDeclaration);
+            if (fieldSymbol == null) return;
+
+            FindSyncTypeSerializables(context, fieldSymbol);
+        }
+
+        public void FindSyncTypeSerializables(SyntaxNodeAnalysisContext context, FieldDeclarationSyntax fieldDeclarationSyntax)
+        {
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, fieldDeclarationSyntax);
+            if (symbol == null)
+                return;
+
+            if (symbol is not IFieldSymbol fieldSymbol) return;
+
+            FindSyncTypeSerializables(context, fieldSymbol);
+        }
+                
+        public void FindSyncTypeSerializables(object context, IFieldSymbol fieldSymbol)
+        {
+            SyncTypeType stt = fieldSymbol.GetSyncType();
+            Currently this iterates fields in everything. Structs, classes, so on.
+            /*  Currently this iterates fields in everything. Structs, classes, so on.
+             * This only needs to check fields in classes which inherit NetworkBehaviour.
+             * Make that change before proceeding. Recommended action is in ClassDeclarationSyntax get
+             * fields and check them.*/
         }
 
         public void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
+            if (symbol == null)
+                return;
+
             if (symbol is not IMethodSymbol methodSymbol) return;
 
             FindRpcSerializables(context, methodSymbol);
@@ -68,6 +108,9 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         public void FindRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
+            if (symbol == null)
+                return;
+
             if (symbol is not IMethodSymbol methodSymbol) return;
 
             FindRpcSerializables(context, methodSymbol);

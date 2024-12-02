@@ -2,6 +2,7 @@
 using FishNet.CodeGenerating;
 using FishNet.Object;
 using FishNet.Object.Prediction;
+using FishNet.Object.Synchronizing;
 using FishNet.Runtime.Unity_Stuff;
 using FishNet.Serializing;
 using FishNet.Transporting;
@@ -61,6 +62,8 @@ namespace ClientAssembly
     }
     public class Player : NetworkBehaviour
     {
+        public SyncVar<int> _mySyncVar;
+        
         public struct EmptyStruct { }
 
         public struct BroadcastStruct : IBroadcast

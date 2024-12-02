@@ -39,86 +39,6 @@ namespace FirstGearGames.Roslyn.Extensions
         
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
-        //
-        // /// <summary>
-        // /// Returns the full name of a symbol which includes the namespace.
-        // /// </summary>
-        // /// <param name="metadataName">True to return name as metadata.</param>
-        // public static string GetSymbolFullNameWithGenerics(this ISymbol symbol, bool metadataName)
-        // {
-        //     string fullName = symbol.GetSymbolFullName(metadataName);
-        //     string genericArguments = symbol.GetGenericArgumentsString().GetCombinedGenericArguments(symbol);
-        //
-        //     return $"{fullName}{genericArguments}";
-        // }
-        //
-        //
-        // /// <summary>
-        // /// Returns generic arguments as ITypeSymbols.
-        // /// </summary>
-        // public static List<ITypeSymbol> GetGenericArgumentsTypeSymbol(this ISymbol symbol)
-        // {
-        //     List<ITypeSymbol> results = new();
-        //
-        //     if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-        //         results.AddRange(namedTypeSymbol.TypeArguments.ToList());
-        //
-        //     return results;
-        // }
-        //
-        //
-        // /// <summary>
-        // /// Returns generic arguments count.
-        // /// </summary>
-        // public static int GetGenericArgumentsCount(this ISymbol symbol)
-        // {
-        //     if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-        //         return namedTypeSymbol.TypeArguments.Length;
-        //
-        //     return 0;
-        // }
-        //
-        //
-        // /// <summary>
-        // /// Returns generic arguments as fullName strings.
-        // /// </summary>
-        // public static List<string> GetGenericArgumentsString(this ISymbol symbol)
-        // {
-        //     List<string> results = new();
-        //     int typeParameterCount = 0;
-        //
-        //     if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
-        //     {
-        //         foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
-        //         {
-        //             if (typeArgument.TypeKind is TypeKind.TypeParameter)
-        //                 results.Add($"T{typeParameterCount++}");
-        //             else
-        //                 results.Add(typeArgument.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
-        //         }
-        //     }
-        //     else if (symbol is IArrayTypeSymbol arrayTypeSymbol)
-        //     {
-        //         if (arrayTypeSymbol.ElementType.TypeKind is TypeKind.TypeParameter)
-        //             results.Add($"T{typeParameterCount++}");
-        //         else
-        //             results.Add(arrayTypeSymbol.ElementType.GetTypeSymbolFullNameWithGenericArguments(metadataName: false));
-        //     }
-        //     
-        //     return results;
-        // }
-        //
-
-        //
-        // /// <summary>
-        // /// Adds generic arguments onto a string in the fashion of <type, type2, type3>.
-        // /// </summary>
-        // public static string AddGenericArguments(this string str, ISymbol symbol)
-        // {
-        //     List<string> results = symbol.GetGenericArgumentsString();
-        //
-        //     return $"{str}{results.GetCombinedGenericArguments()}";
-        // }
 
 
         /// <summary>
@@ -181,6 +101,17 @@ namespace FirstGearGames.Roslyn.Extensions
             foreach (string fullyQualifiedAttributeName in attributeFullNames)
                 if (thisSymbol.HasAttribute(fullyQualifiedAttributeName, isMetadataNames))
                     return true;
+
+            return false;
+        }
+        
+        /// <summary>
+        /// True if symbol inherits base class anywhere along hierarchy.
+        /// </summary>
+        public static bool InheritsClass(this ISymbol symbol, string classFullName)
+        {
+            if (symbol is INamedTypeSymbol namedTypeSymbol)
+                return namedTypeSymbol.InheritsClass(classFullName);
 
             return false;
         }

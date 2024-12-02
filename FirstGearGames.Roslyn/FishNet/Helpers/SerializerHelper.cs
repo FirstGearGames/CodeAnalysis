@@ -14,26 +14,25 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// <summary>
         /// True if the symbol implements IBroadcast. 
         /// </summary>
-        public static bool HasIBroadcastInterface(this ISymbol symbol)
+        public static bool ImplementsIBroadcastInterface(this ISymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
 
             return namedTypeSymbol.ImplementsInterface(FishNetConstants.BroadcastsInterface_FullName);
         }
-        
+
         /// <summary>
         /// True if the symbol implements any prediction interfaces.
         /// </summary>
         /// <returns></returns>
-        public static bool HasPredictionInterface(this ISymbol symbol)
+        public static bool ImplementsPredictionInterface(this ISymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
 
             return namedTypeSymbol.ImplementsInterface(FishNetConstants.IReplicateInterface_FullName) || namedTypeSymbol.ImplementsInterface(FishNetConstants.IReconcileInterface_FullName);
         }
-
 
         /// <summary>
         /// True if symbol has the IncludeSerialization attribute.
@@ -43,7 +42,18 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
 
-            return  namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName, isMetadataName: false, out _);
+            return namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName, isMetadataName: false, out _);
+        }
+
+        /// <summary>
+        /// True if symbol inherits SyncBase anywhere within it's hierarchy.
+        /// </summary>
+        public static bool InheritsSyncBase(this ISymbol symbol)
+        {
+            if (symbol is not INamedTypeSymbol namedTypeSymbol)
+                return false;
+
+            return namedTypeSymbol.InheritsClass(FishNetConstants.SyncBase_FullName);
         }
 
         /// <summary>
@@ -51,22 +61,24 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// </summary>
         public static bool HasAnySerializable(this ISymbol symbol)
         {
-            if (symbol.HasIBroadcastInterface())
+            if (symbol.ImplementsIBroadcastInterface())
                 return true;
             if (symbol.HasRpcAttribute())
                 return true;
-            if (symbol.HasPredictionInterface())
+            if (symbol.ImplementsPredictionInterface())
                 return true;
             if (symbol.HasIncludeSerializationAttribute())
                 return true;
-            
+            if (symbol.InheritsSyncBase())
+                return true;
+
             return false;
         }
 
         /// <summary>
         /// Returns INamedTypeSymbol if symbol is a user define typed. Otherwise returns null.
         /// </summary>
-        private static INamedTypeSymbol? GetUserDefinedNamedTypeSymbol(this ISymbol symbol) 
+        private static INamedTypeSymbol? GetUserDefinedNamedTypeSymbol(this ISymbol symbol)
         {
             //If not named it cannot be class or struct.
             if (symbol is not INamedTypeSymbol namedTypeSymbol)
