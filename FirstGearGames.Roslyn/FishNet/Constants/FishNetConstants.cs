@@ -4,9 +4,13 @@
     {
         #region Namespaces and assemblies.
         /// <summary>
+        /// FishNet.Object namespace.
+        /// </summary>
+        public const string Object_Namespace = "FishNet.Object";
+        /// <summary>
         /// FishNet.Object.Synchronizing namespace.
         /// </summary>
-        public const string Object_Synchronizing_Namespace = "FishNet.Object.Synchronizing";
+        public const string Object_Synchronizing_Namespace = $"{Object_Namespace}.Synchronizing";
         /// <summary>
         /// FishNet.Serializing namespace.
         /// </summary>
@@ -46,12 +50,19 @@
         /// <summary>
         /// [IncludeSerialization] class.
         /// </summary>
-        public const string IncludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.IncludeSerializationAttribute";
+        public const string GenerateSerializersAttribute_FullName = $"{CodeGenerating_Namespace}.IncludeSerializationAttribute";
         /// <summary>
         /// [ExcludeSerialization] class.
         /// </summary>
         public const string ExcludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.ExcludeSerializationAttribute";
 
+        #endregion
+        
+        #region NetworkBehaviours.
+        /// <summary>
+        /// NetworkBehaviour class.
+        /// </summary>
+        public const string NetworkBehaviour_FullName = $"{Object_Namespace}.NetworkBehaviour";
         #endregion
 
         #region RPCs.
@@ -101,6 +112,10 @@
         /// SyncVar class.
         /// </summary>
         public const string SyncVar_FullName =$"{Object_Synchronizing_Namespace}.SyncVar";
+        /// <summary>
+        /// ICustomSync interface.
+        /// </summary>
+        public const string ICustomSync_FullName = $"{Object_Synchronizing_Namespace}.ICustomSync";
         #endregion
         
         #region DeltaSerializing.

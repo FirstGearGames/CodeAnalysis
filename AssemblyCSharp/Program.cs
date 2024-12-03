@@ -60,9 +60,23 @@ namespace ClientAssembly
     {
         public List<T> Lst;
     }
+
+    public struct SimpleStructA
+    {
+        public int TheNUmber;
+    }
+    public struct SimpleStructB
+    {
+        public int TheNUmber;
+    }
+    public struct SimpleStructC
+    {
+        public int TheNUmber;
+    }
+
     public class Player : NetworkBehaviour
     {
-        public SyncVar<int> _mySyncVar;
+        public SyncDictionary<SimpleStructA, SimpleStructB> _syncDictionary = new();
         
         public struct EmptyStruct { }
 

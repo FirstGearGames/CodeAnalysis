@@ -12,6 +12,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         SyncHashSet,
         SyncList,
         SyncVar,
+        Custom,
     }
     
     public static class SyncTypeHelper
@@ -42,7 +43,9 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
             if (symbolFullName == FishNetConstants.SyncVar_FullName)
                 return SyncTypeType.SyncVar;
             if (symbolFullName == FishNetConstants.SyncHashSet_FullName)
-                return SyncTypeType.SyncHashSet;            
+                return SyncTypeType.SyncHashSet;
+            if (namedTypeSymbol.ImplementsInterface(FishNetConstants.ICustomSync_FullName))
+                return SyncTypeType.Custom;
             
             //Fall through or unhandle, such as custom synctypes.
             return SyncTypeType.Unset;

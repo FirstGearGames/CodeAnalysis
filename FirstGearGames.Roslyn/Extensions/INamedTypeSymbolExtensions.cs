@@ -1,12 +1,20 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
-using System.Diagnostics;
-using FirstGearGames.Roslyn.FishNet.Helpers;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.Extensions
 {
     public static class INamedTypeSymbolExtensions
     {
+        /// <summary>
+        /// Returns field members of a named symbol.
+        /// </summary>
+        public static List<IFieldSymbol> GetFieldMembers(this INamedTypeSymbol symbol) 
+        {
+            return symbol.GetMembers().OfType<IFieldSymbol>().ToList();
+        }
+
         /// <summary>
         /// Returns the short name of a symbol which includes the namespace.
         /// </summary>

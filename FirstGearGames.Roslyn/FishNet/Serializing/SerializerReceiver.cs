@@ -52,7 +52,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
+            FindClassSerializables(context, namedTypeSymbol);
         }
 
         public void FindClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
@@ -62,36 +62,82 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
+            FindClassSerializables(context, namedTypeSymbol);
+        }
+
+        private void FindClassSerializables(object context, INamedTypeSymbol namedTypeSymbol)
+        {
+            Log("Doing the thing now.");
+            //Find syncTypes. This only runs if not a NetworkBehaviour. 
+            FindSyncTypeSerializables(context, namedTypeSymbol);
+
+            /* Find serializable fields if namedType can be serializers.
+             * This only runs if not inheriting NetworkBehaviour. */
             FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
-        
-        public void FindSyncTypeSerializables(GeneratorSyntaxContext context, FieldDeclarationSyntax fieldDeclaration)
-        {
-            IFieldSymbol? fieldSymbol = context.SemanticModel.GetFieldSymbol(fieldDeclaration);
-            if (fieldSymbol == null) return;
 
-            FindSyncTypeSerializables(context, fieldSymbol);
-        }
-
-        public void FindSyncTypeSerializables(SyntaxNodeAnalysisContext context, FieldDeclarationSyntax fieldDeclarationSyntax)
+        /// <summary>
+        /// Finds SyncType serializables within a namedTypeSymbol.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="namedTypeSymbol"></param>
+        public void FindSyncTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol)
         {
-            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, fieldDeclarationSyntax);
-            if (symbol == null)
+            //Named type must inherit NetworkBehaviour to look for SyncTypes.
+            if (!namedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName))
                 return;
 
-            if (symbol is not IFieldSymbol fieldSymbol) return;
+            List<IFieldSymbol> fieldSymbols = namedTypeSymbol.GetFieldMembers();
 
-            FindSyncTypeSerializables(context, fieldSymbol);
-        }
-                
-        public void FindSyncTypeSerializables(object context, IFieldSymbol fieldSymbol)
-        {
-            SyncTypeType stt = fieldSymbol.GetSyncType();
-            Currently this iterates fields in everything. Structs, classes, so on.
-            /*  Currently this iterates fields in everything. Structs, classes, so on.
-             * This only needs to check fields in classes which inherit NetworkBehaviour.
-             * Make that change before proceeding. Recommended action is in ClassDeclarationSyntax get
-             * fields and check them.*/
+            //Check all field types to see if they inherit SyncBase.
+            foreach (IFieldSymbol fieldSymbol in fieldSymbols)
+            {
+                ITypeSymbol fieldType = fieldSymbol.Type;
+
+                //SyncTypes can only be named type. Continue if it's not namedType.
+                if (fieldType is not INamedTypeSymbol fieldNamedTypeSymbol)
+                    continue;
+
+                //Get SyncType.
+                SyncTypeType stt = fieldNamedTypeSymbol.GetSyncType();
+
+                //No syncType.
+                if (stt == SyncTypeType.Unset)
+                    continue;
+
+                //Custom.
+                if (stt == SyncTypeType.Custom)
+                    FindCustomSyncTypeSerializable(fieldNamedTypeSymbol);
+                //SyncType is built into FishNet with generics.
+                else
+                    FindIncludedGenericSyncTypeSerializable(fieldNamedTypeSymbol);
+            }
+
+            void FindIncludedGenericSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol)
+            {
+                List<ITypeSymbol> genericArgumentTypeSymbols = fieldNamedTypeSymbol.GetGenericArgumentsOfNamedTypeSymbol();
+                /* FullNames added this iteration.
+                 * This is used to prevent endless loops. */
+                HashSet<string> addedFullNames = new();
+
+                foreach (ITypeSymbol typeSymbol in genericArgumentTypeSymbols)
+                {
+                    //Must be named to be added as a serializable.
+                    if (typeSymbol is not INamedTypeSymbol genericArgumentNamedTypeSymbol)
+                        continue;
+
+                    RecursivelyAddSerializables(context, genericArgumentNamedTypeSymbol, addedFullNames);
+                }
+            }
+
+            /* Our cecil logic reviews the IL instructions in
+             * the method to determine what named type is being returned
+             * in the 'object GetSerializableType' method.
+             *
+             * This is not possible in Roslyn. Users instead will just
+             * need to put the 'GenerateSerializers' attribute on their
+             * type. */
+            void FindCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol) { }
         }
 
         public void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
@@ -189,32 +235,18 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// </summary>
         public void FindNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol)
         {
+            /* Named type cannot inherit NetworkBehaviour as normal fields
+             * within a NetworkBehaviour should not be targeted for serialization. */
+            if (namedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName))
+                return;
+
             if (!namedTypeSymbol.HasAnySerializable())
                 return;
 
             /* FullNames added this iteration.
              * This is used to prevent endless loops. */
             HashSet<string> addedFullNames = new();
-
-            while (true)
-            {
-                string fullName = namedTypeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
-                //Already added.
-                if (addedFullNames.Contains(fullName))
-                    break;
-
-                /* The method indicated it could not add some reason.
-                 * Maybe the type had an attribute. */
-                if (!AddSerializableType(context, namedTypeSymbol))
-                    break;
-                else
-                    addedFullNames.Add(fullName);
-
-                if (namedTypeSymbol.BaseType is not INamedTypeSymbol nts)
-                    break;
-                else
-                    namedTypeSymbol = nts;
-            }
+            RecursivelyAddSerializables(context, namedTypeSymbol, addedFullNames);
         }
 
         /// <summary>
@@ -252,6 +284,33 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 Log($"Added {namedTypeSymbol.GetTypeSymbolFullName(isMetadataName)} to types needing serializers.");
 
             return true;
+        }
+
+        /// <summary>
+        /// Recursively iterates a namedTypeSymbol adding serializable types within.
+        /// </summary>
+        /// <param name="foundNames">A collection reference to store already found serializables during the iteration.</param>
+        private void RecursivelyAddSerializables(object context, INamedTypeSymbol namedTypeSymbol, HashSet<string> foundNames)
+        {
+            while (true)
+            {
+                string fullName = namedTypeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
+                //Already added.
+                if (foundNames.Contains(fullName))
+                    break;
+
+                /* The method indicated it could not add some reason.
+                 * Maybe the type had an attribute. */
+                if (!AddSerializableType(context, namedTypeSymbol))
+                    break;
+                else
+                    foundNames.Add(fullName);
+
+                if (namedTypeSymbol.BaseType is not INamedTypeSymbol nts)
+                    break;
+                else
+                    namedTypeSymbol = nts;
+            }
         }
 
         /// <summary>

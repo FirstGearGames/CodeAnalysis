@@ -1,4 +1,5 @@
-﻿using FirstGearGames.Roslyn.Extensions;
+﻿using System.Collections.Generic;
+using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using Microsoft.CodeAnalysis;
 
@@ -42,7 +43,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
 
-            return namedTypeSymbol.HasAttribute(FishNetConstants.IncludeSerializationAttribute_FullName, isMetadataName: false, out _);
+            return namedTypeSymbol.HasAttribute(FishNetConstants.GenerateSerializersAttribute_FullName, isMetadataName: false, out _);
         }
 
         /// <summary>
@@ -73,6 +74,23 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns the generic arguments of a namedTypeSymbol.
+        /// </summary>
+        public static List<ITypeSymbol> GetGenericArgumentsOfNamedTypeSymbol(this INamedTypeSymbol namedTypeSymbol)
+        {
+            List<ITypeSymbol> results = new();
+
+            //Not generic.
+            if (!namedTypeSymbol.IsGenericType)
+                return results;
+
+            foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
+                results.Add(typeArgument);
+
+            return results;
         }
 
         /// <summary>
