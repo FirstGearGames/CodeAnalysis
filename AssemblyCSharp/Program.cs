@@ -55,7 +55,7 @@ namespace ClientAssembly
     // {
     //        public string C;
     //    }
-    
+
     public class AnyType<T>
     {
         public List<T> Lst;
@@ -65,18 +65,32 @@ namespace ClientAssembly
     {
         public int TheNUmber;
     }
+
     public struct SimpleStructB
     {
         public int TheNUmber;
     }
+
     public struct SimpleStructC
     {
         public int TheNUmber;
     }
 
+    public class MyCustomSync : SyncBase, ICustomSync
+    {
+        public object GetSerializedType()
+        {
+            // if (Environment.TickCount == 100)
+            //     return new SimpleStructB();
+
+            return new SimpleStructC();
+        }
+    }
+
     public class Player : NetworkBehaviour
     {
         public SyncDictionary<SimpleStructA, SimpleStructB> _syncDictionary = new();
+        public MyCustomSync _customSync = new();
         
         public struct EmptyStruct { }
 

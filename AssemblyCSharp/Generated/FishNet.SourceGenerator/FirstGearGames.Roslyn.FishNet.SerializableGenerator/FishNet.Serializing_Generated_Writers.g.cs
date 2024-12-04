@@ -44,12 +44,6 @@ namespace FishNet.Serializing
 
 		}
 
-		public static void GWrite___WriteClientAssembly_Player_MyStructC(this FishNet.Serializing.Writer writer, ClientAssembly.Player.MyStructC value0)
-		{
-			writer.WriteBoolean(value0.Works);
-
-		}
-
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
@@ -58,7 +52,6 @@ namespace FishNet.Serializing
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.BroadcastStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.BroadcastStruct>(GWrite___WriteClientAssembly_Player_BroadcastStruct));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.EmptyStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.EmptyStruct>(GWrite___WriteClientAssembly_Player_EmptyStruct));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.NestedStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.NestedStruct>(GWrite___WriteClientAssembly_Player_NestedStruct));
-			FishNet.Serializing.GenericWriter<ClientAssembly.Player.MyStructC>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.MyStructC>(GWrite___WriteClientAssembly_Player_MyStructC));
 		}
 	}
 }

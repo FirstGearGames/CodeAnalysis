@@ -20,7 +20,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
 
-            return namedTypeSymbol.ImplementsInterface(FishNetConstants.BroadcastsInterface_FullName);
+            return namedTypeSymbol.ImplementsInterface(FishNetConstants.IBroadcasts_FullName);
         }
 
         /// <summary>

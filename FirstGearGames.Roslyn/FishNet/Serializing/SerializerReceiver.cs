@@ -4,6 +4,7 @@ using System.Linq;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -52,7 +53,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindClassSerializables(context, namedTypeSymbol);
+            FindClassSerializables(context, namedTypeSymbol, context.SemanticModel);
         }
 
         public void FindClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
@@ -62,17 +63,19 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindClassSerializables(context, namedTypeSymbol);
+            FindClassSerializables(context, namedTypeSymbol, context.SemanticModel);
         }
 
-        private void FindClassSerializables(object context, INamedTypeSymbol namedTypeSymbol)
+        private void FindClassSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
         {
-            Log("Doing the thing now.");
             //Find syncTypes. This only runs if not a NetworkBehaviour. 
-            FindSyncTypeSerializables(context, namedTypeSymbol);
+            FindSyncTypeSerializables(context, namedTypeSymbol, semanticModel);
 
             /* Find serializable fields if namedType can be serializers.
              * This only runs if not inheriting NetworkBehaviour. */
+
+            This is trying to serialize literally all classes, including anything* that inherits syncBase and so on.Is this really needed since we target* types for serialization
+            such as RPcs and so on ? */
             FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
 
@@ -81,15 +84,15 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// </summary>
         /// <param name="context"></param>
         /// <param name="namedTypeSymbol"></param>
-        public void FindSyncTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol)
+        public void FindSyncTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
         {
-            //Named type must inherit NetworkBehaviour to look for SyncTypes.
+//Named type must inherit NetworkBehaviour to look for SyncTypes.
             if (!namedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName))
                 return;
 
             List<IFieldSymbol> fieldSymbols = namedTypeSymbol.GetFieldMembers();
 
-            //Check all field types to see if they inherit SyncBase.
+//Check all field types to see if they inherit SyncBase.
             foreach (IFieldSymbol fieldSymbol in fieldSymbols)
             {
                 ITypeSymbol fieldType = fieldSymbol.Type;
@@ -107,7 +110,7 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
 
                 //Custom.
                 if (stt == SyncTypeType.Custom)
-                    FindCustomSyncTypeSerializable(fieldNamedTypeSymbol);
+                    FindCustomSyncTypeSerializable(fieldNamedTypeSymbol, semanticModel);
                 //SyncType is built into FishNet with generics.
                 else
                     FindIncludedGenericSyncTypeSerializable(fieldNamedTypeSymbol);
@@ -137,7 +140,26 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
              * This is not possible in Roslyn. Users instead will just
              * need to put the 'GenerateSerializers' attribute on their
              * type. */
-            void FindCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol) { }
+            void FindCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol, SemanticModel semanticModel)
+            {
+                return;
+                IMethodSymbol methodSymbol = fieldNamedTypeSymbol.GetMethod(FishNetConstants.ICustomSync_GetSerializedType_Name, metadataName: false);
+                if (methodSymbol == null) return;
+
+                //Default return type should be System.Object, exit if not the case.
+                if (methodSymbol.ReturnType.GetTypeSymbolFullName(metadataName: false) != NativeConstants.Object_FullName) return;
+
+                List<ITypeSymbol> returnTypeSymbols = methodSymbol.GetBodyReturnTypes(semanticModel);
+                //No entries, or first entry is not named.
+                if (returnTypeSymbols.Count == 0) return;
+                if (returnTypeSymbols[0] is not INamedTypeSymbol namedFirstReturnTypeSymbol) return;
+
+                /* FullNames added this iteration.
+                 * This is used to prevent endless loops. */
+                HashSet<string> addedFullNames = new();
+                //Add first entry.
+                RecursivelyAddSerializables(context, namedFirstReturnTypeSymbol, addedFullNames);
+            }
         }
 
         public void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)

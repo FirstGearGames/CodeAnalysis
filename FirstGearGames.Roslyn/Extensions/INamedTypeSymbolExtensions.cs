@@ -7,6 +7,8 @@ namespace FirstGearGames.Roslyn.Extensions
 {
     public static class INamedTypeSymbolExtensions
     {
+        private static List<IMethodSymbol> _methodSymbols = new();
+        
         /// <summary>
         /// Returns field members of a named symbol.
         /// </summary>
@@ -43,6 +45,22 @@ namespace FirstGearGames.Roslyn.Extensions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns a method containing matching parameter names.
+        /// </summary>
+        public static IMethodSymbol? GetMethod(this INamedTypeSymbol symbol, string methodName, bool metadataName, params string[] parameterNames) 
+        {
+            IEnumerable<IMethodSymbol> methodSymbols = symbol.GetMembers(methodName).OfType<IMethodSymbol>();
+
+            foreach (IMethodSymbol methodSymbol in methodSymbols)
+            {
+                if (methodSymbol.AreParametersMatching(metadataName, parameterNames))
+                    return methodSymbol;
+            }
+
+            return null;
         }
     }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.

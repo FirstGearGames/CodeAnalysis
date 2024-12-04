@@ -68,7 +68,7 @@
         #region RPCs.
 
         /// <summary>
-        /// [targetRpc] class.
+        /// [TargetRpc] class.
         /// </summary>
         public const string TargetRpcAttribute_FullName = "FishNet.Object.TargetRpcAttribute";
 
@@ -88,7 +88,7 @@
         /// <summary>
         /// IBroadcast interface.
         /// </summary>
-        public const string BroadcastsInterface_FullName = $"{Broadcast_Namespace}.IBroadcast";
+        public const string IBroadcasts_FullName = $"{Broadcast_Namespace}.IBroadcast";
         #endregion
 
         #region SyncTypes.
@@ -116,6 +116,10 @@
         /// ICustomSync interface.
         /// </summary>
         public const string ICustomSync_FullName = $"{Object_Synchronizing_Namespace}.ICustomSync";
+        /// <summary>
+        /// GetSerializedType() method.
+        /// </summary>
+        public const string ICustomSync_GetSerializedType_Name = $"GetSerializedType";
         #endregion
         
         #region DeltaSerializing.
