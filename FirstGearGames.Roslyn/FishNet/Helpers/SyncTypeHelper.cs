@@ -32,14 +32,10 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// </summary>
         public static SyncTypeType GetSyncType(this INamedTypeSymbol symbol)
         {
-            //Only named can be syncTypes.
-            if (symbol is not INamedTypeSymbol namedTypeSymbol)
-                return SyncTypeType.Unset;
-            
             if (!symbol.InheritsSyncBase())
                 return SyncTypeType.Unset;
 
-            string symbolFullName = namedTypeSymbol.GetTypeSymbolFullName(metadataName: false);
+            string symbolFullName = symbol.GetTypeSymbolFullName(metadataName: false);
 
             if (symbolFullName == FishNetConstants.SyncDictionary_FullName)
                 return SyncTypeType.SyncDictionary;
@@ -49,7 +45,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
                 return SyncTypeType.SyncVar;
             if (symbolFullName == FishNetConstants.SyncHashSet_FullName)
                 return SyncTypeType.SyncHashSet;
-            if (namedTypeSymbol.ImplementsInterface(FishNetConstants.ICustomSync_FullName))
+            if (symbol.ImplementsInterface(FishNetConstants.ICustomSync_FullName))
                 return SyncTypeType.Custom;
             
             //Fall through or unhandle, such as custom synctypes.
