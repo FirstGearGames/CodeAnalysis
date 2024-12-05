@@ -16,6 +16,12 @@ namespace FishNet.Serializing
 
 		}
 
+		public static void GWrite___WriteClientAssembly_SimpleStructC(this FishNet.Serializing.Writer writer, ClientAssembly.SimpleStructC value0)
+		{
+			writer.WriteInt32(value0.TheNUmber);
+
+		}
+
 		public static void GWrite___WriteClientAssembly_Player_BroadcastStruct(this FishNet.Serializing.Writer writer, ClientAssembly.Player.BroadcastStruct value0)
 		{
 			writer.WriteBoolean(value0.IsBroadcast);
@@ -49,6 +55,7 @@ namespace FishNet.Serializing
 		{
 			FishNet.Serializing.GenericWriter<ClientAssembly.SimpleStructA>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.SimpleStructA>(GWrite___WriteClientAssembly_SimpleStructA));
 			FishNet.Serializing.GenericWriter<ClientAssembly.SimpleStructB>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.SimpleStructB>(GWrite___WriteClientAssembly_SimpleStructB));
+			FishNet.Serializing.GenericWriter<ClientAssembly.SimpleStructC>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.SimpleStructC>(GWrite___WriteClientAssembly_SimpleStructC));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.BroadcastStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.BroadcastStruct>(GWrite___WriteClientAssembly_Player_BroadcastStruct));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.EmptyStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.EmptyStruct>(GWrite___WriteClientAssembly_Player_EmptyStruct));
 			FishNet.Serializing.GenericWriter<ClientAssembly.Player.NestedStruct>.SetWrite(new System.Action<FishNet.Serializing.Writer, ClientAssembly.Player.NestedStruct>(GWrite___WriteClientAssembly_Player_NestedStruct));

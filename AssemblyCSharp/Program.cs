@@ -80,10 +80,7 @@ namespace ClientAssembly
     {
         public object GetSerializedType()
         {
-            // if (Environment.TickCount == 100)
-            //     return new SimpleStructB();
-
-            return new SimpleStructC();
+            return typeof(SimpleStructC);
         }
     }
 
@@ -91,7 +88,7 @@ namespace ClientAssembly
     {
         public SyncDictionary<SimpleStructA, SimpleStructB> _syncDictionary = new();
         public MyCustomSync _customSync = new();
-        
+
         public struct EmptyStruct { }
 
         public struct BroadcastStruct : IBroadcast

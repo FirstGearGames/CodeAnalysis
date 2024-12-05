@@ -20,6 +20,14 @@ namespace FishNet.Serializing
 			return result;
 		}
 
+		public static ClientAssembly.SimpleStructC GRead___ReadClientAssembly_SimpleStructC(this FishNet.Serializing.Reader reader)
+		{
+			ClientAssembly.SimpleStructC result = new();
+
+			result.TheNUmber = reader.ReadInt32();
+			return result;
+		}
+
 		public static ClientAssembly.Player.BroadcastStruct GRead___ReadClientAssembly_Player_BroadcastStruct(this FishNet.Serializing.Reader reader)
 		{
 			ClientAssembly.Player.BroadcastStruct result = new();
@@ -59,6 +67,7 @@ namespace FishNet.Serializing
 		{
 			FishNet.Serializing.GenericReader<ClientAssembly.SimpleStructA>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructA>(GRead___ReadClientAssembly_SimpleStructA));
 			FishNet.Serializing.GenericReader<ClientAssembly.SimpleStructB>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructB>(GRead___ReadClientAssembly_SimpleStructB));
+			FishNet.Serializing.GenericReader<ClientAssembly.SimpleStructC>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructC>(GRead___ReadClientAssembly_SimpleStructC));
 			FishNet.Serializing.GenericReader<ClientAssembly.Player.BroadcastStruct>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.BroadcastStruct>(GRead___ReadClientAssembly_Player_BroadcastStruct));
 			FishNet.Serializing.GenericReader<ClientAssembly.Player.EmptyStruct>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.EmptyStruct>(GRead___ReadClientAssembly_Player_EmptyStruct));
 			FishNet.Serializing.GenericReader<ClientAssembly.Player.NestedStruct>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.NestedStruct>(GRead___ReadClientAssembly_Player_NestedStruct));

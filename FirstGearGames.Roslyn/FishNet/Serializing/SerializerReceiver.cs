@@ -74,9 +74,9 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
             /* Find serializable fields if namedType can be serializers.
              * This only runs if not inheriting NetworkBehaviour. */
 
-            This is trying to serialize literally all classes, including anything* that inherits syncBase and so on.Is this really needed since we target* types for serialization
-            such as RPcs and so on ? */
-            FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
+            // This is trying to serialize literally all classes, including anything* that inherits syncBase and so on.Is this really needed since we target* types for serialization
+            // such as RPcs and so on ? */
+            //FindNamedTypeSymbolSerializables(context, namedTypeSymbol);
         }
 
         /// <summary>
@@ -86,13 +86,13 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
         /// <param name="namedTypeSymbol"></param>
         public void FindSyncTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
         {
-//Named type must inherit NetworkBehaviour to look for SyncTypes.
+            //Named type must inherit NetworkBehaviour to look for SyncTypes.
             if (!namedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName))
                 return;
 
             List<IFieldSymbol> fieldSymbols = namedTypeSymbol.GetFieldMembers();
 
-//Check all field types to see if they inherit SyncBase.
+            //Check all field types to see if they inherit SyncBase.
             foreach (IFieldSymbol fieldSymbol in fieldSymbols)
             {
                 ITypeSymbol fieldType = fieldSymbol.Type;
@@ -142,23 +142,24 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
              * type. */
             void FindCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol, SemanticModel semanticModel)
             {
-                return;
                 IMethodSymbol methodSymbol = fieldNamedTypeSymbol.GetMethod(FishNetConstants.ICustomSync_GetSerializedType_Name, metadataName: false);
                 if (methodSymbol == null) return;
 
                 //Default return type should be System.Object, exit if not the case.
                 if (methodSymbol.ReturnType.GetTypeSymbolFullName(metadataName: false) != NativeConstants.Object_FullName) return;
 
-                List<ITypeSymbol> returnTypeSymbols = methodSymbol.GetBodyReturnTypes(semanticModel);
+                List<ExpressionSyntax> returnExpressions = methodSymbol.GetReturnedExpressionSyntaxes();
                 //No entries, or first entry is not named.
-                if (returnTypeSymbols.Count == 0) return;
-                if (returnTypeSymbols[0] is not INamedTypeSymbol namedFirstReturnTypeSymbol) return;
-
+                if (returnExpressions.Count == 0) return;
+                if (returnExpressions[0] is not TypeOfExpressionSyntax typeOfExpressionSyntax) return;
+                
+                ITypeSymbol returnedTypeSymbol = typeOfExpressionSyntax.GetTypeOfInner(semanticModel);
+                if (returnedTypeSymbol == null || returnedTypeSymbol is not INamedTypeSymbol returnedNamedTypeSymbol) return;
                 /* FullNames added this iteration.
                  * This is used to prevent endless loops. */
                 HashSet<string> addedFullNames = new();
                 //Add first entry.
-                RecursivelyAddSerializables(context, namedFirstReturnTypeSymbol, addedFullNames);
+                RecursivelyAddSerializables(context, returnedNamedTypeSymbol, addedFullNames);
             }
         }
 
