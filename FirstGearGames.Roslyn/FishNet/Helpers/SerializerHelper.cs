@@ -38,13 +38,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// <summary>
         /// True if symbol has the IncludeSerialization attribute.
         /// </summary>
-        public static bool HasIncludeSerializationAttribute(this INamedTypeSymbol symbol)
-        {
-            INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
-            if (namedTypeSymbol == null) return false;
-
-            return namedTypeSymbol.HasAttribute(FishNetConstants.GenerateSerializersAttribute_FullName, isMetadataName: false, out _);
-        }
+        public static bool HasGenerateSerializerAttribute(this INamedTypeSymbol symbol) => symbol.HasAttribute(FishNetConstants.GenerateSerializersAttribute_FullName, isMetadataName: false, out _);
 
         /// <summary>
         /// True if symbol inherits SyncBase anywhere within it's hierarchy.
@@ -63,28 +57,23 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// </summary>
         public static bool HasSerializableIdentifier(this ISymbol symbol)
         {
-            //Methods.
-            if (symbol is IMethodSymbol methodSymbol)
-            {
-                return methodSymbol.HasRpcAttribute();
-            }
-            //Field members.
-            else if (symbol is IFieldSymbol fieldSymbol)
-            {
-                return fieldSymbol.IsSyncType();
-            }
-            //Named types.
-            else if (symbol is INamedTypeSymbol namedTypeSymbol)
-            {
-                if (namedTypeSymbol.ImplementsIBroadcastInterface())
-                    return true;
-                if (namedTypeSymbol.ImplementsPredictionInterface())
-                    return true;
-                if (namedTypeSymbol.HasIncludeSerializationAttribute())
-                    return true;
-            }
+            if (symbol == null) return false;
 
-            return false;
+            return symbol switch
+            {
+                IMethodSymbol methodSymbol => methodSymbol.HasRpcAttribute(),
+                IFieldSymbol fieldSymbol => fieldSymbol.IsSyncType(),
+                INamedTypeSymbol namedTypeSymbol => HasSerializableIdentifierForNamedTypeSymbol(namedTypeSymbol),
+
+                _ => false
+            };
+
+            bool HasSerializableIdentifierForNamedTypeSymbol(INamedTypeSymbol lNamedTypeSymbol)
+            {
+                if (lNamedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName)) return false;
+
+                return lNamedTypeSymbol.ImplementsIBroadcastInterface() || lNamedTypeSymbol.ImplementsPredictionInterface() || lNamedTypeSymbol.HasGenerateSerializerAttribute();
+            }
         }
 
         /// <summary>
