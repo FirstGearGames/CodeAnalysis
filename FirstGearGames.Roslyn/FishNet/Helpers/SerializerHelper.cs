@@ -10,12 +10,12 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// <summary>
         /// True if the symbol has any RPC attribute. Use HasRpcAttributes(List<RpcAttributeData> for RPC details.
         /// </summary>
-        public static bool HasRpcAttribute(this ISymbol symbol) => symbol.HasRpcAttributes(out _);
+        public static bool HasRpcAttribute(this IMethodSymbol symbol) => symbol.HasRpcAttributes(out _);
 
         /// <summary>
         /// True if the symbol implements IBroadcast. 
         /// </summary>
-        public static bool ImplementsIBroadcastInterface(this ISymbol symbol)
+        public static bool ImplementsIBroadcastInterface(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
@@ -27,7 +27,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// True if the symbol implements any prediction interfaces.
         /// </summary>
         /// <returns></returns>
-        public static bool ImplementsPredictionInterface(this ISymbol symbol)
+        public static bool ImplementsPredictionInterface(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
@@ -38,7 +38,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// <summary>
         /// True if symbol has the IncludeSerialization attribute.
         /// </summary>
-        public static bool HasIncludeSerializationAttribute(this ISymbol symbol)
+        public static bool HasIncludeSerializationAttribute(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
             if (namedTypeSymbol == null) return false;
@@ -49,7 +49,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// <summary>
         /// True if symbol inherits SyncBase anywhere within it's hierarchy.
         /// </summary>
-        public static bool InheritsSyncBase(this ISymbol symbol)
+        public static bool InheritsSyncBase(this INamedTypeSymbol symbol)
         {
             if (symbol is not INamedTypeSymbol namedTypeSymbol)
                 return false;
@@ -58,20 +58,31 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         }
 
         /// <summary>
-        /// True if the symbol will have serializable types. This would be true for RPCs, IBroadcast, Replicates, and more.
+        /// True if symbol has any identifiers which mark it for serialization.
+        /// This can include IBroadcast, RPC methods, SyncTypes, prediction interfaces, GenerateSerializer attribute.
         /// </summary>
-        public static bool HasAnySerializable(this ISymbol symbol)
+        public static bool HasSerializableIdentifier(this ISymbol symbol)
         {
-            if (symbol.ImplementsIBroadcastInterface())
-                return true;
-            if (symbol.HasRpcAttribute())
-                return true;
-            if (symbol.ImplementsPredictionInterface())
-                return true;
-            if (symbol.HasIncludeSerializationAttribute())
-                return true;
-            if (symbol.InheritsSyncBase())
-                return true;
+            //Methods.
+            if (symbol is IMethodSymbol methodSymbol)
+            {
+                return methodSymbol.HasRpcAttribute();
+            }
+            //Field members.
+            else if (symbol is IFieldSymbol fieldSymbol)
+            {
+                return fieldSymbol.IsSyncType();
+            }
+            //Named types.
+            else if (symbol is INamedTypeSymbol namedTypeSymbol)
+            {
+                if (namedTypeSymbol.ImplementsIBroadcastInterface())
+                    return true;
+                if (namedTypeSymbol.ImplementsPredictionInterface())
+                    return true;
+                if (namedTypeSymbol.HasIncludeSerializationAttribute())
+                    return true;
+            }
 
             return false;
         }

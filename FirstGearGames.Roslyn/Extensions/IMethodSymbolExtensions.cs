@@ -46,31 +46,16 @@ namespace FirstGearGames.Roslyn.Extensions
         {
             List<ITypeSymbol> results = new();
 
-            MethodDeclarationSyntax? methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
-
-            if (methodSyntax == null) return results;
-            if (methodSyntax.Body == null) return results;
-            
-            //Find all return statements.
-            IEnumerable<ReturnStatementSyntax> returnStatements = methodSyntax.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
-
-            foreach (ReturnStatementSyntax? returnStatement in returnStatements)
+            List<ExpressionSyntax> expressionSyntaxes = GetReturnedExpressionSyntaxes(methodSymbol);
+            foreach (ExpressionSyntax expressionSyntax in expressionSyntaxes)
             {
-                ExpressionSyntax? expression = returnStatement.Expression;
-                //Make sure typeInfo can be found of return statement. If so, add to results.
-                if (expression != null)
-                {
-                    // Get the type of the return expression
-                    TypeInfo typeInfo = semanticModel.GetTypeInfo(expression);
-                    if (typeInfo.Type != null)
-                        results.Add(typeInfo.Type);
-                }
+                if (expressionSyntax.GeTypeInfoTypeSymbol(semanticModel) is { } typeSymbol)
+                    results.Add(typeSymbol);
             }
 
             return results;
         }
-        
-        
+
         /// <summary>
         /// Gets all ExpressionSyntax returned within the body of a method.
         /// </summary>
@@ -81,42 +66,32 @@ namespace FirstGearGames.Roslyn.Extensions
             MethodDeclarationSyntax? methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
 
             if (methodSyntax == null) return results;
-            if (methodSyntax.Body == null) return results;
             
-            //Find all return statements.
-            IEnumerable<ReturnStatementSyntax> returnStatements = methodSyntax.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
-
-            foreach (ReturnStatementSyntax? returnStatement in returnStatements)
+            //Uses expression body, such as MethodName() => something;
+            if (methodSyntax.ExpressionBody != null)
             {
-                ExpressionSyntax? expression = returnStatement.Expression;
-                if (expression != null)
-                    results.Add(expression);
+                //Get the return of the arrowExpression, which is seen as => in code.
+                ExpressionSyntax expressionSyntax = methodSyntax.ExpressionBody.Expression;
+                results.Add(expressionSyntax);
             }
+            /* If method uses return within the body.
+             * EG: MethodName() { return something; } */
+            else
+            {
+                if (methodSyntax.Body == null) return results;
 
+                //Find all return statements.
+                IEnumerable<ReturnStatementSyntax> returnStatements = methodSyntax.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
+
+                foreach (ReturnStatementSyntax? returnStatement in returnStatements)
+                {
+                    ExpressionSyntax? expression = returnStatement.Expression;
+                    if (expression != null)
+                        results.Add(expression);
+                }
+            }
             return results;
         }
-        
-        finish this to test returns on method() => returnType. 
-        public static ITypeSymbol GetReturnTypeFromExpressionBody(IMethodSymbol methodSymbol, SemanticModel semanticModel)
-        {
-            // Check if the method is expression-bodied (i.e., uses =>)
-            var methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
 
-            if (methodSyntax == null || methodSyntax.ExpressionBody == null)
-                return null; // If it's not an expression-bodied method, return null.
-
-            // Get the arrow expression clause (i.e., the => part)
-            var arrowExpression = methodSyntax.ExpressionBody;
-
-            // The expression part of the expression-bodied method
-            var returnExpression = arrowExpression.Expression;
-
-            // Get type information from the expression
-            var typeInfo = semanticModel.GetTypeInfo(returnExpression);
-
-            // Return the type symbol of the expression
-            return typeInfo.Type;
-        }
-        
     }
 }

@@ -10,14 +10,13 @@ namespace FirstGearGames.Roslyn.Extensions
     public static class ExpressSyntaxExtensions
     {
         /// <summary>
-        /// Returns the type symbol for a TypeOfExpressionSyntax.
+        /// Returns ITypeSymbol for a TypeOfExpressionSyntax.
         /// </summary>
-        public static ITypeSymbol? GetTypeOfInner(this TypeOfExpressionSyntax syntax, SemanticModel semanticModel)
-        {
-            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(syntax.Type);
-            if (symbolInfo.Symbol is not ITypeSymbol typeSymbol) return null;
+        public static ITypeSymbol? GetTypeIdentifier(this TypeOfExpressionSyntax syntax, SemanticModel semanticModel) => semanticModel.GetSymbolInfo(syntax.Type).Symbol as ITypeSymbol;
 
-            return typeSymbol;
-        }
+        /// <summary>
+        /// Returns ITypeSymbol for an expression syntax using GetTypeInfo.
+        /// </summary>
+        public static ITypeSymbol? GeTypeInfoTypeSymbol(this ExpressionSyntax syntax, SemanticModel semanticModel) => semanticModel.GetTypeInfo(syntax).Type;
     }
 }

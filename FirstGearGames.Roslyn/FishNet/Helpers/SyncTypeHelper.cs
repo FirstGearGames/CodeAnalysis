@@ -20,12 +20,17 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// <summary>
         /// True if symbol is a SyncType.
         /// </summary>
-        public static bool IsSyncType(this ISymbol symbol) => symbol.InheritsSyncBase();
+        public static bool IsSyncType(this IFieldSymbol symbol)
+        {
+            if (symbol is not INamedTypeSymbol namedTypeSymbol) return false;
+            
+            return (namedTypeSymbol.GetSyncType() != SyncTypeType.Unset);
+        }
 
         /// <summary>
         /// SyncType symbol is.
         /// </summary>
-        public static SyncTypeType GetSyncType(this ISymbol symbol)
+        public static SyncTypeType GetSyncType(this INamedTypeSymbol symbol)
         {
             //Only named can be syncTypes.
             if (symbol is not INamedTypeSymbol namedTypeSymbol)
