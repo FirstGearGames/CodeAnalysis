@@ -17,7 +17,7 @@ namespace FishNet.SourceAnaylzer.Analyzers
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
 
-        private SerializableReceiver SerializableReceiver = new();
+        private SerializableFinder SerializableReceiver = new();
 
         public override void Initialize(AnalysisContext context)
         {

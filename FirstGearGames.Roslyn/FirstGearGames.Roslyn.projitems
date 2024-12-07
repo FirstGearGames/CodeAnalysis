@@ -28,6 +28,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\DebugHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\RpcHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializableType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializerReceiver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializableFinder.cs" />
   </ItemGroup>
 </Project>

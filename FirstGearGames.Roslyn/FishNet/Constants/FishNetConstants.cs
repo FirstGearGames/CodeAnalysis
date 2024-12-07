@@ -31,7 +31,10 @@
         /// FishNet.Broadcast namespace.
         /// </summary>
         public const string Broadcast_Namespace = "FishNet.Broadcast";
-
+        /// <summary>
+        /// FishNet.Managing.Logging namespace.
+        /// </summary>
+        public const string Logging_Namespace = $"FishNet.Managing.Logging";
         #endregion
 
         #region Prediction.
@@ -70,18 +73,26 @@
         /// <summary>
         /// [TargetRpc] class.
         /// </summary>
-        public const string TargetRpcAttribute_FullName = "FishNet.Object.TargetRpcAttribute";
+        public const string TargetRpcAttribute_FullName = $"{Object_Namespace}.TargetRpcAttribute";
 
         /// <summary>
         /// [ServerRpc] class.
         /// </summary>
-        public const string ServerRpcAttribute_FullName = "FishNet.Object.ServerRpcAttribute";
+        public const string ServerRpcAttribute_FullName = $"{Object_Namespace}.ServerRpcAttribute";
+        /// <summary>
+        /// ServerRpcAttribute.RequireOwnership name.
+        /// </summary>
+        public const string ServerRpc_RequireOwnership_FullName = $"RequireOwnership";
 
         /// <summary>
         /// [ObserversRpc] class.
         /// </summary>
-        public const string ObserversRpcAttribute_FullName = "FishNet.Object.ObserversRpcAttribute";
+        public const string ObserversRpcAttribute_FullName = $"{Object_Namespace}.ObserversRpcAttribute";
 
+        /// <summary>
+        /// RpcAttribute.Logging name.
+        /// </summary>
+        public const string RpcAttribute_Logging_Name = $"Logging";
         #endregion
         
         #region Broadcasts.
@@ -293,6 +304,61 @@
 
         #endregion
 
+        #region Logging.
+        /// <summary>
+        /// LoggingType enum.
+        /// </summary>
+        public const string LoggingType_FullName = $"{Logging_Namespace}.LoggingType";
+        /// <summary>
+        /// LoggingType.Off enum value.
+        /// </summary>
+        public const string LoggingType_Off_FullName = $"{Logging_Namespace}.LoggingType.Off";
+        /// <summary>
+        /// LoggingType.Error enum value.
+        /// </summary>
+        public const string LoggingType_Error_FullName = $"{Logging_Namespace}.LoggingType.Error";
+        /// <summary>
+        /// LoggingType.Warning enum value.
+        /// </summary>
+        public const string LoggingType_Warning_FullName = $"{Logging_Namespace}.LoggingType.Warning";
+        /// <summary>
+        /// LoggingType.Common enum value.
+        /// </summary>
+        public const string LoggingType_Common_FullName = $"{Logging_Namespace}.LoggingType.Common";
+        /// <summary>
+        /// LoggingType.Off enum value.
+        /// </summary>
+        public const string LoggingType_Off_Name = $"LoggingType.Off";
+        /// <summary>
+        /// LoggingType.Error enum value.
+        /// </summary>
+        public const string LoggingType_Error_Name = $"LoggingType.Error";
+        /// <summary>
+        /// LoggingType.Warning enum value.
+        /// </summary>
+        public const string LoggingType_Warning_Name = $"LoggingType.Warning";
+        /// <summary>
+        /// LoggingType.Common enum value.
+        /// </summary>
+        public const string LoggingType_Common_Name = $"LoggingType.Common";
+        /// <summary>
+        /// LoggingType.Off numeric value.
+        /// </summary>
+        public const int LoggingType_Off_NumericValue = 0;
+        /// <summary>
+        /// LoggingType.Error numeric value.
+        /// </summary>
+        public const int LoggingType_Error_NumericValue = 1;
+        /// <summary>
+        /// LoggingType.Warning numeric value.
+        /// </summary>
+        public const int LoggingType_Warning_NumericValue = 2;
+        /// <summary>
+        /// LoggingType.Common numeric value.
+        /// </summary>
+        public const int LoggingType_Common_NumericValue = 3;
+        #endregion
+        
         #region General.
 
         /// <summary>

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 
 namespace FirstGearGames.Roslyn.Extensions

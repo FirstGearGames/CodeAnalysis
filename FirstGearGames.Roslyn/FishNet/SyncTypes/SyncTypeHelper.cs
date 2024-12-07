@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 
@@ -22,7 +21,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers
         /// </summary>
         public static bool IsSyncType(this IFieldSymbol symbol)
         {
-            if (symbol is not INamedTypeSymbol namedTypeSymbol) return false;
+            if (symbol.Type is not INamedTypeSymbol namedTypeSymbol) return false;
             
             return (namedTypeSymbol.GetSyncType() != SyncTypeType.Unset);
         }

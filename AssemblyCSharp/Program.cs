@@ -1,5 +1,6 @@
 ﻿using FishNet.Broadcast;
 using FishNet.CodeGenerating;
+using FishNet.Managing.Logging;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using FishNet.Object.Synchronizing;
@@ -125,8 +126,8 @@ namespace ClientAssembly
         //          public float VelocityY;
         //          public float VelocityZ;
         //	public MyStructC StructC;
-        [IncludeSerialization]
-        public class MyStructC
+
+        public struct MyStructC
         {
             public bool Works;
         }
@@ -137,7 +138,7 @@ namespace ClientAssembly
         //{
         //}
 
-        [ServerRpc]
+        [ServerRpc(Logging = LoggingType.Error)]
         private void MyRpcTwo(MyStructC ms) { }
 
         // [ServerRpc]

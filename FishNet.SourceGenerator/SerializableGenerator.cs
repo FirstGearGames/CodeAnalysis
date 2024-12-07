@@ -6,6 +6,7 @@ using FirstGearGames.Roslyn.FishNet.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
+using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using Roslyn.FishNet.CodeBuilding;
 
 namespace FirstGearGames.Roslyn.FishNet

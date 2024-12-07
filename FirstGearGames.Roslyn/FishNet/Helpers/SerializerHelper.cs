@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.FishNet.Helpers

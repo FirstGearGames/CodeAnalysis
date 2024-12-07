@@ -21,6 +21,10 @@ namespace FishNet.Object
     public class RpcAttribute : Attribute
     {
         /// <summary>
+        /// Type of logging to use when the IsServer check fails.
+        /// </summary>
+        public LoggingType Logging = LoggingType.Warning;
+        /// <summary>
         /// True to also run the RPC logic locally.
         /// </summary>
         public bool RunLocally = false;
