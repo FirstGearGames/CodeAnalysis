@@ -4,7 +4,7 @@ using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
     public static class CodeBuilder
     {

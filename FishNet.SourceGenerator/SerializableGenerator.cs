@@ -2,19 +2,16 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
-using FirstGearGames.Roslyn.FishNet.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Constants;
-using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
-using Roslyn.FishNet.CodeBuilding;
 
-namespace FirstGearGames.Roslyn.FishNet
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
     [Generator]
     public sealed class SerializableGenerator : ISourceGenerator
     {
-        internal Serializers Serializers;
+        internal Methods SerializerMethods;
         internal DeltaWriter_Builder DeltaWriterBuilder;
         internal DeltaReader_Builder DeltaReaderBuilder;
         internal Writer_Builder WriterBuilder;
@@ -56,8 +53,8 @@ namespace FirstGearGames.Roslyn.FishNet
 
             /* Initialize the serializers class which finds
              * default serializers and is used by most builders. */
-            Serializers = new();
-            Serializers.Initialize(fishnetRuntimeAssemblySymbol);
+            SerializerMethods = new();
+            SerializerMethods.Initialize(fishnetRuntimeAssemblySymbol);
 
 
             /* Initialize each builder. This mostly

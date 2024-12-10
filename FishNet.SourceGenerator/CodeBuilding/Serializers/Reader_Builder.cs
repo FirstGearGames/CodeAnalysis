@@ -3,16 +3,14 @@ using System.Text;
 using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
-using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.Serializing;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
-using Roslyn.FishNet.CodeBuilding;
 using RoslynCodeBuilder = FirstGearGames.Roslyn.CodeBuilding.CodeBuilder;
 
-namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
+namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
     public class Reader_Builder
     {
@@ -22,7 +20,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public const string InitializeOnLoad_Method_Name = Writer_Builder.InitializeOnLoad_Method_Name;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private Serializers _serializers => _generator.Serializers;
+        private Methods _serializers => _generator.SerializerMethods;
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
@@ -43,9 +41,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
         public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
-        public SerializerMethod CreateSerializerMethod(ITypeSymbol typeSymbol)
+        public MethodData CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new SerializerMethod(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
+            return new MethodData(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
         }
 
         /// <summary>
@@ -110,7 +108,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetReadMethods())
+            foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
@@ -131,7 +129,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethod sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    MethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     //Serializer not found.
                     if (!sm.IsValid())
@@ -163,7 +161,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
 
             int addedSerializers = 0;
 
-            foreach (KeyValuePair<string, SerializerMethod> item in _serializers.GetReadMethods())
+            foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
 
@@ -201,7 +199,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding
             return sb.ToString();
         }
 
-        public string GetReadCall(SerializerMethod sm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
+        public string GetReadCall(MethodData sm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
         {
             if (!sm.IsValid())
                 return string.Empty;
