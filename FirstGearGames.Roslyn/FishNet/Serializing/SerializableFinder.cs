@@ -195,8 +195,6 @@ namespace FirstGearGames.Roslyn.FishNet.Serializing
                 {
                     RemoveTrailingNetworkConnection();
                     RemoveTrailingChannel();
-
-                    Log($"xyxyxyxy {item.GetLoggingTypeNumericValue()}. MethodName {methodSymbol.Name}");
                 } 
                 //TargetRpc.
                 else if (item.RPCType == RPCType.Target)

@@ -62,8 +62,6 @@ namespace FirstGearGames.Roslyn.FishNet.RemoteProcedureCalls
         /// <summary>
         /// Gets the logging type specified on a RPC attribute.
         /// </summary>
-        /// <param name="rpcAttributeData"></param>
-        /// <returns></returns>
         public static int GetLoggingTypeNumericValue(this RpcAttributeData rpcAttributeData)
         {
             KeyValuePair<string, TypedConstant> loggingArgument = rpcAttributeData.AttributeData.NamedArguments.FirstOrDefault(arg => arg.Key == FishNetConstants.RpcAttribute_Logging_Name);
@@ -74,25 +72,8 @@ namespace FirstGearGames.Roslyn.FishNet.RemoteProcedureCalls
                 if (loggingArgument.Value.Value is byte loggingTypeValue)
                     return loggingTypeValue;
             }
-            
-            If here then we need to get the default value of the class.
-            This can be done using the INamedTypeSymbol of the rpcAttribute class.
-            // Get the field 'MyField' from the class symbol
-            // var fieldSymbol = classSymbol.GetMembers("MyField").OfType<IFieldSymbol>().FirstOrDefault();
-            //
-            // if (fieldSymbol != null)
-            // {
-            //     // Check if the field has an initializer (default value)
-            //     var initializer = fieldSymbol.Initializer?.Value;
-            //
-            //     if (initializer != null)
-            //     {
-            //         // Print the default value (the initializer value)
-            //         Console.WriteLine("Default value of MyField: " + initializer.ConstantValue);
-            //     }
-            // }
 
-            return -1;
+            return FishNetConstants.Default_LoggingType_NumericValue;
         }
 
         /// <summary>

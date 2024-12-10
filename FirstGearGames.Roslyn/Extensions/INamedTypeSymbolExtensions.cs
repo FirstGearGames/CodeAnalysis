@@ -16,7 +16,7 @@ namespace FirstGearGames.Roslyn.Extensions
         {
             return symbol.GetMembers().OfType<IFieldSymbol>().ToList();
         }
-
+        
         /// <summary>
         /// Returns the short name of a symbol which includes the namespace.
         /// </summary>

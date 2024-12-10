@@ -357,6 +357,10 @@
         /// LoggingType.Common numeric value.
         /// </summary>
         public const int LoggingType_Common_NumericValue = 3;
+        /// <summary>
+        /// LoggingType value to use when none is specified.
+        /// </summary>
+        public const int Default_LoggingType_NumericValue = LoggingType_Warning_NumericValue;
         #endregion
         
         #region General.

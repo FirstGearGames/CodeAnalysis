@@ -138,7 +138,7 @@ namespace ClientAssembly
         //{
         //}
 
-        [ServerRpc(Logging = LoggingType.Error)]
+        [ServerRpc]
         private void MyRpcTwo(MyStructC ms) { }
 
         // [ServerRpc]
