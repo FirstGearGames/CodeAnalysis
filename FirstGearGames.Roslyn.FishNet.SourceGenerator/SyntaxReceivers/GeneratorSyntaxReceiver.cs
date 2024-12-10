@@ -1,5 +1,5 @@
 ﻿using FirstGearGames.Roslyn.FishNet.Helpers;
-using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

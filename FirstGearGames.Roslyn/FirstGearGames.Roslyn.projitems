@@ -9,19 +9,6 @@
     <Import_RootNamespace>FirstGearGames.Roslyn</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CodeBuilding\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Constants\NativeConstants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\AttributeDataExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\EnumExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IAssemblySymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IMethodSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\INamedTypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IntExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ISymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ITypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SemanticModelExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringBuilderExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FirstGearGames.Roslyn\Debugg.cs" />
   </ItemGroup>
 </Project>

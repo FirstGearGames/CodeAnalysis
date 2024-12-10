@@ -19,10 +19,10 @@
 		<Compile Include="..\FirstGearGames.Roslyn\**\*.cs">
 			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Extensions\" />
+		<Compile Remove="..\FirstGearGames.Roslyn\CodeBuilding\**" />
+		<Compile Include="..\FirstGearGames.Roslyn.FishNet\**\*.cs">
+			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
 	</ItemGroup>
 
 	<Import Project="..\FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.projitems" Label="Shared" />

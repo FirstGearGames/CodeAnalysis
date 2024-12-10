@@ -7,7 +7,7 @@ using FirstGearGames.Roslyn.FishNet.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
-using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
@@ -132,7 +132,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     sb.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariableName));
 
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent + 1, CodeBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol));
+                        sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol));
                     else
                         sb.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{sm.MethodName}({_serializers.GetValueParameterName(1)});");
 
@@ -144,7 +144,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                 ulong fieldFlag = (FishNetConstants.DeltaSerializerOption_MaxValue * 2);
 
                 //PooledWriter local variable.
-                sb.AppendLine(bodyIndent, CodeBuilder.CallGetPooledWriter(out string tmpWriterVariableName) + NativeConstants.LineFeed);
+                sb.AppendLine(bodyIndent, GeneralBuilder.CallGetPooledWriter(out string tmpWriterVariableName) + NativeConstants.LineFeed);
 
                 List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
 
@@ -157,14 +157,14 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     //Neither delta nor full could be found.
                     if (!sm.IsValid())
                     {
-                        sb.AppendLine(bodyIndent, CodeBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
+                        sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
                         continue;
                     }
 
                     //If is a full serializer.
                     if (!sm.IsDeltaSerializer())
                     {
-                        sb.AppendLine(bodyIndent + 1, CodeBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
+                        sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
                         sb.AppendLine(bodyIndent, _generator.WriterBuilder.GetWriteCall(sm, tmpWriterVariableName, fieldSymbol.Name, closeCall: true));
                     }
                     else
@@ -202,10 +202,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                 sb.AppendLine(bodyIndent + 1, RoslynCodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariableName));
                 /*  writer.WriteBytes(pooledWriter.GetBuffer(), 0, pooledWriter.Length);
                  } */
-                sb.AppendLine(bodyIndent + 1, CodeBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariableName));
+                sb.AppendLine(bodyIndent + 1, GeneralBuilder.CallWriteArraySegment(Generated_WriterParameter_Name, tmpWriterVariableName));
                 sb.AppendLine(bodyIndent, "}");
                 //store tmpWriter.
-                sb.AppendLine(bodyIndent, CodeBuilder.CallStorePooledWriter(tmpWriterVariableName) + NativeConstants.LineFeed);
+                sb.AppendLine(bodyIndent, GeneralBuilder.CallStorePooledWriter(tmpWriterVariableName) + NativeConstants.LineFeed);
                 /* Struct/class writers must always return true. This is so if they are being encapsulated
                  * the flags written will be read, even if that flag is 0. */
                 sb.Append(bodyIndent, $"return {changedVariable};");
@@ -226,7 +226,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
-            MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            MethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             int addedSerializers = 0;
 

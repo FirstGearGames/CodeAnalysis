@@ -1,7 +1,7 @@
 ﻿using FirstGearGames.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.Roslyn.FishNet.Serializing
+namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
 {
     public struct SerializableType
     {

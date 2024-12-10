@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
-using System.Linq;
-using FirstGearGames.Roslyn.FishNet.Helpers;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FirstGearGames.Roslyn.Extensions

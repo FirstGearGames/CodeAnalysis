@@ -6,7 +6,7 @@ using FirstGearGames.Roslyn.FishNet.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
-using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
@@ -128,7 +128,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 
                     //Serializer not found.
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent, CodeBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
+                        sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
                     //Serializer found.
                     else
                         sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol.Name, closeCall: true));
@@ -150,7 +150,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
-            MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            MethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             int addedSerializers = 0;
 

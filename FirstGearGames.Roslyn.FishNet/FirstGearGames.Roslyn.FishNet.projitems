@@ -9,11 +9,6 @@
     <Import_RootNamespace>FirstGearGames.Roslyn</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Constants\FishNetConstants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Constants\UnityConstants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\Helper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializableFinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializableType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\SyncTypes\Helper.cs" />
+    <Folder Include="$(MSBuildThisFileDirectory)FirstGearGames.Roslyn.FishNet\" />
   </ItemGroup>
 </Project>

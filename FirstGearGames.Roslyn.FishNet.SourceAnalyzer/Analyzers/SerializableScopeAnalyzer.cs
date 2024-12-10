@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FishNet.SourceAnaylze.Constants;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,14 +17,14 @@ namespace FishNet.SourceAnaylzer.Analyzers
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
 
-        private SerializableFinder SerializableReceiver = new();
+        private SerializableFinder SerializableFinder = new();
 
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            SerializableReceiver.OnIsNotSerializableAccessible += SerializableReceiver_OnIsNotSerializableAccessible;
+            SerializableFinder.OnIsNotSerializableAccessible += SerializableReceiver_OnIsNotSerializableAccessible;
 
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.StructDeclaration);
@@ -36,11 +36,11 @@ namespace FishNet.SourceAnaylzer.Analyzers
             SyntaxNode syntaxNode = context.Node;
 
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)
-                SerializableReceiver.FindClassSerializables(context, classDeclaration);
+                SerializableFinder.FindClassSerializables(context, classDeclaration);
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
-                SerializableReceiver.FindStructSerializables(context, structDeclaration);
+                SerializableFinder.FindStructSerializables(context, structDeclaration);
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
-                SerializableReceiver.FindRpcSerializables(context, methodDeclaration);
+                SerializableFinder.FindRpcSerializables(context, methodDeclaration);
         }
 
         private void SerializableReceiver_OnIsNotSerializableAccessible(SyntaxNodeAnalysisContext context)

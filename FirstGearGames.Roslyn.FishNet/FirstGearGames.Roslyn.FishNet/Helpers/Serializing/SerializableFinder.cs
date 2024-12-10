@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace FirstGearGames.Roslyn.FishNet.Serializing
+namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
 {
     public class SerializableFinder
     {

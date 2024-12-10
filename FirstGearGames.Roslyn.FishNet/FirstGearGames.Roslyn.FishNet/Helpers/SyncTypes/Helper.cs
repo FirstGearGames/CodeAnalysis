@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 
 namespace FirstGearGames.Roslyn.FishNet.Helpers
 {

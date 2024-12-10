@@ -1,12 +1,11 @@
 ﻿using System.Text;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
-using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
-    public static class CodeBuilder
+    public static class GeneralBuilder
     {
         private static StringBuilder _stringBuilder = new();
 

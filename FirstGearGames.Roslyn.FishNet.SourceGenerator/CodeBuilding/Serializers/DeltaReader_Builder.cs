@@ -4,7 +4,7 @@ using FirstGearGames.Roslyn.CodeBuilding;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Receivers;
-using FirstGearGames.Roslyn.FishNet.Serializing;
+using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
@@ -134,7 +134,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     sb.AppendLine(bodyIndent, "{");
 
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent + 1, CodeBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol));
+                        sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol));
                     else
                         sb.AppendLine(bodyIndent + 1, $"{resultVariableName} = {Generated_ReaderParameter_Name}.{sm.MethodName}();{NativeConstants.LineFeed}");
 
@@ -155,7 +155,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     //Neither delta nor full could be found.
                     if (!sm.IsValid())
                     {
-                        sb.AppendLine(bodyIndent, CodeBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
+                        sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
                         continue;
                     }
 
@@ -165,7 +165,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     //If is a full serializer.
                     if (!sm.IsDeltaSerializer())
                     {
-                        sb.AppendLine(bodyIndent + 1, CodeBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
+                        sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
                         sb.AppendLine(bodyIndent + 1, _generator.ReaderBuilder.GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
                     }
                     else
@@ -199,7 +199,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
-            MethodContent initializeMethod = CodeBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            MethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadDeltaMethods())
             {
