@@ -23,11 +23,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\SyntaxNodeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Constants\FishNetConstants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Constants\UnityConstants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\DebugHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Helpers\RpcHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializableType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FishNet\Serializing\SerializableFinder.cs" />
   </ItemGroup>
 </Project>
