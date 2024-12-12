@@ -1,16 +1,17 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
+﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.RemoteProcedureCalls;
+using FirstGearGames.CodeAnalysis.Constants;
+using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.CodeAnalysis.Helpers;
+using FirstGearGames.FishNet.CodeAnalysis.Receivers;
+using FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing
+namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 {
     public class SerializableFinder
     {

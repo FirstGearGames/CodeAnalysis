@@ -2,13 +2,10 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.SyncTypes;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants;
+using FirstGearGames.CodeAnalysis.CodeBuilding;
+using FirstGearGames.CodeAnalysis.Constants;
+using FirstGearGames.CodeAnalysis.Helpers;
 
 namespace FirstGearGames.CodeAnalysis.Extensions
 {

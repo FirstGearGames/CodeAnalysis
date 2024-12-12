@@ -3,8 +3,8 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers;
+using FirstGearGames.FishNet.CodeAnalysis.CodeBuilding;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers;
 
 namespace FirstGearGames.CodeAnalysis.Extensions
 {

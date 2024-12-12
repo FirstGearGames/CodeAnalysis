@@ -1,7 +1,7 @@
-﻿// using System;
-// using System.Collections.Generic;
-// using System.IO;
-// using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 namespace FirstGearGames.CodeAnalysis.Helpers
 {
@@ -52,7 +52,7 @@ namespace FirstGearGames.CodeAnalysis.Helpers
             
              File.WriteAllLines(path, _msgs);
              _msgs.Clear();
-            System.Diagnostics.Process.Start(path);
+            //System.Diagnostics.Process.Start(path);
         }
     }
 }

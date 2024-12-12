@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.RemoteProcedureCalls;
+using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.CodeAnalysis.Helpers;
+using FirstGearGames.FishNet.CodeAnalysis.Receivers;
+using FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.RemoteProcedureCalls
+namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
 {
     public class RpcFinder
     {

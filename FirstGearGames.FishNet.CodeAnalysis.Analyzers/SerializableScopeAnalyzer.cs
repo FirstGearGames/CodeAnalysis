@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,14 +24,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
 
            // SerializableFinder.OnIsNotSerializableAccessible += SerializableReceiver_OnIsNotSerializableAccessible;
 
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.StructDeclaration);
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.MethodDeclaration);
+            // context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
+            // context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.StructDeclaration);
+            // context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.MethodDeclaration);
         }
 
         private void Analyze(SyntaxNodeAnalysisContext context)
         {
-            SyntaxNode syntaxNode = context.Node;
+            //SyntaxNode syntaxNode = context.Node;
             //
             // if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             //     SerializableFinder.AddClassSerializables(context, classDeclaration);

@@ -1,17 +1,16 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
+﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using System.Collections.Generic;
 using System.Text;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.SyncTypes;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers;
+using FirstGearGames.CodeAnalysis.CodeBuilding;
+using FirstGearGames.CodeAnalysis.Constants;
+using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.CodeAnalysis.Helpers;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
+using FirstGearGames.FishNet.CodeAnalysis.Receivers;
 using FirstGearGames.FishNet.CodeAnalysis.SourceGenerators;
 using Microsoft.CodeAnalysis;
-using RoslynCodeBuilder = FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding.CodeBuilder;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding.Serializers
+namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
     public class GeneratedReader_Builder
     {

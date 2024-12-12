@@ -1,12 +1,10 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
-using System;
+﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.SyncTypes;
+using FirstGearGames.CodeAnalysis.Extensions;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.RemoteProcedureCalls
+namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
 {
     public enum RPCType
     {

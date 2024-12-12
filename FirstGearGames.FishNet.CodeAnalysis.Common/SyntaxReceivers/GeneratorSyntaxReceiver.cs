@@ -1,9 +1,10 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.RemoteProcedureCalls;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing;
+﻿using FirstGearGames.CodeAnalysis.Helpers;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers
+namespace FirstGearGames.FishNet.CodeAnalysis.Receivers
 {
     public class GeneratorSyntaxReceiver : ISyntaxContextReceiver
     {

@@ -1,10 +1,11 @@
 ﻿using System.Text;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers;
+using FirstGearGames.CodeAnalysis.Helpers;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
+using FirstGearGames.FishNet.CodeAnalysis.Receivers;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding.RemoteProcedureCalls
+namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 {
     public class RpcWriter_Builder
     {

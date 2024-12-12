@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.RemoteProcedureCalls
+namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
 {
     public static class RpcMethodDataExtensions
     {

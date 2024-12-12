@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants;
+using FirstGearGames.CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
+using FirstGearGames.CodeAnalysis.Extensions;
 
 namespace FirstGearGames.CodeAnalysis.CodeBuilding
 {

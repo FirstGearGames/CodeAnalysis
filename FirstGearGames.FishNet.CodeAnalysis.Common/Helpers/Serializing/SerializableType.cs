@@ -1,7 +1,7 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
+﻿using FirstGearGames.CodeAnalysis.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing
+namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 {
     public struct SerializableType
     {

@@ -1,10 +1,10 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
+﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using System.Collections.Generic;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.RemoteProcedureCalls;
+using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing
+namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 {
     public static class SerializerHelper
     {

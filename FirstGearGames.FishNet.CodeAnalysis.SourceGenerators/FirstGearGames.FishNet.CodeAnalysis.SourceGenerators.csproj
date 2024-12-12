@@ -10,18 +10,8 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
 	</ItemGroup>
-	
-	<ItemGroup>
-		<Compile Include="..\FirstGearGames.Roslyn\**\*.cs">
-			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-		<Compile Include="..\FirstGearGames.Roslyn.FishNet\**\*.cs">
-			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-		<Compile Remove="..\FirstGearGames.Roslyn\FirstGearGames.Roslyn\**" />
-		<Compile Remove="..\FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet\**" />
-	</ItemGroup>
-	
+
+	<Import Project="..\FirstGearGames.CodeAnalysis.Common\FirstGearGames.CodeAnalysis.Common.projitems" Label="Shared" />
 	<Import Project="..\FirstGearGames.FishNet.CodeAnalysis.Common\FirstGearGames.FishNet.CodeAnalysis.Common.projitems" Label="Shared" />
 
 

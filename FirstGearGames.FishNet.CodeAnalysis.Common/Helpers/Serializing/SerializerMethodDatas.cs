@@ -1,9 +1,9 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Text;
+using FirstGearGames.CodeAnalysis.Extensions;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding.Serializers
+namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
     public static class SerializerMethodDataExtensions
     {

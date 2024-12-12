@@ -1,9 +1,9 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
+﻿using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers.Serializing;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers
+namespace FirstGearGames.FishNet.CodeAnalysis.Helpers
 {
     public enum SyncTypeType
     {

@@ -1,12 +1,12 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding.RemoteProcedureCalls;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding.Serializers;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers;
+﻿using FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls;
+using FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
+using FirstGearGames.FishNet.CodeAnalysis.Receivers;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using FirstGearGames.CodeAnalysis.Helpers;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
 {
@@ -50,9 +50,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
                 Debugg.Send();
                 return;
             }
-
+            
             if (!FindSerializers(context)) return;
-
+            
             if (!CreateGeneratedSerializers(context)) return;
 
             if (!CreateRpcSerializerMethods(context)) return;
