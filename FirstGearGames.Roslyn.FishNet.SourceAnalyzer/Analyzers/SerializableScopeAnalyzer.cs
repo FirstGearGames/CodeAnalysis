@@ -36,11 +36,11 @@ namespace FishNet.SourceAnaylzer.Analyzers
             SyntaxNode syntaxNode = context.Node;
 
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)
-                SerializableFinder.FindClassSerializables(context, classDeclaration);
+                SerializableFinder.AddClassSerializables(context, classDeclaration);
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
-                SerializableFinder.FindStructSerializables(context, structDeclaration);
+                SerializableFinder.AddStructSerializables(context, structDeclaration);
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
-                SerializableFinder.FindRpcSerializables(context, methodDeclaration);
+                SerializableFinder.AddRpcSerializables(context, methodDeclaration);
         }
 
         private void SerializableReceiver_OnIsNotSerializableAccessible(SyntaxNodeAnalysisContext context)

@@ -18,17 +18,17 @@ namespace FirstGearGames.Roslyn.FishNet.Receivers
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             {
                 LogVisit();
-                SerializableReceiver.FindClassSerializables(context, classDeclaration);
+                SerializableReceiver.AddClassSerializables(context, classDeclaration);
             }
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
             {
                 LogVisit();
-                SerializableReceiver.FindStructSerializables(context, structDeclaration);
+                SerializableReceiver.AddStructSerializables(context, structDeclaration);
             }
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
             {
                 LogVisit();
-                SerializableReceiver.FindRpcSerializables(context, methodDeclaration);
+                SerializableReceiver.AddRpcSerializables(context, methodDeclaration);
             }
             
 
