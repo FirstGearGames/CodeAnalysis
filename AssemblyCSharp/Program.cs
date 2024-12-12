@@ -64,17 +64,17 @@ namespace ClientAssembly
 
     public struct SimpleStructA
     {
-        public int TheNUmber;
+        public int TheNumber;
     }
 
     public struct SimpleStructB
     {
-        public int TheNUmber;
+        public int TheNumber;
     }
 
     public struct SimpleStructC
     {
-        public int TheNUmber;
+        public int TheNumber;
     }
 
     public class MyCustomSync : SyncBase, ICustomSync
