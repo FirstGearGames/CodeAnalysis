@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <RootNamespace>FirstGearGames.FishNet.CodeAnalysis.Analyzers</RootNamespace>
+        <AssemblyName>FirstGearGames.FishNet.CodeAnalysis.Analyzers</AssemblyName>
+    </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+		<PackageReference Include="Roslyn.Diagnostics.Analyzers" Version="3.3.4">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\FirstGearGames.Roslyn\**\*.cs">
+			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+		<Compile Remove="..\FirstGearGames.Roslyn\CodeBuilding\**" />
+		<Compile Include="..\FirstGearGames.Roslyn.FishNet\**\*.cs">
+			<Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+		<Compile Remove="..\FirstGearGames.Roslyn\FirstGearGames.Roslyn\**" />
+		<Compile Remove="..\FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet\**" />
+	</ItemGroup>
+
+	<Import Project="..\FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.projitems" Label="Shared" />
+
+	<Import Project="..\FirstGearGames.Roslyn\FirstGearGames.Roslyn.projitems" Label="Shared" />
+
+	<Import Project="..\FirstGearGames.FishNet.CodeAnalysis.Common\FirstGearGames.FishNet.CodeAnalysis.Common.projitems" Label="Shared" />
+
+
+</Project>
