@@ -5,7 +5,6 @@ using System.Linq;
 using FirstGearGames.Roslyn.CodeBuilding.RemoteProcedureCalls;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Receivers;
-using FirstGearGames.Roslyn.FishNet.SyncTypes;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
@@ -41,7 +40,6 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             if (context.SyntaxContextReceiver is GeneratorSyntaxReceiver syntaxReceiver)
             {
                 GeneratorSyntaxReceiver = syntaxReceiver;
-                GeneratorSyntaxReceiver.Initialize();
                 Log($"Iteration begin for assembly {context.Compilation.AssemblyName}.");
             }
             else

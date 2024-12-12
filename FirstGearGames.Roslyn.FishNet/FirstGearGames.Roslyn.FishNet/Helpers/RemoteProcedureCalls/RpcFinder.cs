@@ -25,31 +25,31 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.RemoteProcedureCalls
         /// <summary>
         /// Finds serializables for methods which implement RPC attributes.
         /// </summary>
-        public void AddRpcMethod(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
+        public void CheckRpcMethod(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol) return;
 
-            AddRpcMethod(context, methodSymbol);
+            CheckRpcMethod(context, methodSymbol);
         }
 
         /// <summary>
         /// Finds serializables for methods which implement RPC attributes.
         /// </summary>
-        public void AddRpcMethod(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
+        public void CheckRpcMethod(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol) return;
 
-            AddRpcMethod(context, methodSymbol);
+            CheckRpcMethod(context, methodSymbol);
         }
 
         /// <summary>
         /// Finds serializables for methods which implement RPC attributes.
         /// </summary>
-        private void AddRpcMethod(object context, IMethodSymbol methodSymbol)
+        private void CheckRpcMethod(object context, IMethodSymbol methodSymbol)
         {
             if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
 
