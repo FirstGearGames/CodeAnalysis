@@ -9,5 +9,33 @@
     <Import_RootNamespace>FirstGearGames.FishNet.CodeAnalysis.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CodeBuilding\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants\FishNetConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants\NativeConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants\UnityConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Debugg.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\AttributeDataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\EnumExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ExpressSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IAssemblySymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IMethodSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\INamedTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IntExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ISymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ITypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SemanticModelExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringBuilderExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcFinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcMethodData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializableFinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializableType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializerHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializerMethodDatas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\SyncTypes\SyncTypeHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SyntaxReceivers\GeneratorSyntaxReceiver.cs" />
   </ItemGroup>
 </Project>
