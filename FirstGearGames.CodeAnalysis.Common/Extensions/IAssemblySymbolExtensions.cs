@@ -1,7 +1,7 @@
 ﻿using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions
+namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class IAssemblySymbolExtensions
     {

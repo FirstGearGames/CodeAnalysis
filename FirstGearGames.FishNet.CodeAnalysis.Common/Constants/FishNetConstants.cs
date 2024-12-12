@@ -1,4 +1,4 @@
-﻿namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Constants
+﻿namespace FirstGearGames.FishNet.CodeAnalysis.Constants
 {
     public class FishNetConstants
     {

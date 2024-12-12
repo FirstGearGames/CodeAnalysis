@@ -4,7 +4,7 @@ using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants;
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding
+namespace FirstGearGames.CodeAnalysis.CodeBuilding
 {
     public static class CodeBuilder
     {

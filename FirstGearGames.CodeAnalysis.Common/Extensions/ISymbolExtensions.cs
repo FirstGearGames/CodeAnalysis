@@ -6,7 +6,7 @@ using System.Linq;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.CodeBuilding;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions
+namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class ISymbolExtensions
     {

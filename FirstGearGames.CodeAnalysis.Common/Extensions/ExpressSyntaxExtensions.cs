@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions
+namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class ExpressSyntaxExtensions
     {

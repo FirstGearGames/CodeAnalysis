@@ -10,7 +10,7 @@ using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Helpers;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.SyncTypes;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions
+namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public enum GenericArgumentType
     {

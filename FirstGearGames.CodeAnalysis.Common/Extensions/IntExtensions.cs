@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions
+namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class IntExtensions
     {

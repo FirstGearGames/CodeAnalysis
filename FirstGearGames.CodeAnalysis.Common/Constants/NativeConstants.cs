@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers.Native.Constants
+namespace FirstGearGames.CodeAnalysis.Constants
 {
     public static class NativeConstants
     {

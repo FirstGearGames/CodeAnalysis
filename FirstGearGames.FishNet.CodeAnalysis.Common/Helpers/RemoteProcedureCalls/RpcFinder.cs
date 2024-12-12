@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Extensions;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.Receivers;
 using FirstGearGames.FishNet.CodeAnalysis.Analyzers.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
