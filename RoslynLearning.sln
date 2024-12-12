@@ -18,7 +18,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirstGearGames.Roslyn.FishN
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirstGearGames.Roslyn", "FirstGearGames.Roslyn\FirstGearGames.Roslyn.shproj", "{FD824511-9B2D-4E7A-9133-246AB0A6606E}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirstGearGames.Roslyn.FishNet", "FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.shproj", "{FD824511-9B2D-4E7A-9133-246AB0A6606E}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirstGearGames.Roslyn.FishNet", "FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.shproj", "{957D3955-2D1D-4382-964B-BB7CD4BAC63B}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirstGearGames.FishNet.CodeAnalysis.Analyzers", "FirstGearGames.FishNet.CodeAnalysis.Analyzers\FirstGearGames.FishNet.CodeAnalysis.Analyzers.shproj", "{31875C05-395D-4500-9B8B-E8B9649EBECC}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirstGearGames.FishNet.CodeAnalysis.SourceGenerators", "FirstGearGames.FishNet.CodeAnalysis.SourceGenerators\FirstGearGames.FishNet.CodeAnalysis.SourceGenerators.shproj", "{3C3E8FC2-9028-47A7-9254-8D0319C6F993}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,8 +54,13 @@ Global
 		SolutionGuid = {E851779B-2B71-4EF6-B73B-246C96FEB91D}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		FishNet.Core.Annotations\FishNet.Core.Annotations.projitems*{7939c5fd-7071-44fa-bf2e-3f51344f9bef}*SharedItemsImports = 5
-		FishNet.Core\FishNet.Core.projitems*{7939c5fd-7071-44fa-bf2e-3f51344f9bef}*SharedItemsImports = 5
+		FirstGearGames.FishNet.CodeAnalysis.Analyzers\FirstGearGames.FishNet.CodeAnalysis.Analyzers.projitems*{31875c05-395d-4500-9b8b-e8b9649ebecc}*SharedItemsImports = 13
+		FirstGearGames.FishNet.CodeAnalysis.SourceGenerators\FirstGearGames.FishNet.CodeAnalysis.SourceGenerators.projitems*{3c3e8fc2-9028-47a7-9254-8d0319c6f993}*SharedItemsImports = 13
+		FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.projitems*{3d5238fe-e015-4b4d-9570-4f3c0ceaf7a6}*SharedItemsImports = 5
+		FirstGearGames.Roslyn\FirstGearGames.Roslyn.projitems*{3d5238fe-e015-4b4d-9570-4f3c0ceaf7a6}*SharedItemsImports = 5
+		FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.projitems*{7939c5fd-7071-44fa-bf2e-3f51344f9bef}*SharedItemsImports = 5
+		FirstGearGames.Roslyn\FirstGearGames.Roslyn.projitems*{7939c5fd-7071-44fa-bf2e-3f51344f9bef}*SharedItemsImports = 5
+		FirstGearGames.Roslyn.FishNet\FirstGearGames.Roslyn.FishNet.projitems*{957d3955-2d1d-4382-964b-bb7cd4bac63b}*SharedItemsImports = 13
 		FirstGearGames.Roslyn\FirstGearGames.Roslyn.projitems*{fd824511-9b2d-4e7a-9133-246ab0a6606e}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
