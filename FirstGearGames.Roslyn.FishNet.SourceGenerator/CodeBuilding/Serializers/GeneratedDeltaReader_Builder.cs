@@ -5,42 +5,41 @@ using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
-using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 using RoslynCodeBuilder = FirstGearGames.Roslyn.CodeBuilding.CodeBuilder;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
-    public class DeltaReader_Builder
+    public class GeneratedDeltaReader_Builder
     {
-        private const string InitializeOnLoad_Method_Name = DeltaWriter_Builder.InitializeOnLoad_Method_Name;
+        private const string InitializeOnLoad_Method_Name = GeneratedDeltaWriter_Builder.InitializeOnLoad_Method_Name;
         private const string Generated_Class_Name = "Generated_DeltaReaders";
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedReaderPrefix}ReadDelta";
         private const string Generated_ReaderParameter_Name = "reader";
-        private const string Generated_DeltaSerializerOption_Name = DeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
+        private const string Generated_DeltaSerializerOption_Name = GeneratedDeltaWriter_Builder.Generated_DeltaSerializerOption_Name;
 
         private static readonly StringBuilder _stringBuilder = new();
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private Methods _serializers => _generator.SerializerMethods;
+        private SerializableMethods _serializers => _generator.SerializerMethods;
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
-        private GeneratorSyntaxReceiver _rootSyntaxReceiver;
+        private GeneratorSyntaxReceiver _generatorSyntaxReceiver;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver generatorSyntaxReceiver, SerializableGenerator generator)
         {
             Log("");
             Log("Initialize.");
 
             _context = context;
-            _rootSyntaxReceiver = rootSyntaxReceiver;
+            _generatorSyntaxReceiver = generatorSyntaxReceiver;
             _generator = generator;
         }
 
-        public void CreateEmptySerializerMethods() => CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
-        public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
+        public void CreateEmptySerializerMethods() => CreateEmptySerializerMethods(_context, _generatorSyntaxReceiver);
+        public void CreateSerializerBodies() => CreateSerializerBodies(_context, _generatorSyntaxReceiver);
         public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
+            foreach (SerializableType item in syntaxReceiver.SerializableFinder.TypesNeedingSerializers)
                 CreateEmptyDeltaSerializerMethod(context, item);
         }
 
@@ -93,10 +92,10 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         /// <summary>
         /// Creates bodies for empty delta serializer methods.
         /// </summary>
-        private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver)
+        private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver generatorSyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadDeltaMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetReadDeltaMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
@@ -124,7 +123,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                 void CreateReadFullIf()
                 {
                     ITypeSymbol typeSymbol = item.Value.TypeSymbol;
-                    MethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    SerializerMethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     string optionsVariableName = $"options";
                     sb.Append(bodyIndent, RoslynCodeBuilder.CreateLocalVariable(FishNetConstants.DeltaSerializerOption_FullName, optionsVariableName, closeLine: false));
@@ -150,7 +149,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
                     Debugg.Log("");
                     Log($"Getting reader for field name {fieldSymbol.Name}");
-                    MethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out _);
+                    SerializerMethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out _);
 
                     //Neither delta nor full could be found.
                     if (!sm.IsValid())
@@ -166,7 +165,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     if (!sm.IsDeltaSerializer())
                     {
                         sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
-                        sb.AppendLine(bodyIndent + 1, _generator.ReaderBuilder.GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
+                        sb.AppendLine(bodyIndent + 1, _generator.GeneratedReaderBuilder.GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
                     }
                     else
                     {
@@ -199,9 +198,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
-            MethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
-            foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadDeltaMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetReadDeltaMethods())
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 
@@ -237,9 +236,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         /// <summary>
         /// Returns a SerializerMethod for a DefaultWriter of a type. Optionally returns a call to Write<T> if a DefaultWriter is not found.
         /// </summary>
-        private MethodData GetFullReader(string typeFullName, out bool found)
+        private SerializerMethodData GetFullReader(string typeFullName, out bool found)
         {
-            MethodData sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full);
+            SerializerMethodData sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full);
 
             found = sm.IsValid();
 

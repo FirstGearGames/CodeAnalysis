@@ -12,15 +12,15 @@ using RoslynCodeBuilder = FirstGearGames.Roslyn.CodeBuilding.CodeBuilder;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
-    public class Reader_Builder
+    public class GeneratedReader_Builder
     {
         private const string Generated_Class_Name = "Generated_Readers";
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedReaderPrefix}Read";
         private const string Generated_ReaderParameter_Name = "reader";
-        public const string InitializeOnLoad_Method_Name = Writer_Builder.InitializeOnLoad_Method_Name;
+        public const string InitializeOnLoad_Method_Name = GeneratedWriter_Builder.InitializeOnLoad_Method_Name;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private Methods _serializers => _generator.SerializerMethods;
+        private SerializableMethods _serializers => _generator.SerializerMethods;
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
@@ -41,9 +41,9 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
         public void CreateGeneratedSerializersClass() => CreateGeneratedSerializersClass(_context);
 
-        public MethodData CreateSerializerMethod(ITypeSymbol typeSymbol)
+        public SerializerMethodData CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new MethodData(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
+            return new SerializerMethodData(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
+            foreach (SerializableType item in syntaxReceiver.SerializableFinder.TypesNeedingSerializers)
                 CreateEmptySerializerMethod(context, item);
         }
 
@@ -108,7 +108,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetReadMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
@@ -129,7 +129,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    MethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    SerializerMethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     //Serializer not found.
                     if (!sm.IsValid())
@@ -157,11 +157,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
-            MethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             int addedSerializers = 0;
 
-            foreach (KeyValuePair<string, MethodData> item in _serializers.GetReadMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetReadMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
 
@@ -199,7 +199,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             return sb.ToString();
         }
 
-        public string GetReadCall(MethodData sm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
+        public string GetReadCall(SerializerMethodData sm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
         {
             if (!sm.IsValid())
                 return string.Empty;

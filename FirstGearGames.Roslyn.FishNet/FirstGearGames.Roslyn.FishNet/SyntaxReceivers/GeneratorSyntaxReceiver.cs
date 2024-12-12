@@ -1,4 +1,5 @@
 ﻿using FirstGearGames.Roslyn.FishNet.Helpers;
+using FirstGearGames.Roslyn.FishNet.Helpers.RemoteProcedureCalls;
 using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using Microsoft.CodeAnalysis;
@@ -8,7 +9,14 @@ namespace FirstGearGames.Roslyn.FishNet.Receivers
 {
     public class GeneratorSyntaxReceiver : ISyntaxContextReceiver
     {
-        public SerializableFinder SerializableReceiver = new();
+        public SerializableFinder SerializableFinder;
+        public RpcFinder RpcFinder;
+
+        public void Initialize()
+        {
+            SerializableFinder = new(this);
+            RpcFinder = new(this);
+        }
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
@@ -18,17 +26,18 @@ namespace FirstGearGames.Roslyn.FishNet.Receivers
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             {
                 LogVisit();
-                SerializableReceiver.AddClassSerializables(context, classDeclaration);
+                SerializableFinder.AddClassSerializables(context, classDeclaration);
             }
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
             {
                 LogVisit();
-                SerializableReceiver.AddStructSerializables(context, structDeclaration);
+                SerializableFinder.AddStructSerializables(context, structDeclaration);
             }
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
             {
                 LogVisit();
-                SerializableReceiver.AddRpcSerializables(context, methodDeclaration);
+                SerializableFinder.AddRpcSerializables(context, methodDeclaration);
+                RpcFinder.AddRpcMethod(context, methodDeclaration);
             }
             
 

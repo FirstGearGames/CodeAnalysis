@@ -5,45 +5,45 @@ using FirstGearGames.Roslyn.Extensions;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
-    public static class MethodDataExtensions
+    public static class SerializerMethodDataExtensions
     {
-        public static bool IsValid(this MethodData? sm)
+        public static bool IsValid(this SerializerMethodData? sm)
         {
             if (sm == null) return false;
             return !string.IsNullOrWhiteSpace(sm.TypeFullName);
         }
     }
 
-    public class MethodContent
+    public class SerializerMethodContent
     {
         public StringBuilder Header;
         public StringBuilder Body;
 
-        public MethodContent()
+        public SerializerMethodContent()
         {
             Header = new();
             Body = new();
         }
 
-        public MethodContent(StringBuilder header)
+        public SerializerMethodContent(StringBuilder header)
         {
             Header = header;
             Body = new();
         }
 
-        public MethodContent(string header)
+        public SerializerMethodContent(string header)
         {
             Header = new(header);
             Body = new();
         }
 
-        public MethodContent(StringBuilder header, StringBuilder body)
+        public SerializerMethodContent(StringBuilder header, StringBuilder body)
         {
             Header = header;
             Body = body;
         }
 
-        public MethodContent(string header, string body)
+        public SerializerMethodContent(string header, string body)
         {
             Header = new(header);
             Body = new(body);
@@ -67,7 +67,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         }
     }
 
-    public class MethodData
+    public class SerializerMethodData
     {
         /// <summary>
         /// Type the serializer is for.
@@ -96,11 +96,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         /// <summary>
         /// Content of the method.
         /// </summary>
-        public readonly MethodContent MethodContent;
+        public readonly SerializerMethodContent MethodContent;
 
-        public MethodData() { }
+        public SerializerMethodData() { }
 
-        public MethodData(ITypeSymbol typeSymbol, string methodName)
+        public SerializerMethodData(ITypeSymbol typeSymbol, string methodName)
         {
             TypeSymbol = typeSymbol;
             TypeFullName = typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
@@ -110,7 +110,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             MethodContent = new();
         }
 
-        public MethodData(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody) : this(typeSymbol, methodName)
+        public SerializerMethodData(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody) : this(typeSymbol, methodName)
         {
             MethodContent = new(methodSignature, methodBody);
         }
@@ -127,7 +127,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         public virtual bool IsDeltaSerializer() => false;
     }
 
-    public class DeltaSerializerMethod : MethodData
+    public class DeltaSerializerMethod : SerializerMethodData
     {
         public DeltaSerializerMethod(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody) : base(typeSymbol, methodName, methodSignature, methodBody) { }
 
@@ -148,7 +148,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         public GeneratedDeltaSerializerMethod(ITypeSymbol typeSymbol, string methodName, string methodSignature, string methodBody) : base(typeSymbol, methodName, methodSignature, methodBody) { }
     }
 
-    public class GeneratedSerializerMethod : MethodData
+    public class GeneratedSerializerMethod : SerializerMethodData
     {
         /// <summary>
         /// True if is a generated serializer.

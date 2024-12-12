@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Helpers.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
@@ -85,13 +86,13 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             return _stringBuilder.ToString();
         }
 
-        public static MethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
+        public static SerializerMethodContent CreatePublicRuntimeInitializeOnLoadMethod(int indent, string methodName)
         {
             StringBuilder sb = new();
             sb.AppendLine(indent, $"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
             sb.Append(indent, $"public static void {methodName}()");
 
-            return new MethodContent(sb);
+            return new SerializerMethodContent(sb);
         }
     }
 }

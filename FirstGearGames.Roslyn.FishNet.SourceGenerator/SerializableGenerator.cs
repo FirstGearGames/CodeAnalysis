@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
+using FirstGearGames.Roslyn.CodeBuilding.RemoteProcedureCalls;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.SyncTypes;
@@ -11,11 +12,16 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
     [Generator]
     public sealed class SerializableGenerator : ISourceGenerator
     {
-        internal Methods SerializerMethods;
-        internal DeltaWriter_Builder DeltaWriterBuilder;
-        internal DeltaReader_Builder DeltaReaderBuilder;
-        internal Writer_Builder WriterBuilder;
-        internal Reader_Builder ReaderBuilder;
+        public GeneratorSyntaxReceiver GeneratorSyntaxReceiver;
+
+        public SerializableMethods SerializerMethods;
+
+        public GeneratedDeltaWriter_Builder GeneratedDeltaWriterBuilder;
+        public GeneratedDeltaReader_Builder GeneratedDeltaReaderBuilder;
+        public GeneratedWriter_Builder GeneratedWriterBuilder;
+        public GeneratedReader_Builder GeneratedReaderBuilder;
+
+        public RpcWriter_Builder RpcWriterBuilder;
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -32,23 +38,38 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 
             Debugg.SetAssemblyName(assemblyName);
 
-            if (context.SyntaxContextReceiver is not GeneratorSyntaxReceiver syntaxReceiver)
+            if (context.SyntaxContextReceiver is GeneratorSyntaxReceiver syntaxReceiver)
+            {
+                GeneratorSyntaxReceiver = syntaxReceiver;
+                GeneratorSyntaxReceiver.Initialize();
+                Log($"Iteration begin for assembly {context.Compilation.AssemblyName}.");
+            }
+            else
             {
                 Log($"Excepted receiver to be our own, it was not.");
                 Debugg.Send();
                 return;
             }
-            else
-            {
-                Log($"Iteration begin for assembly {context.Compilation.AssemblyName}.");
-            }
+            
+            if (!FindSerializers(context)) return;
 
+            if (!CreateGeneratedSerializers(context)) return;
+
+            if (!CreateRpcSerializerMethods(context)) return;
+
+            Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
+
+            Debugg.Send();
+        }
+
+        private bool FindSerializers(GeneratorExecutionContext context)
+        {
             IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
             if (fishnetRuntimeAssemblySymbol == null)
             {
                 Log($"FishNet assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
                 Debugg.Send();
-                return;
+                return false;
             }
 
             /* Initialize the serializers class which finds
@@ -56,47 +77,59 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             SerializerMethods = new();
             SerializerMethods.Initialize(fishnetRuntimeAssemblySymbol);
 
+            return true;
+        }
 
+        private bool CreateGeneratedSerializers(GeneratorExecutionContext context)
+        {
             /* Initialize each builder. This mostly
              * just sets references. */
-            DeltaWriterBuilder = new();
-            DeltaWriterBuilder.Initialize(context, syntaxReceiver, this);
+            GeneratedDeltaWriterBuilder = new();
+            GeneratedDeltaWriterBuilder.Initialize(context, GeneratorSyntaxReceiver, this);
 
-            DeltaReaderBuilder = new();
-            DeltaReaderBuilder.Initialize(context, syntaxReceiver, this);
+            GeneratedDeltaReaderBuilder = new();
+            GeneratedDeltaReaderBuilder.Initialize(context, GeneratorSyntaxReceiver, this);
 
-            WriterBuilder = new();
-            WriterBuilder.Initialize(context, syntaxReceiver, this);
+            GeneratedWriterBuilder = new();
+            GeneratedWriterBuilder.Initialize(context, GeneratorSyntaxReceiver, this);
 
-            ReaderBuilder = new();
-            ReaderBuilder.Initialize(context, syntaxReceiver, this);
+            GeneratedReaderBuilder = new();
+            GeneratedReaderBuilder.Initialize(context, GeneratorSyntaxReceiver, this);
 
             /* Create the method template of each generated serializer. These need
              * to be done before any bodies are generated so that
              * generated bodies can call stubs. */
-            DeltaWriterBuilder.CreateEmptySerializerMethods();
-            DeltaReaderBuilder.CreateEmptySerializerMethods();
-            WriterBuilder.CreateEmptySerializerMethods();
-            ReaderBuilder.CreateEmptySerializerMethods();
+            GeneratedDeltaWriterBuilder.CreateEmptySerializerMethods();
+            GeneratedDeltaReaderBuilder.CreateEmptySerializerMethods();
+            GeneratedWriterBuilder.CreateEmptySerializerMethods();
+            GeneratedReaderBuilder.CreateEmptySerializerMethods();
 
             /* Make method bodies. This is done separately from
              * creating the class with the empty serializer methods
              * so it is easier to debug sections of code where one builder
              * might be causing problems with another. */
-            DeltaWriterBuilder.CreateSerializerBodies();
-            DeltaReaderBuilder.CreateSerializerBodies();
-            WriterBuilder.CreateSerializerBodies();
-            ReaderBuilder.CreateSerializerBodies();
-            
+            GeneratedDeltaWriterBuilder.CreateSerializerBodies();
+            GeneratedDeltaReaderBuilder.CreateSerializerBodies();
+            GeneratedWriterBuilder.CreateSerializerBodies();
+            GeneratedReaderBuilder.CreateSerializerBodies();
+
             /* Create the class containing generated serializers. */
-            DeltaWriterBuilder.CreateGeneratedSerializersClass();
-            DeltaReaderBuilder.CreateGeneratedSerializersClass();
-            WriterBuilder.CreateGeneratedSerializersClass();
-            ReaderBuilder.CreateGeneratedSerializersClass();
+            GeneratedDeltaWriterBuilder.CreateGeneratedSerializersClass();
+            GeneratedDeltaReaderBuilder.CreateGeneratedSerializersClass();
+            GeneratedWriterBuilder.CreateGeneratedSerializersClass();
+            GeneratedReaderBuilder.CreateGeneratedSerializersClass();
 
-            Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
+            return true;
+        }
 
-            Debugg.Send();
+        private bool CreateRpcSerializerMethods(GeneratorExecutionContext context)
+        {
+            RpcWriterBuilder = new();
+            RpcWriterBuilder.Initialize(context, GeneratorSyntaxReceiver);
+
+            RpcWriterBuilder.CreateEmptySerializerMethods();
+
+            return true;
         }
 
         private IAssemblySymbol? GetFishNetRuntimeAssemblySymbol(in GeneratorExecutionContext context)

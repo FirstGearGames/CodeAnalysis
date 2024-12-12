@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
+using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.RemoteProcedureCalls;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
@@ -13,18 +14,16 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
 {
     public class SerializableFinder
     {
-        public enum TypeScope
+        public SerializableFinder(GeneratorSyntaxReceiver generatorSyntaxReceiver)
         {
-            Unset,
-            Public,
-            Private,
+            _generatorSyntaxReceiver = generatorSyntaxReceiver;
         }
 
         public event Action<SyntaxNodeAnalysisContext> OnIsNotSerializableAccessible;
 
-        public const string NetworkConnection_FullName = "FishNet.Connection.NetworkConnection";
-        public const string Channel_FullName = "FishNet.Transporting.Channel";
         public readonly HashSet<SerializableType> TypesNeedingSerializers = new();
+
+        private GeneratorSyntaxReceiver _generatorSyntaxReceiver;
 
         public void AddStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
@@ -228,7 +227,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.
-                    if (parameters[0].Type.GetTypeSymbolFullName(metadataName) == NetworkConnection_FullName)
+                    if (parameters[0].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
 
@@ -237,7 +236,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                 {
                     if (parametersCount == 0) return;
                     //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == NetworkConnection_FullName)
+                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
 
@@ -247,7 +246,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                     if (parametersCount == 0) return;
                     if (!parameters[parametersCount - 1].IsOptional) return;
                     //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == Channel_FullName)
+                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
                         parameters.RemoveAt(--parametersCount);
                 }
             }
@@ -299,8 +298,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                     return false;
             }
 
-            TypeScope typeScope = GetTypeScope(context, namedTypeSymbol);
-            if (typeScope == TypeScope.Unset)
+            if (!namedTypeSymbol.HasPublicAccessibility())
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnIsNotSerializableAccessible?.Invoke(analysisContext);
@@ -339,35 +337,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                     namedTypeSymbol = nts;
             }
         }
-
-        /// <summary>
-        /// Returns if a type is accessible for serialization.
-        /// This returns true if scope is internal or public, or if the class it's nested within is partial.
-        /// </summary>
-        private TypeScope GetTypeScope(object context, INamedTypeSymbol typeSymbol)
-        {
-            //Public.
-            if (typeSymbol.DeclaredAccessibility is Accessibility.Public) return TypeScope.Public;
-            ////Internal.
-            //if (typeSymbol.DeclaredAccessibility is Accessibility.Internal or Accessibility.ProtectedAndInternal) return SerializableType.TypeExposure.Internal;
-
-            /* If here type is not exposed enough. See if containing type is partial which will allow us
-             * to put the generated serializer in the containing type. */
-
-            if (typeSymbol.ContainingType is not INamedTypeSymbol baseNamedType) return TypeScope.Unset;
-
-            if (baseNamedType.DeclaringSyntaxReferences.First() is not SyntaxReference syntaxReference) return TypeScope.Unset;
-
-            SyntaxNode node = syntaxReference.GetSyntax();
-            if (node is not TypeDeclarationSyntax typeDeclaration) return TypeScope.Unset;
-
-            // if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
-            //     return SerializableType.TypeExposure.NestedWithinPartial;
-
-            //Not partial.
-            return TypeScope.Unset;
-        }
-
+        
         private void Log(string txt)
         {
             if (txt.Length == 0)

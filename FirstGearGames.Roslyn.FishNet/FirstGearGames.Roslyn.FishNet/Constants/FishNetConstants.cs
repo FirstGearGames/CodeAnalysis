@@ -369,6 +369,14 @@
         /// FastContains method.
         /// </summary>
         public const string FastContains_Name = "FastContains";
+        /// <summary>
+        /// NetworkConnection class.
+        /// </summary>
+        public const string NetworkConnection_FullName = "FishNet.Connection.NetworkConnection";
+        /// <summary>
+        /// Channel enum.
+        /// </summary>
+        public const string Channel_FullName = "FishNet.Transporting.Channel";
 
         #endregion
     }

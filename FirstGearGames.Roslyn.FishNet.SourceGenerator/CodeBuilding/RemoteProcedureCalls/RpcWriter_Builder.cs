@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using FirstGearGames.Roslyn.Extensions;
-using FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers;
+﻿using System.Text;
 using FirstGearGames.Roslyn.FishNet.Constants;
 using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
 using FirstGearGames.Roslyn.FishNet.Receivers;
@@ -9,12 +6,8 @@ using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.Roslyn.CodeBuilding.RemoteProcedureCalls
 {
-    public class Rpc_Builder
+    public class RpcWriter_Builder
     {
-        public const string Generated_WriterParameter_Name = "writer";
-        public const string InitializeOnLoad_Method_Name = "InitializeSerializers";
-        private const string Generated_Class_Name = "Generated_Writers";
-        private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}Write";
 
         private static StringBuilder _stringBuilder = new();
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -40,7 +33,7 @@ namespace FirstGearGames.Roslyn.CodeBuilding.RemoteProcedureCalls
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
+            foreach (SerializableType item in syntaxReceiver.SerializableFinder.TypesNeedingSerializers)
             {
                 Log("//////////////////////////");
                 Log($"Processing root serializable type {item.FullName}.");

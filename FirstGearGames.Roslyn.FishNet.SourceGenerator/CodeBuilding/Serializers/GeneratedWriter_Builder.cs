@@ -1,20 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using FirstGearGames.Roslyn.Extensions;
-using FirstGearGames.Roslyn.FishNet;
-using FirstGearGames.Roslyn.FishNet.CodeBuilding;
 using FirstGearGames.Roslyn.FishNet.Constants;
-using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.Receivers;
 using FirstGearGames.Roslyn.FishNet.Helpers.Serializing;
-using FirstGearGames.Roslyn.FishNet.SyncTypes;
-using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 using RoslynCodeBuilder = FirstGearGames.Roslyn.CodeBuilding.CodeBuilder;
 
 namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 {
-    public class Writer_Builder
+    public class GeneratedWriter_Builder
     {
         public const string Generated_WriterParameter_Name = "writer";
         public const string InitializeOnLoad_Method_Name = "InitializeSerializers";
@@ -23,7 +18,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
 
         private static StringBuilder _stringBuilder = new();
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private Methods _methods => _generator.SerializerMethods;
+        private SerializableMethods _methods => _generator.SerializerMethods;
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
@@ -49,7 +44,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         /// </summary>
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableReceiver.TypesNeedingSerializers)
+            foreach (SerializableType item in syntaxReceiver.SerializableFinder.TypesNeedingSerializers)
             {
                 Log("//////////////////////////");
                 Log($"Processing root serializable type {item.FullName}.");
@@ -106,7 +101,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, MethodData> item in _methods.GetWriteMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _methods.GetWriteMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
@@ -124,7 +119,7 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    MethodData sm = _methods.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    SerializerMethodData sm = _methods.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     //Serializer not found.
                     if (!sm.IsValid())
@@ -150,11 +145,11 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             sb.AppendLine(clsText);
 
             const int initializeIndent = 2;
-            MethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
 
             int addedSerializers = 0;
 
-            foreach (KeyValuePair<string, MethodData> item in _methods.GetWriteMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _methods.GetWriteMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
 
@@ -192,15 +187,26 @@ namespace FirstGearGames.Roslyn.FishNet.CodeBuilding.Serializers
             return sb.ToString();
         }
 
-        public string GetWriteCall(MethodData sm, string writerVariableName, string fieldName, bool closeCall)
+        /// <summary>
+        /// Returns a call to WriteNamedMethod.
+        /// </summary>
+        public string GetWriteCall(SerializerMethodData sm, string writerVariableName, string fieldName, bool closeCall)
+        {
+            if (!sm.IsValid())
+                return string.Empty;
+            
+            return RoslynCodeBuilder.CallMethod($"{sm.MethodName}", writerVariableName, closeCall, $"{_methods.GetValueParameterName(0)}.{fieldName}");
+        }
+
+        /// <summary>
+        /// Returns a call to Write<T>.
+        /// </summary>
+        public string GetWriteGenericCall(SerializerMethodData sm, string writerVariableName, string parameterName,  bool closeCall)
         {
             if (!sm.IsValid())
                 return string.Empty;
 
-            // if (sm.IsGenerated())
-            //     return RoslynCodeBuilder.CallMethod($"Write", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}");
-            // else
-            return RoslynCodeBuilder.CallMethod($"{sm.MethodName}", writerVariableName, closeCall, $"{_methods.GetValueParameterName(0)}.{fieldName}");
+            return RoslynCodeBuilder.CallMethod($"Write", writerVariableName, closeCall, $"{parameterName}");
         }
 
         private void Log(string txt)
