@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FirstGearGames.Roslyn.Extensions;
 using FirstGearGames.Roslyn.FishNet.Constants;
-using FirstGearGames.Roslyn.FishNet.Helpers;
 using FirstGearGames.Roslyn.FishNet.RemoteProcedureCalls;
-using FirstGearGames.Roslyn.FishNet.SyncTypes;
 using FirstGearGames.Roslyn.Native.Constants;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -28,40 +26,40 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
         public const string Channel_FullName = "FishNet.Transporting.Channel";
         public readonly HashSet<SerializableType> TypesNeedingSerializers = new();
 
-        public void FindStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
+        public void AddStructSerializables(GeneratorSyntaxContext context, StructDeclarationSyntax structDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(context, namedTypeSymbol, checkForSerializableIdentifier: false);
+            AddNamedTypeSymbolSerializables(context, namedTypeSymbol, checkForSerializableIdentifier: false);
         }
 
-        public void FindStructSerializables(SyntaxNodeAnalysisContext context, StructDeclarationSyntax structDeclaration)
+        public void AddStructSerializables(SyntaxNodeAnalysisContext context, StructDeclarationSyntax structDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, structDeclaration);
-            
+
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindNamedTypeSymbolSerializables(context, namedTypeSymbol, checkForSerializableIdentifier: false);
+            AddNamedTypeSymbolSerializables(context, namedTypeSymbol, checkForSerializableIdentifier: false);
         }
 
-        public void FindClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
+        public void AddClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindClassSerializables(context, namedTypeSymbol, context.SemanticModel);
+            AddClassSerializables(context, namedTypeSymbol, context.SemanticModel);
         }
 
-        public void FindClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
+        public void AddClassSerializables(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classDeclaration);
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            FindClassSerializables(context, namedTypeSymbol, context.SemanticModel);
+            AddClassSerializables(context, namedTypeSymbol, context.SemanticModel);
         }
 
         /// <summary>
@@ -70,16 +68,16 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
         /// <param name="context"></param>
         /// <param name="namedTypeSymbol"></param>
         /// <param name="semanticModel"></param>
-        private void FindClassSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
+        private void AddClassSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
         {
             //Find syncTypes. This only runs if not a NetworkBehaviour. 
-            FindSyncTypeSerializables(context, namedTypeSymbol, semanticModel);
+            AddSyncTypeSerializables(context, namedTypeSymbol, semanticModel);
         }
 
         /// <summary>
         /// Finds SyncType serializables within a namedTypeSymbol that inherits NetowrkBehaviour.
         /// </summary>
-        public void FindSyncTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
+        public void AddSyncTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
         {
             //Named type must inherit NetworkBehaviour to look for SyncTypes.
             if (!namedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName))
@@ -105,14 +103,14 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
 
                 //Custom.
                 if (stt == SyncTypeType.Custom)
-                    FindCustomSyncTypeSerializable(fieldNamedTypeSymbol);
+                    AddCustomSyncTypeSerializable(fieldNamedTypeSymbol);
                 //SyncType is built into FishNet with generics.
                 else
-                    FindIncludedGenericSyncTypeSerializable(fieldNamedTypeSymbol);
+                    AddIncludedGenericSyncTypeSerializable(fieldNamedTypeSymbol);
             }
 
             //Finds serializables for generic synctypes such as SyncVar<T>.
-            void FindIncludedGenericSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol)
+            void AddIncludedGenericSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol)
             {
                 List<ITypeSymbol> genericArgumentTypeSymbols = fieldNamedTypeSymbol.GetGenericArgumentsOfNamedTypeSymbol();
                 /* FullNames added this iteration.
@@ -130,7 +128,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
             }
 
             //Finds serializables on types which implement ICustomSync by reading the GetSerializedType method.
-            void FindCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol)
+            void AddCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol)
             {
                 IMethodSymbol methodSymbol = fieldNamedTypeSymbol.GetMethod(FishNetConstants.ICustomSync_GetSerializedType_Name, metadataName: false);
                 if (methodSymbol == null) return;
@@ -155,33 +153,49 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
         /// <summary>
         /// Finds serializables for methods which implement RPC attributes.
         /// </summary>
-        public void FindRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
+        public void AddRpcSerializables(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol) return;
 
-            FindRpcSerializables(context, methodSymbol);
+            AddRpcSerializables(context, methodSymbol);
         }
 
         /// <summary>
         /// Finds serializables for methods which implement RPC attributes.
         /// </summary>
-        public void FindRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
+        public void AddRpcSerializables(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol) return;
 
-            FindRpcSerializables(context, methodSymbol);
+            AddRpcSerializables(context, methodSymbol);
         }
 
         /// <summary>
         /// Finds serializables for methods which implement RPC attributes.
         /// </summary>
-        private void FindRpcSerializables(object context, IMethodSymbol methodSymbol)
+        private void AddRpcSerializables(object context, IMethodSymbol methodSymbol)
         {
-            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
+            List<IParameterSymbol> serializables = GetRpcSerializableParameters(context, methodSymbol);
+
+            foreach (IParameterSymbol parameterSymbol in serializables)
+            {
+                if (parameterSymbol.Type is INamedTypeSymbol namedSymbol)
+                    AddSerializableType(context, namedSymbol);
+            }
+        }
+
+        /// <summary>
+        /// Returns possible serializables in a Rpc.
+        /// </summary>
+        public List<IParameterSymbol> GetRpcSerializableParameters(object context, IMethodSymbol methodSymbol)
+        {
+            List<IParameterSymbol> serializableResults = new();
+
+            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return serializableResults;
 
             List<IParameterSymbol> parameters = methodSymbol.Parameters.ToList();
             int parametersCount = parameters.Count;
@@ -195,7 +209,7 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                 {
                     RemoveTrailingNetworkConnection();
                     RemoveTrailingChannel();
-                } 
+                }
                 //TargetRpc.
                 else if (item.RPCType == RPCType.Target)
                 {
@@ -238,20 +252,20 @@ namespace FirstGearGames.Roslyn.FishNet.Helpers.Serializing
                 }
             }
 
-            //Anything left in parameters is serializable.
-            foreach (IParameterSymbol parameter in parameters)
+            for (int i = 0; i < parameters.Count; i++)
             {
-                if (parameter is not INamedTypeSymbol namedSymbol) continue;
-
-                AddSerializableType(context, namedSymbol);
+                if (parameters[i].Type is not INamedTypeSymbol)
+                    parameters.RemoveAt(i--);
             }
+
+            return parameters;
         }
 
         /// <summary>
         /// Finds serializables for an INamedTypeSymbol which may not be bound to specific mechanics, such as RPC.
         /// This method will ignore symbols which inherit NetworkBehaviour.
         /// </summary>
-        public void FindNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol, bool checkForSerializableIdentifier)
+        public void AddNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol, bool checkForSerializableIdentifier)
         {
             if (checkForSerializableIdentifier && !namedTypeSymbol.HasSerializableIdentifier())
                 return;
