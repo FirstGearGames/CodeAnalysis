@@ -208,7 +208,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             if (!sm.IsValid())
                 return string.Empty;
 
-            return CodeBuilder.CallMethod($"Write", writerVariableName, closeCall, $"{parameterName}");
+            return CodeBuilder.CallMethod($"Write<{sm.TypeSymbol.GetTypeSymbolFullName(metadataName: false)}{sm.GenericArguments.GetCombinedGenericArguments(sm.TypeSymbol)}>", writerVariableName, closeCall, $"{parameterName}");
         }
 
         private void Log(string txt)

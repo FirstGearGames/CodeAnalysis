@@ -69,13 +69,17 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
             {
                 _stringBuilder.Clear();
                 //Prefix_MethodName(
-                _stringBuilder.Append(indent, $"{GENERATED_METHOD_PREFIX}{methodData.MethodName}(");
+                string returnType = methodData.MethodSymbol.ReturnType.GetTypeSymbolFullName(metadataName: false);
+                _stringBuilder.Append(indent, $"public {returnType} {GENERATED_METHOD_PREFIX}{methodData.MethodName}(");
 
                 _stringList.Clear();
                 //Add parameters to list as: ParameterType.FullName p___variableName.
                 foreach (IParameterSymbol symbol in methodData.SerializableParameters)
-                    _stringList.Add($"{symbol.Type.GetTypeSymbolFullName(metadataName: false)} {GENERATED_PAREMETER_PREFIX}{symbol.Name}");
-                
+                {
+                    string symbolTypeName = symbol.Type.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
+                    _stringList.Add($"{symbolTypeName} {GENERATED_PAREMETER_PREFIX}{symbol.Name}");
+                }
+
                 //Add parameters to header.
                 _stringBuilder.Append(string.Join(", ", _stringList));
                 //Close header off and return it.
