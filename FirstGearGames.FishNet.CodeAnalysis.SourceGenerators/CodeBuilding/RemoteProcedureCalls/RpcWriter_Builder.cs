@@ -1,22 +1,30 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
+using FirstGearGames.CodeAnalysis.Extensions;
 using FirstGearGames.CodeAnalysis.Helpers;
-using FirstGearGames.FishNet.CodeAnalysis.Constants;
-using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
+using FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers;
+using FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls;
 using FirstGearGames.FishNet.CodeAnalysis.Receivers;
+using FirstGearGames.FishNet.CodeAnalysis.SourceGenerators;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 {
     public class RpcWriter_Builder
     {
+        public const string GENERATED_METHOD_PREFIX = "SendRpc_";
+        public const string GENERATED_PAREMETER_PREFIX = "p___";
 
-        private static StringBuilder _stringBuilder = new();
+        private StringBuilder _stringBuilder = new();
+        private List<string> _stringList = new();
+        private SerializableGenerator _generator;
+        
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
         {
             Log("");
             Log("Initialize.");
@@ -24,39 +32,90 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 
             _context = context;
             _rootSyntaxReceiver = rootSyntaxReceiver;
+            _generator = generator;
         }
 
-        public void CreateEmptySerializerMethods() => CreateEmptySerializerMethods(_context, _rootSyntaxReceiver);
+        public void CreateEmptyRpcMethods() => CreateEmptyRpcMethods(_context, _rootSyntaxReceiver);
         public void CreateSerializerBodies() => CreateSerializerBodies(_context, _rootSyntaxReceiver);
 
         /// <summary>
         /// Creates SerializerMethod for each type in need.
         /// </summary>
-        private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
+        private void CreateEmptyRpcMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (SerializableType item in syntaxReceiver.SerializableFinder.TypesNeedingSerializers)
-            {
-                Log("//////////////////////////");
-                Log($"Processing root serializable type {item.FullName}.");
-                Log("//////////////////////////");
-                CreateEmptySerializerMethod(context, item);
-            }
+            foreach (RpcMethodDatas item in syntaxReceiver.RpcFinder.MethodsNeedingSerializers)
+                CreateEmptyRpcMethod(context, item);
         }
 
         /// <summary>
         /// Creates an empty delta serializer method for a type.
         /// </summary>
-        private void CreateEmptySerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
+        private void CreateEmptyRpcMethod(GeneratorExecutionContext context, RpcMethodDatas methodData)
         {
+            Log($"Processing rpc method name {methodData.MethodName}.");
+
+            const int indent = 3;
+            
+            string header = CreateMethodHeader();
+            string writeBody = CreateBody();
+            
+            RpcMethodContent methodContent = new(header, writeBody);
+            methodData.MethodContent = methodContent;
+
+            Log(methodContent.ToString(indent));
+            
+            //Creates the header for the method.
+            string CreateMethodHeader()
+            {
+                _stringBuilder.Clear();
+                //Prefix_MethodName(
+                _stringBuilder.Append(indent, $"{GENERATED_METHOD_PREFIX}{methodData.MethodName}(");
+
+                _stringList.Clear();
+                //Add parameters to list as: ParameterType.FullName p___variableName.
+                foreach (IParameterSymbol symbol in methodData.SerializableParameters)
+                    _stringList.Add($"{symbol.Type.GetTypeSymbolFullName(metadataName: false)} {GENERATED_PAREMETER_PREFIX}{symbol.Name}");
+                
+                //Add parameters to header.
+                _stringBuilder.Append(string.Join(", ", _stringList));
+                //Close header off and return it.
+                _stringBuilder.Append(")");
+                
+                return _stringBuilder.ToString();
+            }
+
+            //Creates calls to Write<T> for each parameter, and calls send rpc.
+            string CreateBody()
+            {
+                _stringBuilder.Clear();
+
+                _stringBuilder.AppendLine(indent + 1, GeneralBuilder.CallGetPooledWriter(out string writerVariableName));
+                _stringBuilder.AppendLine();
+
+                GeneratedWriter_Builder generatedWriterBuilder = _generator.GeneratedWriterBuilder;
+                SerializableMethods serializerMethods = _generator.SerializerMethods;
+                
+                foreach (IParameterSymbol symbol in methodData.SerializableParameters)
+                {
+                    SerializerMethodData smd = serializerMethods.CreateWriteGenericSerializerMethod(symbol.Type, metadataName: false);
+                    _stringBuilder.AppendLine(indent + 1,
+                        generatedWriterBuilder.GetWriteGenericCall(smd, writerVariableName, $"{GENERATED_PAREMETER_PREFIX}{symbol.Name}",closeCall: true)
+                        );
+                }
+
+                //todo: call the 'sendRpc' method before pooling.
+                
+                _stringBuilder.AppendLine();
+                _stringBuilder.AppendLine(indent + 1, GeneralBuilder.CallStorePooledWriter(writerVariableName, closeCall: true));
+                
+                return _stringBuilder.ToString();
+            }
         }
 
         /// <summary>
         /// Creates bodies for empty delta serializer methods.
         /// </summary>
-        private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
-        {
-        }
-
+        private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver) { }
 
         private void Log(string txt)
         {

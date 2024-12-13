@@ -8,7 +8,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.SimpleStructA result = new();
 
-			result.TheNUmber = reader.ReadInt32();
+			result.TheNumber = reader.ReadInt32();
 			return result;
 		}
 
@@ -16,7 +16,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.SimpleStructB result = new();
 
-			result.TheNUmber = reader.ReadInt32();
+			result.TheNumber = reader.ReadInt32();
 			return result;
 		}
 
@@ -24,7 +24,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.SimpleStructC result = new();
 
-			result.TheNUmber = reader.ReadInt32();
+			result.TheNumber = reader.ReadInt32();
 			return result;
 		}
 

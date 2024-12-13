@@ -6,19 +6,19 @@ namespace FishNet.Serializing
 
 		public static void GWrite___WriteClientAssembly_SimpleStructA(this FishNet.Serializing.Writer writer, ClientAssembly.SimpleStructA value0)
 		{
-			writer.WriteInt32(value0.TheNUmber);
+			writer.WriteInt32(value0.TheNumber);
 
 		}
 
 		public static void GWrite___WriteClientAssembly_SimpleStructB(this FishNet.Serializing.Writer writer, ClientAssembly.SimpleStructB value0)
 		{
-			writer.WriteInt32(value0.TheNUmber);
+			writer.WriteInt32(value0.TheNumber);
 
 		}
 
 		public static void GWrite___WriteClientAssembly_SimpleStructC(this FishNet.Serializing.Writer writer, ClientAssembly.SimpleStructC value0)
 		{
-			writer.WriteInt32(value0.TheNUmber);
+			writer.WriteInt32(value0.TheNumber);
 
 		}
 

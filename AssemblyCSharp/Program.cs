@@ -85,7 +85,7 @@ namespace ClientAssembly
         }
     }
 
-    public class Player : NetworkBehaviour
+    public partial class Player : NetworkBehaviour
     {
         public SyncDictionary<SimpleStructA, SimpleStructB> _syncDictionary = new();
         public MyCustomSync _customSync = new();
@@ -139,7 +139,7 @@ namespace ClientAssembly
         //}
 
         [ServerRpc]
-        private void MyRpcTwo(MyStructC ms) { }
+        private void MyRpcTwo(MyStructC ms, string txt, int value) { }
 
         // [ServerRpc]
         // private void MyRpc(int value, Channel channel = Channel.Unreliable)

@@ -125,9 +125,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
         private bool CreateRpcSerializerMethods(GeneratorExecutionContext context)
         {
             RpcWriterBuilder = new();
-            RpcWriterBuilder.Initialize(context, GeneratorSyntaxReceiver);
+            RpcWriterBuilder.Initialize(context, GeneratorSyntaxReceiver, this);
 
-            RpcWriterBuilder.CreateEmptySerializerMethods();
+            RpcWriterBuilder.CreateEmptyRpcMethods();
 
             return true;
         }

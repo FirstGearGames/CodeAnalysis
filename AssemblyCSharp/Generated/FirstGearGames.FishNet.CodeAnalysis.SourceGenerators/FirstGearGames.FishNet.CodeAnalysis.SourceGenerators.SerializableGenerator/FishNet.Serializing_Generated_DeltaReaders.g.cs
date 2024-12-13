@@ -17,9 +17,9 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNUmber = reader.ReadDeltaInt32(value0.TheNUmber);
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
 			else
-				result.TheNUmber = value0.TheNUmber;
+				result.TheNumber = value0.TheNumber;
 
 			return result;
 		}
@@ -38,9 +38,9 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNUmber = reader.ReadDeltaInt32(value0.TheNUmber);
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
 			else
-				result.TheNUmber = value0.TheNUmber;
+				result.TheNumber = value0.TheNumber;
 
 			return result;
 		}
@@ -59,9 +59,9 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNUmber = reader.ReadDeltaInt32(value0.TheNUmber);
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
 			else
-				result.TheNUmber = value0.TheNUmber;
+				result.TheNumber = value0.TheNumber;
 
 			return result;
 		}

@@ -12,7 +12,7 @@ namespace FirstGearGames.CodeAnalysis.Helpers
 
         public static void SetAssemblyName(string value)
         {
-             AssemblyName = value;
+            AssemblyName = value;
         }
 
         /// <summary>
@@ -29,29 +29,31 @@ namespace FirstGearGames.CodeAnalysis.Helpers
 
         public static void Send()
         {
-             bool fileExist = File.Exists(@"D:\Development\Personal\FishNets\SourceGenFix.txt");
-             if (!fileExist)
-             {
-             	_msgs.Clear();
-             	return;
-             }
+            bool fileExist = File.Exists(@"D:\Development\Personal\FishNets\SourceGenFix.txt");
+            if (!fileExist)
+                fileExist = File.Exists(@"D:\Development\FishNet\SourceGenFix.txt");
+            if (!fileExist)
+            {
+                _msgs.Clear();
+                return;
+            }
 
-             string path = @"D:/Output_" + AssemblyName + ".txt";
-             try
-             {
-                 DateTime startTime = DateTime.Now;
-                 File.Delete(path);
-                 while (File.Exists(path))
-                 {
-                     Thread.Sleep(100);
-                     if ((DateTime.Now - startTime).TotalSeconds > 3)
-                         break;
-                 }
-             }
-             catch { }
-            
-             File.WriteAllLines(path, _msgs);
-             _msgs.Clear();
+            string path = @"D:/Output_" + AssemblyName + ".txt";
+            try
+            {
+                DateTime startTime = DateTime.Now;
+                File.Delete(path);
+                while (File.Exists(path))
+                {
+                    Thread.Sleep(100);
+                    if ((DateTime.Now - startTime).TotalSeconds > 3)
+                        break;
+                }
+            }
+            catch { }
+
+            File.WriteAllLines(path, _msgs);
+            _msgs.Clear();
             //System.Diagnostics.Process.Start(path);
         }
     }

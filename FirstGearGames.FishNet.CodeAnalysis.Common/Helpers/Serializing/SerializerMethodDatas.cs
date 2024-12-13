@@ -30,19 +30,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             Header = header;
             Body = new();
         }
-
-        public SerializerMethodContent(string header)
-        {
-            Header = new(header);
-            Body = new();
-        }
-
-        public SerializerMethodContent(StringBuilder header, StringBuilder body)
-        {
-            Header = header;
-            Body = body;
-        }
-
+        
         public SerializerMethodContent(string header, string body)
         {
             Header = new(header);

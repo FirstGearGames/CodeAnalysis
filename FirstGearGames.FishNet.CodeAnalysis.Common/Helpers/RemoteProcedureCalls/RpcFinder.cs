@@ -19,7 +19,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
 
         public event Action<SyntaxNodeAnalysisContext> OnClassIsNotPartial;
 
-        public readonly HashSet<RpcMethodData> MethodsNeedingSerializers = new();
+        public readonly HashSet<RpcMethodDatas> MethodsNeedingSerializers = new();
 
         private GeneratorSyntaxReceiver _generatorSyntaxReceiver;
 
@@ -59,11 +59,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnClassIsNotPartial?.Invoke(analysisContext);
-
+                else
+                    Log($"Class {methodSymbol.ContainingType.GetTypeSymbolFullName(metadataName: false)} must be partial to create RPC serializers.");
+                
                 return;
             }
 
-            //TODO this should be using SerializerFinder
             List<IParameterSymbol> serializables = _generatorSyntaxReceiver.SerializableFinder.GetRpcSerializableParameters(context, methodSymbol);
 
             for (int i = 0; i < serializables.Count; i++)
@@ -73,6 +74,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             }
 
             //Build RpcMethodData here.
+            RpcMethodDatas rmd = new(methodSymbol, serializables);
+            MethodsNeedingSerializers.Add(rmd);
         }
 
 

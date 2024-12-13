@@ -13,7 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Constants\UnityConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcMethodData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcMethodDatas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializableFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializableType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Serializing\SerializerHelper.cs" />
