@@ -18,7 +18,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
         private StringBuilder _stringBuilder = new();
         private List<string> _stringList = new();
         private SerializableGenerator _generator;
-        
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
@@ -55,15 +55,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
             Log($"Processing rpc method name {methodData.MethodName}.");
 
             const int indent = 3;
-            
+
             string header = CreateMethodHeader();
             string writeBody = CreateBody();
-            
+
             RpcMethodContent methodContent = new(header, writeBody);
             methodData.MethodContent = methodContent;
 
             Log(methodContent.ToString(indent));
-            
+
             //Creates the header for the method.
             string CreateMethodHeader()
             {
@@ -84,7 +84,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                 _stringBuilder.Append(string.Join(", ", _stringList));
                 //Close header off and return it.
                 _stringBuilder.Append(")");
-                
+
                 return _stringBuilder.ToString();
             }
 
@@ -98,20 +98,24 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 
                 GeneratedWriter_Builder generatedWriterBuilder = _generator.GeneratedWriterBuilder;
                 SerializableMethods serializerMethods = _generator.SerializerMethods;
-                
+
                 foreach (IParameterSymbol symbol in methodData.SerializableParameters)
                 {
-                    SerializerMethodData smd = serializerMethods.CreateWriteGenericSerializerMethod(symbol.Type, metadataName: false);
-                    _stringBuilder.AppendLine(indent + 1,
-                        generatedWriterBuilder.GetWriteGenericCall(smd, writerVariableName, $"{GENERATED_PAREMETER_PREFIX}{symbol.Name}",closeCall: true)
-                        );
+                    //Get built in serializer. If it does not exist get generic.
+                    SerializerMethodData smd = serializerMethods.GetWriteMethod(symbol.Type, GetSerializerType.Full, metadataName: false, out _);
+                     if (!smd.IsValid())
+                         smd = serializerMethods.CreateWriteGenericSerializerMethod(symbol.Type, metadataName: false);
+ This is busted. It is trying to use value0. because it thinks symbol is a field name.
+* It should also be specifying the argument types in the Write when using built in serializer, eg: WriteDictionary<byte, int>,
+ * but it is not. /
+                    _stringBuilder.AppendLine(indent + 1, generatedWriterBuilder.GetWriteCall(smd, writerVariableName, $"{GENERATED_PAREMETER_PREFIX}{symbol.Name}", closeCall: true));
                 }
 
                 //todo: call the 'sendRpc' method before pooling.
-                
+
                 _stringBuilder.AppendLine();
                 _stringBuilder.AppendLine(indent + 1, GeneralBuilder.CallStorePooledWriter(writerVariableName, closeCall: true));
-                
+
                 return _stringBuilder.ToString();
             }
         }
