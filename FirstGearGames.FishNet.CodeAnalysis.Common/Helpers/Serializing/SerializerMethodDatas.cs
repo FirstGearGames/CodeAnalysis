@@ -8,17 +8,33 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
     public static class SerializerMethodDataExtensions
     {
-        public static bool IsValid(this SerializerMethodData? sm)
+        public static bool IsValid(this SerializerMethodData? smd)
         {
-            if (sm == null) return false;
-            return !string.IsNullOrWhiteSpace(sm.TypeFullName);
+            if (smd == null) return false;
+            return !string.IsNullOrWhiteSpace(smd.TypeFullName);
         }
 
-        public static bool IsGenericReadOrWriteMethod(this SerializerMethodData? sm)
+        public static bool IsGenericReadOrWriteMethod(this SerializerMethodData? smd)
         {
-            if (!sm.IsValid()) return false;
+            if (!smd.IsValid()) return false;
 
-            return (sm.MethodName == FishNetConstants.Writer_Write_Name || sm.MethodName == FishNetConstants.Reader_Read_Name);
+            return (smd.MethodName == FishNetConstants.Writer_Write_Name || smd.MethodName == FishNetConstants.Reader_Read_Name);
+        }
+
+        public static string GetReadOrWriteArgumentString(this SerializerMethodData? smd, ITypeSymbol typeSymbol)
+        {
+            if (!smd.IsValid()) return string.Empty;
+
+            //Uses Read/Write<T>.
+            if (smd.IsGenericReadOrWriteMethod())
+                return ReturnArguments();
+            //Uses generated or built-in serializer.
+            if (smd.HasGenericArguments && !smd.AreGenericsNamed)
+                return ReturnArguments();
+
+            return string.Empty;
+
+            string ReturnArguments() => typeSymbol.GetTypeSymbolCombinedGenericArgumentsString(argumentType: GenericArgumentType.PreferNamed);
         }
     }
 
@@ -38,7 +54,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             Header = header;
             Body = new();
         }
-        
+
         public SerializerMethodContent(string header, string body)
         {
             Header = new(header);
@@ -101,7 +117,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             TypeSymbol = typeSymbol;
             TypeFullName = typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
             AreGenericsNamed = typeSymbol.AreGenericArgumentsNamed();
-            GenericArguments = typeSymbol.GetGenericArgumentsString(GenericArgumentType.PreferNamed);
+            GenericArguments = typeSymbol.GetTypeSymbolGenericArgumentsString(GenericArgumentType.PreferNamed);
             MethodName = methodName;
             MethodContent = new();
         }

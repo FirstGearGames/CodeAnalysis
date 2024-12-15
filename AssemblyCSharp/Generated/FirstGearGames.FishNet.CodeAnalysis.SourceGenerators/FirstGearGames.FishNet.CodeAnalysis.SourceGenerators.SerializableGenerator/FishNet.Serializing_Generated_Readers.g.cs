@@ -8,7 +8,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.SimpleStructA result = new();
 
-			result.TheNumber = reader.ReadInt32System.Int32();
+			result.TheNumber = reader.ReadInt32();
 			return result;
 		}
 
@@ -16,7 +16,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.SimpleStructB result = new();
 
-			result.TheNumber = reader.ReadInt32System.Int32();
+			result.TheNumber = reader.ReadInt32();
 			return result;
 		}
 
@@ -24,7 +24,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.SimpleStructC result = new();
 
-			result.TheNumber = reader.ReadInt32System.Int32();
+			result.TheNumber = reader.ReadInt32();
 			return result;
 		}
 
@@ -39,7 +39,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.Player.BroadcastStruct result = new();
 
-			result.IsBroadcast = reader.ReadBooleanSystem.Boolean();
+			result.IsBroadcast = reader.ReadBoolean();
 			return result;
 		}
 
@@ -47,16 +47,16 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.Player.NestedStruct result = new();
 
-			result.Struct = reader.GRead___ReadClientAssembly_Player_EmptyStructClientAssembly.Player.EmptyStruct();
-			result.ByteArr = reader.ReadUInt8ArrayAndSizeAllocatedSystem.Byte[]();
-			result.StructArr = reader.ReadArrayAllocatedClientAssembly.Player.NestedStruct[]();
+			result.Struct = reader.GRead___ReadClientAssembly_Player_EmptyStruct();
+			result.ByteArr = reader.ReadUInt8ArrayAndSizeAllocated();
+			result.StructArr = reader.ReadArrayAllocated<ClientAssembly.Player.NestedStruct>();
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrMultiDimensional. Value will not be serialized.
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrJagged. Value will not be serialized.
-			result.StructLst = reader.ReadListAllocatedSystem.Collections.Generic.List<ClientAssembly.Player.NestedStruct>();
-			result.TupleLst = reader.ReadListAllocatedSystem.Collections.Generic.List<System.ValueTuple<System.Boolean, System.String>>();
-			result.StructDict = reader.ReadDictionaryAllocatedSystem.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>();
-			result.ArrSegment = reader.ReadArraySegmentAndSizeSystem.ArraySegment<System.Byte>();
-			result.String = reader.ReadStringSystem.String();
+			result.StructLst = reader.ReadListAllocated<ClientAssembly.Player.NestedStruct>();
+			result.TupleLst = reader.ReadListAllocated<System.ValueTuple<System.Boolean, System.String>>();
+			result.StructDict = reader.ReadDictionaryAllocated<ClientAssembly.Player.NestedStruct, System.String>();
+			result.ArrSegment = reader.ReadArraySegmentAndSize();
+			result.String = reader.ReadString();
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.ObjectType. Value will not be serialized.
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.GenericObjectType. Value will not be serialized.
 			return result;
@@ -66,7 +66,7 @@ namespace FishNet.Serializing
 		{
 			ClientAssembly.Player.MyStructC result = new();
 
-			result.Works = reader.ReadBooleanSystem.Boolean();
+			result.Works = reader.ReadBoolean();
 			return result;
 		}
 

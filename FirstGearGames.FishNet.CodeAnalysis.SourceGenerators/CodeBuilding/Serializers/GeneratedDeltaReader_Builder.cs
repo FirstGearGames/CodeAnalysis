@@ -166,7 +166,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     if (!sm.IsDeltaSerializer())
                     {
                         sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
-                        sb.AppendLine(bodyIndent + 1, _generator.GeneratedReaderBuilder.GetReadCall(sm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
+                        sb.AppendLine(bodyIndent + 1, _generator.GeneratedReaderBuilder.GetReadCall(sm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", closeCall: true));
                     }
                     else
                     {
@@ -256,7 +256,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             string arguments;
             if (!dsm.AreGenericsNamed && dsm.GenericArguments.Count > 0)
-                arguments = $"{fieldSymbolType.GetGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments()}";
+                arguments = $"{fieldSymbolType.GetTypeSymbolGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments()}";
             else
                 arguments = string.Empty;
 

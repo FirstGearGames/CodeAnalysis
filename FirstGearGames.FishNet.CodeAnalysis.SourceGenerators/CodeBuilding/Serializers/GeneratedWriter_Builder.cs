@@ -190,31 +190,29 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         }
 
         /// <summary>
-        /// Returns a call to WriteNamedMethod.
+        /// Returns a call to WriteMethodName or Write<T> for a field.
         /// </summary>
         public string GetWriteCall(SerializerMethodData sm, string writerVariableName, IFieldSymbol fieldSymbol, string variableName, bool closeCall)
         {
-            return GetWriteCall(sm, writerVariableName, fieldSymbol.Type, $"{fieldSymbol.Name}.{variableName}", closeCall);
+            return GetWriteCall(sm, writerVariableName, fieldSymbol.Type, $"{variableName}", closeCall);
         }
 
+        /// <summary>
+        /// Returns a call to WriteMethodName or Write<T> for a type.
+        /// </summary>
         public string GetWriteCall(SerializerMethodData sm, string writerVariableName, ITypeSymbol typeSymbol, string variableName, bool closeCall)
         {
             if (!sm.IsValid())
                 return string.Empty;
 
-            if (sm.IsGenericReadOrWriteMethod())
-            {
-                string nameWithArguments = typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName: false, GenericArgumentType.PreferNamed);
-                return CodeBuilder.CallMethod($"{FishNetConstants.Writer_Write_Name}<{nameWithArguments}>", writerVariableName, closeCall, $"{variableName}");
-            }
-            else
-            {
-                string arguments;
-                //Generic arguments exist. Need to check more details to determine how to implement.
-                if (sm.HasGenericArguments) { }
-                string arguments = (sm.HasGenericArguments && !sm.AreGenericsNamed) ? typeSymbol.GetTypeSymbolNamedArguments(metadataName: false) : string.Empty;
-                return CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", writerVariableName, closeCall, $"{variableName}");
-            }
+            string arguments = sm.GetReadOrWriteArgumentString(typeSymbol);
+
+            //Uses Read/Write<T>.
+            if (sm.IsGenericReadOrWriteMethod()) 
+                return CodeBuilder.CallMethod($"{FishNetConstants.Writer_Write_Name}<{arguments}>", writerVariableName, closeCall, $"{variableName}");
+            
+            //Uses generated or built-in serializer.
+            return CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", writerVariableName, closeCall, $"{variableName}");   
         }
 
         private void Log(string txt)

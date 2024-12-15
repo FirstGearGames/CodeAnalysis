@@ -76,7 +76,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
 
-            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString(argumentType).GetCombinedGenericArguments();
+            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments();
 
             return $"{fullName}{genericArguments}";
         }
@@ -97,7 +97,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <returns></returns>
         public static string GetTypeSymbolArguments(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType argumentType)
         {
-            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString(argumentType).GetCombinedGenericArguments();
+            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments();
 
             return $"{genericArguments}";
         }
@@ -137,8 +137,14 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             return _stringBuilder.ToString();
         }
 
+        
+        public static string GetTypeSymbolCombinedGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType) 
+        {
+            return $"{symbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments()}";
+        }
 
-        public static List<string> GetGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType)
+        
+        public static List<string> GetTypeSymbolGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType)
         {
             List<string> results = new();
             int typeParameterCount = 0;
