@@ -159,7 +159,7 @@
 
 			if ((totalFlags & 1024) == 1024)
 				//Delta serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.String; full serializer will be used.
-				result.String = reader.ReadString();
+				result.String = reader.ReadStringSystem.String();
 			else
 				result.String = value0.String;
 

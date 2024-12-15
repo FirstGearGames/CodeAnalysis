@@ -105,10 +105,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                     SerializerMethodData smd = serializerMethods.GetWriteMethod(symbol.Type, GetSerializerType.Full, metadataName: false, out _);
                      if (!smd.IsValid())
                          smd = serializerMethods.CreateWriteGenericSerializerMethod(symbol.Type, metadataName: false);
- This is busted. It is trying to use value0. because it thinks symbol is a field name.
-* It should also be specifying the argument types in the Write when using built in serializer, eg: WriteDictionary<byte, int>,
- * but it is not. /
-                    _stringBuilder.AppendLine(indent + 1, generatedWriterBuilder.GetWriteCall(smd, writerVariableName, $"{GENERATED_PAREMETER_PREFIX}{symbol.Name}", closeCall: true));
+//  This is busted. It is trying to use value0. because it thinks symbol is a field name.
+// * It should also be specifying the argument types in the Write when using built in serializer, eg: WriteDictionary<byte, int>,
+//  * but it is not. /
+                    //_stringBuilder.AppendLine(indent + 1, generatedWriterBuilder.GetWriteCall(smd, writerVariableName, $"{GENERATED_PAREMETER_PREFIX}{symbol.Name}", closeCall: true));
                 }
 
                 //todo: call the 'sendRpc' method before pooling.

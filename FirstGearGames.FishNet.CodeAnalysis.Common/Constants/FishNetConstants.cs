@@ -268,7 +268,6 @@
         /// Prefix to use for all generated writers.
         /// </summary>
         public const string GeneratedWriterPrefix = "GWrite___";
-
         #endregion
 
         #region Reader.
@@ -301,7 +300,6 @@
         /// Prefix to use for all generated readers.
         /// </summary>
         public const string GeneratedReaderPrefix = "GRead___";
-
         #endregion
 
         #region Logging.

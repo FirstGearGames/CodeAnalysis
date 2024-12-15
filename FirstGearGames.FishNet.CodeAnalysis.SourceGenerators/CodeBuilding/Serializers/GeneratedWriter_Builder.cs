@@ -128,7 +128,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                         sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
                     //Serializer found.
                     else
-                        sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol.Name, closeCall: true));
+                        sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol, $"{_methods.GetValueParameterName(0)}.{fieldSymbol.Name}", closeCall: true));
                 }
 
                 gsm.MethodContent.Body = sb;
@@ -192,23 +192,29 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         /// <summary>
         /// Returns a call to WriteNamedMethod.
         /// </summary>
-        public string GetWriteCall(SerializerMethodData sm, string writerVariableName, string fieldName, bool closeCall)
+        public string GetWriteCall(SerializerMethodData sm, string writerVariableName, IFieldSymbol fieldSymbol, string variableName, bool closeCall)
         {
-            if (!sm.IsValid())
-                return string.Empty;
-
-            return CodeBuilder.CallMethod($"{sm.MethodName}", writerVariableName, closeCall, $"{_methods.GetValueParameterName(0)}.{fieldName}");
+            return GetWriteCall(sm, writerVariableName, fieldSymbol.Type, $"{fieldSymbol.Name}.{variableName}", closeCall);
         }
 
-        /// <summary>
-        /// Returns a call to Write<T>.
-        /// </summary>
-        public string GetWriteGenericCall(SerializerMethodData sm, string writerVariableName, string parameterName,  bool closeCall)
+        public string GetWriteCall(SerializerMethodData sm, string writerVariableName, ITypeSymbol typeSymbol, string variableName, bool closeCall)
         {
             if (!sm.IsValid())
                 return string.Empty;
 
-            return CodeBuilder.CallMethod($"Write<{sm.TypeSymbol.GetTypeSymbolFullName(metadataName: false)}{sm.GenericArguments.GetCombinedGenericArguments(sm.TypeSymbol)}>", writerVariableName, closeCall, $"{parameterName}");
+            if (sm.IsGenericReadOrWriteMethod())
+            {
+                string nameWithArguments = typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName: false, GenericArgumentType.PreferNamed);
+                return CodeBuilder.CallMethod($"{FishNetConstants.Writer_Write_Name}<{nameWithArguments}>", writerVariableName, closeCall, $"{variableName}");
+            }
+            else
+            {
+                string arguments;
+                //Generic arguments exist. Need to check more details to determine how to implement.
+                if (sm.HasGenericArguments) { }
+                string arguments = (sm.HasGenericArguments && !sm.AreGenericsNamed) ? typeSymbol.GetTypeSymbolNamedArguments(metadataName: false) : string.Empty;
+                return CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", writerVariableName, closeCall, $"{variableName}");
+            }
         }
 
         private void Log(string txt)

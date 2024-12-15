@@ -27,6 +27,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private SerializableGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
+        private SerializableMethods _methods => _generator.SerializerMethods;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
@@ -162,7 +163,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     if (!sm.IsDeltaSerializer())
                     {
                         sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
-                        sb.AppendLine(bodyIndent, _generator.GeneratedWriterBuilder.GetWriteCall(sm, tmpWriterVariableName, fieldSymbol.Name, closeCall: true));
+                        //sb.AppendLine(bodyIndent, _generator.GeneratedWriterBuilder.GetWriteCall(sm, tmpWriterVariableName, $"{_methods.GetValueParameterName(0)}.{fieldSymbol.Name}", closeCall: true));
                     }
                     else
                     {

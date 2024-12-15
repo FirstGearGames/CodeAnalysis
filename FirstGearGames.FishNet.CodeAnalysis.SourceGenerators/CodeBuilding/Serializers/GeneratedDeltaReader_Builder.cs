@@ -256,7 +256,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             string arguments;
             if (!dsm.AreGenericsNamed && dsm.GenericArguments.Count > 0)
-                arguments = $"{fieldSymbolType.GetGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments(fieldSymbolType)}";
+                arguments = $"{fieldSymbolType.GetGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments()}";
             else
                 arguments = string.Empty;
 

@@ -59,7 +59,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <param name="metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolFullNameWithNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName, GenericArgumentType.PreferNamed);
-
+        
         /// <summary>
         /// Returns full name with generic arguments as generic types (System.Collections.Generic.List<T0>).
         /// </summary>
@@ -76,13 +76,33 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
 
-            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString(argumentType).GetCombinedGenericArguments(typeSymbol);
+            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString(argumentType).GetCombinedGenericArguments();
 
             return $"{fullName}{genericArguments}";
         }
 
 
+        /// <summary>
+        /// Returns arguments as named types (eg: <int, bool>).
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolArguments(metadataName, GenericArgumentType.PreferNamed); 
 
+
+        /// <summary>
+        /// Returns full name with generic arguments as named types (System.Collections.Generic.List<System.String>).
+        /// </summary>
+        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <returns></returns>
+        public static string GetTypeSymbolArguments(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType argumentType)
+        {
+            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetGenericArgumentsString(argumentType).GetCombinedGenericArguments();
+
+            return $"{genericArguments}";
+        }
+        
+        
         /// <summary>
         /// Returns type as a generic array, if an array (T0[], T0[][]). If not an array empty is returned.
         /// </summary>

@@ -119,7 +119,6 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-
         public static string CreateAction(params string[] types)
         {
             _stringBuilder.Clear();
@@ -137,13 +136,12 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
             return _stringBuilder.ToString();
         }
 
-
         /// <summary>
         /// Combines generic argument strings into <str0, str1, str2 ...>
         /// </summary>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static string GetCombinedGenericArguments(this List<string> arguments, ITypeSymbol typeSymbol)
+        public static string GetCombinedGenericArguments(this List<string> arguments)
         {
             if (arguments.Count == 0) return string.Empty;
 
@@ -158,10 +156,7 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
                 _stringBuilder.Append(s);
             }
 
-            // if (typeSymbol is IArrayTypeSymbol)
-            //     return $"{_stringBuilder.ToString()}[]";
-            // else
-                return $"<{_stringBuilder.ToString()}>";
+            return $"<{_stringBuilder.ToString()}>";
         }
     }
 }

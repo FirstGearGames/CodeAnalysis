@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Text;
 using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
@@ -11,6 +12,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         {
             if (sm == null) return false;
             return !string.IsNullOrWhiteSpace(sm.TypeFullName);
+        }
+
+        public static bool IsGenericReadOrWriteMethod(this SerializerMethodData? sm)
+        {
+            if (!sm.IsValid()) return false;
+
+            return (sm.MethodName == FishNetConstants.Writer_Write_Name || sm.MethodName == FishNetConstants.Reader_Read_Name);
         }
     }
 

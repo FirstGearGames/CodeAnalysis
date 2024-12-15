@@ -207,15 +207,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             ITypeSymbol fieldSymbolType = fieldSymbol.Type;
             string fieldName = fieldSymbol.Name;
 
-            string arguments;
-            if (!sm.AreGenericsNamed && sm.GenericArguments.Count > 0)
-                arguments = $"{fieldSymbolType.GetGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments(fieldSymbolType)}";
-            else
-                arguments = string.Empty;
+            string arguments = fieldSymbolType.GetTypeSymbolFullNameWithArguments(metadataName: false, GenericArgumentType.PreferNamed);
 
-            // if (sm.IsGenerated())
-            //     return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"Read{arguments}", readerVariableName, closeCall)}";
-            // else
             return $"{resultVariableName}.{fieldName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall)}";
         }
 
