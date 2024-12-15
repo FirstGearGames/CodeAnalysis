@@ -49,7 +49,6 @@
         #endregion
 
         #region Codegenerating special.
-
         /// <summary>
         /// [IncludeSerialization] class.
         /// </summary>
@@ -58,7 +57,6 @@
         /// [ExcludeSerialization] class.
         /// </summary>
         public const string ExcludeSerializationAttribute_FullName = $"{CodeGenerating_Namespace}.ExcludeSerializationAttribute";
-
         #endregion
 
         #region NetworkBehaviours.
@@ -69,7 +67,6 @@
         #endregion
 
         #region RPCs.
-
         /// <summary>
         /// [TargetRpc] class.
         /// </summary>
@@ -110,19 +107,19 @@
         /// <summary>
         /// SyncDictionary class.
         /// </summary>
-        public const string SyncDictionary_FullName =$"{Object_Synchronizing_Namespace}.SyncDictionary";
+        public const string SyncDictionary_FullName = $"{Object_Synchronizing_Namespace}.SyncDictionary";
         /// <summary>
         /// SyncHashSet class.
         /// </summary>
-        public const string SyncHashSet_FullName =$"{Object_Synchronizing_Namespace}.SyncHashSet";
+        public const string SyncHashSet_FullName = $"{Object_Synchronizing_Namespace}.SyncHashSet";
         /// <summary>
         /// SyncList class.
         /// </summary>
-        public const string SyncList_FullName =$"{Object_Synchronizing_Namespace}.SyncList";
+        public const string SyncList_FullName = $"{Object_Synchronizing_Namespace}.SyncList";
         /// <summary>
         /// SyncVar class.
         /// </summary>
-        public const string SyncVar_FullName =$"{Object_Synchronizing_Namespace}.SyncVar";
+        public const string SyncVar_FullName = $"{Object_Synchronizing_Namespace}.SyncVar";
         /// <summary>
         /// ICustomSync interface.
         /// </summary>
@@ -133,8 +130,7 @@
         public const string ICustomSync_GetSerializedType_Name = $"GetSerializedType";
         #endregion
 
-        #region DeltaSerializing.
-
+        #region DeltaSerializing Classes and Types.
         /// <summary>
         /// Maximum flag value within DeltaSerializerOption.
         /// </summary>
@@ -187,11 +183,9 @@
         /// GenericReader.SetRead method.
         /// </summary>
         public const string GenericReader_SetRead_Name = $"SetRead";
-
         #endregion
 
         #region Writer.
-
         ///// <summary>
         ///// Writer.WriteBytes method.
         ///// </summary>
@@ -201,11 +195,14 @@
         /// Writer.GetBuffer() property.
         /// </summary>
         public const string Writer_GetBuffer_Name = "GetBuffer";
-
         /// <summary>
         /// Writer.Write() method.
         /// </summary>
         public const string Writer_Write_Name = "Write";
+        /// <summary>
+        /// Writer.WriteDelta() method.
+        /// </summary>
+        public const string Writer_WriteDelta_Name = "WriteDelta";
         /// <summary>
         /// Writer.WriteArraySegmentAndSize() method.
         /// </summary>
@@ -218,18 +215,14 @@
         /// Writer.GetArraySegment() method.
         /// </summary>
         public const string Writer_GetArraySegment_Name = "GetArraySegment";
-
-
         /// <summary>
         /// Writer.Length property.
         /// </summary>
         public const string Writer_Length_Name = "Length";
-
         /// <summary>
         /// Writer.Position property.
         /// </summary>
         public const string Writer_Position_Name = "Position";
-
         /// <summary>
         /// PooledWriter.Store method.
         /// </summary>
@@ -271,11 +264,14 @@
         #endregion
 
         #region Reader.
-
         /// <summary>
-        /// Writer.Write() method.
+        /// Reader.Read() method.
         /// </summary>
         public const string Reader_Read_Name = "Read";
+        /// <summary>
+        /// Reader.Read() method.
+        /// </summary>
+        public const string Reader_ReadDelta_Name = "ReadDelta";
         /// <summary>
         /// Writer class.
         /// </summary>
@@ -362,7 +358,6 @@
         #endregion
 
         #region General.
-
         /// <summary>
         /// FastContains method.
         /// </summary>
@@ -375,7 +370,6 @@
         /// Channel enum.
         /// </summary>
         public const string Channel_FullName = "FishNet.Transporting.Channel";
-
         #endregion
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using System.Text;
 using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.CodeAnalysis.Helpers;
 using FirstGearGames.FishNet.CodeAnalysis.Constants;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
@@ -17,8 +19,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         public static bool IsGenericReadOrWriteMethod(this SerializerMethodData? smd)
         {
             if (!smd.IsValid()) return false;
-
-            return (smd.MethodName == FishNetConstants.Writer_Write_Name || smd.MethodName == FishNetConstants.Reader_Read_Name);
+            
+            return (smd.MethodName == FishNetConstants.Writer_Write_Name || smd.MethodName == FishNetConstants.Reader_Read_Name) || (smd.MethodName == FishNetConstants.Writer_WriteDelta_Name || smd.MethodName == FishNetConstants.Reader_ReadDelta_Name);
         }
 
         public static string GetReadOrWriteArgumentString(this SerializerMethodData? smd, ITypeSymbol typeSymbol)
@@ -31,7 +33,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             //Uses generated or built-in serializer.
             if (smd.HasGenericArguments && !smd.AreGenericsNamed)
                 return ReturnArguments();
-
+            
             return string.Empty;
 
             string ReturnArguments() => typeSymbol.GetTypeSymbolCombinedGenericArgumentsString(argumentType: GenericArgumentType.PreferNamed);

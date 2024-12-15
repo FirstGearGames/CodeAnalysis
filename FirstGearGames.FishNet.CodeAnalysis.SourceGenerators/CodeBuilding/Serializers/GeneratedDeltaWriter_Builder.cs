@@ -172,7 +172,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
                         /* if (writer.WriteDeltaXYZ(p0, p1))
                             totalFlags += x */
-                        string writeDeltaText = GetWriteDeltaCall(dsm, tmpWriterVariableName, fieldSymbol.Name, closeCall: false);
+                        //string writeDeltaText = GetWriteDeltaCall(dsm, tmpWriterVariableName, fieldSymbol.Name, closeCall: false);
+                        string previousValueName = $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}";
+                        string valueName = $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}";
+                        string writeDeltaText = GetWriteDeltaCall(dsm, fieldSymbol, tmpWriterVariableName, previousValueName, valueName, closeCall: false);
                         sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
                     }
 
@@ -266,23 +269,36 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             return sb.ToString();
         }
 
-        public string GetWriteDeltaCall(DeltaSerializerMethod dsm, string writerVariableName, string fieldName, bool closeCall)
+        /// <summary>
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
+        /// </summary>
+        public string GetWriteDeltaCall(SerializerMethodData sm, IFieldSymbol fieldSymbol, string writerVariableName, string previousValueName, string valueName, bool closeCall)
         {
-            if (!dsm.IsValid())
-                return string.Empty;
-
-            //Make this specify arguments like the reader. While this is not needed since type is assumed when
-            /* Make this specify arguments like the reader. While this is not needed since type is assumed when
-             * its used as a parameter doing so will show the serializers are generating properly. Code can be taken from
-             * GetReadCall. */
-
-
-            // if (dsm.IsGenerated())
-            //     return RoslynCodeBuilder.CallMethod($"WriteDelta", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}", $"{FishNetConstants.DeltaSerializerOption_Unset_FullName}");
-            // else
-            return CodeBuilder.CallMethod($"{dsm.MethodName}", writerVariableName, closeCall, $"{_serializers.GetValueParameterName(0)}.{fieldName}", $"{_serializers.GetValueParameterName(1)}.{fieldName}");
+            return GetWriteDeltaCall(sm, fieldSymbol.Type, writerVariableName, previousValueName, valueName, closeCall);
         }
 
+        /// <summary>
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
+        /// </summary>
+        public string GetWriteDeltaCall(SerializerMethodData smd, ITypeSymbol typeSymbol, string writerVariableName, string previousValueName, string valueName, bool closeCall)
+        {
+            if (!smd.IsValid())
+                return string.Empty;
+
+            string arguments = smd.GetReadOrWriteArgumentString(typeSymbol);
+
+            //Uses Read/Write<T>.
+            if (smd.IsGenericReadOrWriteMethod()) 
+                return CodeBuilder.CallMethod($"{FishNetConstants.Reader_Read_Name}<{arguments}>", writerVariableName, closeCall, previousValueName);
+/^^ This Reader_Read should be Writer_WriteDelta. The DeltaReader has the same thing that needs to be fixed. Also, should the arguments be put into brackets
+manually?? I recall the GetArguemntString does that.
+
+            return CodeBuilder.CallMethod($"{smd.MethodName}{arguments}", writerVariableName, closeCall, previousValueName, valueName);
+
+            // //Uses generated or built-in serializer.
+            // return $"{valueName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", writerVariableName, closeCall, previousValueName)}";
+        }
+        
         private void Log(string txt)
         {
             if (txt.Length == 0)

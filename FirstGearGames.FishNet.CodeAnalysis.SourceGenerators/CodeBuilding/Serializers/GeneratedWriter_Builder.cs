@@ -190,7 +190,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         }
 
         /// <summary>
-        /// Returns a call to WriteMethodName or Write<T> for a field.
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
         /// </summary>
         public string GetWriteCall(SerializerMethodData sm, string writerVariableName, IFieldSymbol fieldSymbol, string variableName, bool closeCall)
         {
@@ -198,7 +198,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         }
 
         /// <summary>
-        /// Returns a call to WriteMethodName or Write<T> for a type.
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
         /// </summary>
         public string GetWriteCall(SerializerMethodData sm, string writerVariableName, ITypeSymbol typeSymbol, string variableName, bool closeCall)
         {

@@ -172,7 +172,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     {
                         //If here then is a delta serializer.
                         DeltaSerializerMethod dsm = sm as DeltaSerializerMethod;
-                        sb.AppendLine(bodyIndent + 1, GetReadDeltaCall(dsm, resultVariableName, Generated_ReaderParameter_Name, fieldSymbol, closeCall: true));
+                        string previousValueName = $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}";
+                        sb.AppendLine(bodyIndent + 1, GetReadDeltaCall(dsm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", previousValueName, closeCall: true));
                     }
 
                     /* else
@@ -233,39 +234,31 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             return sb.ToString();
         }
-
+        
         /// <summary>
-        /// Returns a SerializerMethod for a DefaultWriter of a type. Optionally returns a call to Write<T> if a DefaultWriter is not found.
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
         /// </summary>
-        private SerializerMethodData GetFullReader(string typeFullName, out bool found)
+        public string GetReadDeltaCall(SerializerMethodData sm, IFieldSymbol fieldSymbol, string readerVariableName, string resultVariableName, string previousValueName, bool closeCall)
         {
-            SerializerMethodData sm = _serializers.GetReadMethod(typeFullName, GetSerializerType.Full);
-
-            found = sm.IsValid();
-
-            return sm;
+            return GetReadDeltaCall(sm, fieldSymbol.Type, readerVariableName, resultVariableName, previousValueName, closeCall);
         }
 
-        private string GetReadDeltaCall(DeltaSerializerMethod dsm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
+        /// <summary>
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
+        /// </summary>
+        public string GetReadDeltaCall(SerializerMethodData sm, ITypeSymbol typeSymbol, string readerVariableName, string resultName, string previousValueName, bool closeCall)
         {
-            if (!dsm.IsValid())
+            if (!sm.IsValid())
                 return string.Empty;
 
-            ITypeSymbol fieldSymbolType = fieldSymbol.Type;
-            string fieldName = fieldSymbol.Name;
+            string arguments = sm.GetReadOrWriteArgumentString(typeSymbol);
 
-            string arguments;
-            if (!dsm.AreGenericsNamed && dsm.GenericArguments.Count > 0)
-                arguments = $"{fieldSymbolType.GetTypeSymbolGenericArgumentsString(GenericArgumentType.PreferNamed).GetCombinedGenericArguments()}";
-            else
-                arguments = string.Empty;
+            //Uses Read/Write<T>.
+            if (sm.IsGenericReadOrWriteMethod())
+                return CodeBuilder.CallMethod($"{FishNetConstants.Reader_Read_Name}<{arguments}>", readerVariableName, closeCall, previousValueName);
 
-            // if (dsm.IsGenerated())
-            //     return $"{resultVariableName}.{fieldName} = {RoslynCodeBuilder.CallMethod($"ReadDelta{arguments}", readerVariableName, closeCall,
-            //         $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
-            // else
-            return $"{resultVariableName}.{fieldName} = {CodeBuilder.CallMethod($"{dsm.MethodName}{arguments}", readerVariableName, closeCall,
-                $"{_serializers.GetValueParameterName(0)}.{fieldName}")}";
+            //Uses generated or built-in serializer.
+            return $"{resultName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall, previousValueName)}";
         }
 
         private void Log(string txt)

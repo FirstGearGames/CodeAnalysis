@@ -137,8 +137,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     //Serializer found.
                     else
                         sb.AppendLine(bodyIndent, GetReadCall(sm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", closeCall: true));
-                    todo Modify GeneratedDeltaReader to implement GetReadDelta that does both read<T> and typed. 
-                        todo make delta write do the same.
                 }
 
                 sb.Append(bodyIndent, $"return {resultVariableName};");
@@ -202,7 +200,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         }
 
         /// <summary>
-        /// Returns a call to WriteMethodName or Write<T> for a field.
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
         /// </summary>
         public string GetReadCall(SerializerMethodData sm, IFieldSymbol fieldSymbol, string readerVariableName, string resultVariableName, bool closeCall)
         {
@@ -210,7 +208,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         }
 
         /// <summary>
-        /// Returns a call to WriteMethodName or Write<T> for a type.
+        /// Returns a call to Read/WriteMethodName or Read/Write<T> for a field.
         /// </summary>
         public string GetReadCall(SerializerMethodData sm, ITypeSymbol typeSymbol, string readerVariableName, string resultVariableName, bool closeCall)
         {
@@ -226,18 +224,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             //Uses generated or built-in serializer.
             return $"{resultVariableName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall)}";
         }
-        //
-        // public string GetReadCall(SerializerMethodData sm, string resultVariableName, string readerVariableName, IFieldSymbol fieldSymbol, bool closeCall)
-        // {
-        //     if (!sm.IsValid())
-        //         return string.Empty;
-        //
-        //     ITypeSymbol fieldSymbolType = fieldSymbol.Type;
-        //     string fieldName = fieldSymbol.Name;
-        //
-        //     string arguments = sm.GetReadOrWriteArgumentString(fieldSymbolType);
-        //     return $"{resultVariableName}.{fieldName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall)}";
-        // }
 
         private void Log(string txt)
         {

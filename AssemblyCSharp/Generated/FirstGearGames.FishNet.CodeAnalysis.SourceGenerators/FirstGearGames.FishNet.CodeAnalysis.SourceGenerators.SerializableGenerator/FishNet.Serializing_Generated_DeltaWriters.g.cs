@@ -155,18 +155,18 @@ namespace FishNet.Serializing
 			if (pooledWriter.WriteDeltaUInt8Array(value0.ByteArr, value1.ByteArr))
 				totalFlags += 8;
 
-			if (pooledWriter.WriteDeltaArray(value0.StructArr, value1.StructArr))
+			if (pooledWriter.WriteDeltaArray<ClientAssembly.Player.NestedStruct>(value0.StructArr, value1.StructArr))
 				totalFlags += 16;
 
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrMultiDimensional. Value will not be serialized.
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrJagged. Value will not be serialized.
-			if (pooledWriter.WriteDeltaList(value0.StructLst, value1.StructLst))
+			if (pooledWriter.WriteDeltaList<ClientAssembly.Player.NestedStruct>(value0.StructLst, value1.StructLst))
 				totalFlags += 32;
 
-			if (pooledWriter.WriteDeltaList(value0.TupleLst, value1.TupleLst))
+			if (pooledWriter.WriteDeltaList<System.ValueTuple<System.Boolean, System.String>>(value0.TupleLst, value1.TupleLst))
 				totalFlags += 64;
 
-			if (pooledWriter.WriteDeltaDictionary(value0.StructDict, value1.StructDict))
+			if (pooledWriter.WriteDeltaDictionary<ClientAssembly.Player.NestedStruct, System.String>(value0.StructDict, value1.StructDict))
 				totalFlags += 128;
 
 			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
