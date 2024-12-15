@@ -284,19 +284,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         {
             if (!smd.IsValid())
                 return string.Empty;
-
+            
             string arguments = smd.GetReadOrWriteArgumentString(typeSymbol);
+            //Look into comment in generated delta writer: 				//Delta serializer not found for ClientAssembly.SimpleStructB.ClientAssembly.SimpleStructB.TheNumber; full serializer will be used.
 
             //Uses Read/Write<T>.
             if (smd.IsGenericReadOrWriteMethod()) 
-                return CodeBuilder.CallMethod($"{FishNetConstants.Reader_Read_Name}<{arguments}>", writerVariableName, closeCall, previousValueName);
-/^^ This Reader_Read should be Writer_WriteDelta. The DeltaReader has the same thing that needs to be fixed. Also, should the arguments be put into brackets
-manually?? I recall the GetArguemntString does that.
+                return CodeBuilder.CallMethod($"{FishNetConstants.Writer_WriteDelta_Name}<{arguments}>", writerVariableName, closeCall, previousValueName, valueName);
 
             return CodeBuilder.CallMethod($"{smd.MethodName}{arguments}", writerVariableName, closeCall, previousValueName, valueName);
-
-            // //Uses generated or built-in serializer.
-            // return $"{valueName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", writerVariableName, closeCall, previousValueName)}";
         }
         
         private void Log(string txt)

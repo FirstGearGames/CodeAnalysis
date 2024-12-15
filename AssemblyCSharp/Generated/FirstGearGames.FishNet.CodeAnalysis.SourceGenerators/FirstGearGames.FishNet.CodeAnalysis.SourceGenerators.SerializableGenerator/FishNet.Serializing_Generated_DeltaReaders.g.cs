@@ -17,7 +17,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
+				result.TheNumber = reader.ReadDelta<System.Int32>(value0.TheNumber);
 			else
 				result.TheNumber = value0.TheNumber;
 
@@ -38,7 +38,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
+				result.TheNumber = reader.ReadDelta<System.Int32>(value0.TheNumber);
 			else
 				result.TheNumber = value0.TheNumber;
 
@@ -59,7 +59,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
+				result.TheNumber = reader.ReadDelta<System.Int32>(value0.TheNumber);
 			else
 				result.TheNumber = value0.TheNumber;
 
@@ -96,7 +96,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.IsBroadcast = reader.ReadDeltaBoolean(value0.IsBroadcast);
+				result.IsBroadcast = reader.ReadDelta<System.Boolean>(value0.IsBroadcast);
 			else
 				result.IsBroadcast = value0.IsBroadcast;
 
@@ -117,43 +117,43 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.Struct = reader.GRead___ReadDeltaClientAssembly_Player_EmptyStruct(value0.Struct);
+				result.Struct = reader.ReadDelta<ClientAssembly.Player.EmptyStruct>(value0.Struct);
 			else
 				result.Struct = value0.Struct;
 
 			if ((totalFlags & 8) == 8)
-				result.ByteArr = reader.ReadDeltaUInt8ArrayAllocated(value0.ByteArr);
+				result.ByteArr = reader.ReadDelta<System.Byte[]>(value0.ByteArr);
 			else
 				result.ByteArr = value0.ByteArr;
 
 			if ((totalFlags & 16) == 16)
-				result.StructArr = reader.ReadDeltaArrayAllocated<ClientAssembly.Player.NestedStruct>(value0.StructArr);
+				result.StructArr = reader.ReadDelta<ClientAssembly.Player.NestedStruct[]>(value0.StructArr);
 			else
 				result.StructArr = value0.StructArr;
 
 			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrMultiDimensional. Value will not be serialized.
 			if ((totalFlags & 32) == 32)
-				result.StructArrJagged = reader.ReadDeltaJaggedArrayAllocated(value0.StructArrJagged);
+				result.StructArrJagged = reader.ReadDelta<[]>(value0.StructArrJagged);
 			else
 				result.StructArrJagged = value0.StructArrJagged;
 
 			if ((totalFlags & 64) == 64)
-				result.StructLst = reader.ReadDeltaListAllocated<ClientAssembly.Player.NestedStruct>(value0.StructLst);
+				result.StructLst = reader.ReadDelta<System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>>(value0.StructLst);
 			else
 				result.StructLst = value0.StructLst;
 
 			if ((totalFlags & 128) == 128)
-				result.TupleLst = reader.ReadDeltaListAllocated<System.ValueTuple<System.Boolean, System.String>>(value0.TupleLst);
+				result.TupleLst = reader.ReadDelta<System.Collections.Generic.List<System.ValueTuple<System.Boolean, System.String>>>(value0.TupleLst);
 			else
 				result.TupleLst = value0.TupleLst;
 
 			if ((totalFlags & 256) == 256)
-				result.StructDict = reader.ReadDeltaDictionaryAllocated<ClientAssembly.Player.NestedStruct, System.String>(value0.StructDict);
+				result.StructDict = reader.ReadDelta<System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>>(value0.StructDict);
 			else
 				result.StructDict = value0.StructDict;
 
 			if ((totalFlags & 512) == 512)
-				result.ArrSegment = reader.ReadDeltaArraySegment(value0.ArrSegment);
+				result.ArrSegment = reader.ReadDelta<System.ArraySegment<System.Byte>>(value0.ArrSegment);
 			else
 				result.ArrSegment = value0.ArrSegment;
 
@@ -182,7 +182,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.Works = reader.ReadDeltaBoolean(value0.Works);
+				result.Works = reader.ReadDelta<System.Boolean>(value0.Works);
 			else
 				result.Works = value0.Works;
 

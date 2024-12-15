@@ -251,11 +251,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             if (!sm.IsValid())
                 return string.Empty;
 
+            //todo: This code fails for jagged arrays for DeltaRead<T>.
+            //make 'serializer not found' just call generic read/write.
+               sm = _serializers.CreateReadDeltaGenericSerializerMethod(typeSymbol, metadataName: false);
+            
             string arguments = sm.GetReadOrWriteArgumentString(typeSymbol);
 
             //Uses Read/Write<T>.
             if (sm.IsGenericReadOrWriteMethod())
-                return CodeBuilder.CallMethod($"{FishNetConstants.Reader_Read_Name}<{arguments}>", readerVariableName, closeCall, previousValueName);
+                return CodeBuilder.CallMethod($"{FishNetConstants.Reader_ReadDelta_Name}<{arguments}>", readerVariableName, closeCall, previousValueName);
 
             //Uses generated or built-in serializer.
             return $"{resultName} = {CodeBuilder.CallMethod($"{sm.MethodName}{arguments}", readerVariableName, closeCall, previousValueName)}";
