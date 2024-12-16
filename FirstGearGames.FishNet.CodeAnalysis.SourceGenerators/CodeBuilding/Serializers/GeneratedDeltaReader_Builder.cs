@@ -58,7 +58,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
+
             //Already exist either in FishNet or already created.
             if (_serializerMethods.GetReadMethod(serializableType.TypeSymbol, GetSerializerType.Delta, metadataName: false, out _).IsValid())
                 return;
@@ -101,8 +101,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
-
-                Log($"Creating serializer body for {item.Value.TypeFullName}.");
 
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
@@ -151,8 +149,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
-                    Debugg.Log("");
-                    Log($"Getting reader for field name {fieldSymbol.Name}");
+
                     SerializerMethodData sm = _serializerMethods.GetReadMethod(typeSymbol, GetSerializerType.Delta, metadataName: false, out _);
 
                     //Neither delta nor full could be found.
@@ -265,11 +262,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         {
             if (!sm.IsValid())
                 return string.Empty;
-
-            //todo: This code fails for jagged arrays for DeltaRead<T>.
-            //make 'serializer not found' just call generic read/write.
-            sm = _serializerMethods.CreateReadDeltaGenericSerializerMethod(typeSymbol, metadataName: false);
-
+            
             string arguments = sm.GetReadOrWriteArgumentString(typeSymbol);
 
             //Uses Read/Write<T>.

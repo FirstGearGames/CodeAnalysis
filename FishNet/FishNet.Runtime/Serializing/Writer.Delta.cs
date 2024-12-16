@@ -66,7 +66,7 @@ namespace FishNet.Serializing
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaUInt16(ushort valueA, ushort valueB) => WriteDifference8_16_32(valueA, valueB);
+        public bool WriteDeltaUInt16(ushort valueA, ushort valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
         /// Writes a delta value.
@@ -74,7 +74,7 @@ namespace FishNet.Serializing
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaInt32(int valueA, int valueB) => WriteDifference8_16_32(valueA, valueB);
+        public bool WriteDeltaInt32(int valueA, int valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
         /// Writes a delta value.
@@ -82,7 +82,7 @@ namespace FishNet.Serializing
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaUInt32(uint valueA, uint valueB) => WriteDifference8_16_32(valueA, valueB);
+        public bool WriteDeltaUInt32(uint valueA, uint valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
         /// Writes a delta value.
@@ -90,7 +90,7 @@ namespace FishNet.Serializing
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaInt64(long valueA, long valueB) => WriteDeltaUInt64((ulong)valueA, (ulong)valueB);
+        public bool WriteDeltaInt64(long valueA, long valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDeltaUInt64((ulong)valueA, (ulong)valueB, option);
 
         /// <summary>
         /// Writes a delta value.
@@ -98,7 +98,7 @@ namespace FishNet.Serializing
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaUInt64(ulong valueA, ulong valueB)
+        public bool WriteDeltaUInt64(ulong valueA, ulong valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
             return default;
         }
@@ -106,7 +106,7 @@ namespace FishNet.Serializing
         /// <summary>
         /// Writes the difference between two values for signed and unsigned shorts and ints.
         /// </summary>
-        private bool WriteDifference8_16_32(long valueA, long valueB)
+        private bool WriteDifference8_16_32(long valueA, long valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
             return default;
         }

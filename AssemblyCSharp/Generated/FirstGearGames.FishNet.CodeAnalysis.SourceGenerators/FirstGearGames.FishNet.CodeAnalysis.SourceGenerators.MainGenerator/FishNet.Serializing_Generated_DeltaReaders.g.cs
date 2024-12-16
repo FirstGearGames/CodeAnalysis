@@ -17,7 +17,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNumber = reader.ReadDelta<System.Int32>(value0.TheNumber);
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
 			else
 				result.TheNumber = value0.TheNumber;
 
@@ -38,7 +38,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNumber = reader.ReadDelta<System.Int32>(value0.TheNumber);
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
 			else
 				result.TheNumber = value0.TheNumber;
 
@@ -59,7 +59,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.TheNumber = reader.ReadDelta<System.Int32>(value0.TheNumber);
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
 			else
 				result.TheNumber = value0.TheNumber;
 
@@ -96,7 +96,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.IsBroadcast = reader.ReadDelta<System.Boolean>(value0.IsBroadcast);
+				result.IsBroadcast = reader.ReadDeltaBoolean(value0.IsBroadcast);
 			else
 				result.IsBroadcast = value0.IsBroadcast;
 
@@ -138,7 +138,7 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.Works = reader.ReadDelta<System.Boolean>(value0.Works);
+				result.Works = reader.ReadDeltaBoolean(value0.Works);
 			else
 				result.Works = value0.Works;
 

@@ -39,7 +39,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Receivers
 
             void LogVisit()
             {
-                Log($"OnVisitSyntaxNode type {syntaxNode.GetType().Name}");
+                //Log($"OnVisitSyntaxNode type {syntaxNode.GetType().Name}");
             }
         }
 

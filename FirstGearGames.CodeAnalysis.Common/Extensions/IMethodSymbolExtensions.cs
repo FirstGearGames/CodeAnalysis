@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using FirstGearGames.FishNet.CodeAnalysis.Helpers;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FirstGearGames.CodeAnalysis.Extensions

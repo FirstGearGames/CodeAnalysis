@@ -17,7 +17,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDelta<System.Int32>(value0.TheNumber, value1.TheNumber))
+			if (pooledWriter.WriteDeltaInt32(value0.TheNumber, value1.TheNumber))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -44,7 +44,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDelta<System.Int32>(value0.TheNumber, value1.TheNumber))
+			if (pooledWriter.WriteDeltaInt32(value0.TheNumber, value1.TheNumber))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -71,7 +71,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDelta<System.Int32>(value0.TheNumber, value1.TheNumber))
+			if (pooledWriter.WriteDeltaInt32(value0.TheNumber, value1.TheNumber))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);

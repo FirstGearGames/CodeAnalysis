@@ -139,7 +139,7 @@ namespace ClientAssembly
         //}
 
         [ServerRpc]
-        private void MyRpcTwo(MyStructC ms, string txt, Dictionary<string, byte> dict) { }
+        public void MyRpcTwo(MyStructC ms, string txt, Dictionary<string, byte> dict) { }
 
         // [ServerRpc]
         // private void MyRpc(int value, Channel channel = Channel.Unreliable)

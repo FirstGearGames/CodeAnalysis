@@ -57,7 +57,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateEmptyDeltaSerializerMethod(GeneratorExecutionContext context, SerializableType serializableType, int recursiveCount = 1)
         {
             string typeFullName = serializableType.FullName;
-            Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
+
             //Already exist either in FishNet or already created.
             if (_serializerMethods.GetWriteMethod(serializableType.TypeSymbol, GetSerializerType.Delta, metadataName: false, out _).IsValid())
                 return;
@@ -100,8 +100,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
                     continue;
-
-                Log($"Creating serializer body for {item.Value.TypeFullName}.");
 
                 const int bodyIndent = 3;
                 StringBuilder sb = new();

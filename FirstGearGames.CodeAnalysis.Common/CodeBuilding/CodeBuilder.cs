@@ -11,6 +11,25 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
         private static StringBuilder _stringBuilder = new();
 
         /// <summary>
+        /// Gets the delcared accessibility of a method and returns it as string to use in code.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetDeclaredAccessibility(this IMethodSymbol symbol) 
+        {
+            return symbol.DeclaredAccessibility switch
+            {
+                Accessibility.Public => "public",
+                Accessibility.Internal => "internal",
+                Accessibility.Protected => "protected",
+                Accessibility.Private => "private",
+                Accessibility.ProtectedAndInternal => "protected internal",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.NotApplicable => "private",
+                _ => "public"
+            };
+        }
+        
+        /// <summary>
         /// Creates a class optionally wrapping it in a namespace.
         /// </summary>
         public static string CreatePublicStaticClass(string className, out string footer, string namespaceName = "")

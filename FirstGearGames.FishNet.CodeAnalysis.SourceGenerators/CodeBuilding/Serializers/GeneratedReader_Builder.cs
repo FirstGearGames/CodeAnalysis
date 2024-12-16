@@ -61,28 +61,21 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateEmptySerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
         {
             string typeFullName = serializableType.FullName;
-            Log($"Checking to create a reader for {typeFullName}.");
+
             //Already exist either in FishNet or already created.
             if (_serializerMethods.GetReadMethod(typeFullName, GetSerializerType.Full).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
-            {
-                Log($"NamedTypeSymbol is null for fullMetaName {serializableType.FullMetadataName}");
                 return;
-            }
             if (!_serializerMethods.CanCreateSerializer(namedTypeSymbol))
-            {
-                Log($"Cannot create serializer.");
                 return;
-            }
 
             List<IFieldSymbol> serializableFields = _serializerMethods.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
-                Log($"Checking serializable field {item.Name}.");
                 CreateEmptySerializerMethod(context, new SerializableType(typeSymbol));
             }
 
@@ -113,8 +106,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
                     continue;
-
-                Log($"Creating serializer body for {item.Value.TypeFullName}.");
+                
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
 

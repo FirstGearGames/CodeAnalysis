@@ -47,12 +47,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateEmptySerializerMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
             foreach (SerializableType item in syntaxReceiver.SerializableFinder.TypesNeedingSerializers)
-            {
-                Log("//////////////////////////");
-                Log($"Processing root serializable type {item.FullName}.");
-                Log("//////////////////////////");
                 CreateEmptySerializerMethod(context, item);
-            }
         }
 
         /// <summary>
@@ -61,7 +56,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateEmptySerializerMethod(GeneratorExecutionContext context, SerializableType serializableType)
         {
             string typeFullName = serializableType.FullName;
-            Log($"Checking to create a writer for {typeFullName}.");
+
             //Already exist either in FishNet or already created.
             if (_serializerMethods.GetWriteMethod(typeFullName, GetSerializerType.Full).IsValid())
                 return;
@@ -109,7 +104,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
                     continue;
 
-                Log($"Creating serializer body for {item.Value.TypeFullName}.");
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
 
