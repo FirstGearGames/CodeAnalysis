@@ -23,14 +23,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private static readonly StringBuilder _stringBuilder = new();
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private SerializableMethods _serializers => _generator.SerializerMethods;
-        private SerializableGenerator _generator;
+        private SerializerMethods _serializerMethods => _generator.SerializerMethods;
+        private MainGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
-        private SerializableMethods _methods => _generator.SerializerMethods;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, MainGenerator generator)
         {
             Log("");
             Log($"Initialize.");
@@ -60,16 +59,16 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             string typeFullName = serializableType.FullName;
             Log($"{recursiveCount.ToIndent()}Trying to create writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
-            if (_serializers.GetWriteMethod(serializableType.TypeSymbol, GetSerializerType.Delta, metadataName: false, out _).IsValid())
+            if (_serializerMethods.GetWriteMethod(serializableType.TypeSymbol, GetSerializerType.Delta, metadataName: false, out _).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
                 return;
-            if (!_serializers.CanCreateDeltaSerializer(namedTypeSymbol))
+            if (!_serializerMethods.CanCreateDeltaSerializer(namedTypeSymbol))
                 return;
 
-            List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
+            List<IFieldSymbol> serializableFields = _serializerMethods.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
@@ -78,13 +77,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
-            _serializers.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
+            _serializerMethods.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
 
             string GetMethodHeader(out string mName)
             {
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();
-                sb.Append(2, $"public static bool {mName}" + $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," + $" {typeFullName} {_serializers.GetValueParameterName(0)}, {typeFullName} {_serializers.GetValueParameterName(1)}" + $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
+                sb.Append(2, $"public static bool {mName}" + $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," + $" {typeFullName} {_serializerMethods.GetValueParameterName(0)}, {typeFullName} {_serializerMethods.GetValueParameterName(1)}" + $", {FishNetConstants.DeltaSerializerOption_FullName} {Generated_DeltaSerializerOption_Name} = {FishNetConstants.DeltaSerializerOption_Unset_FullName})");
 
                 return sb.ToString();
             }
@@ -96,7 +95,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetWriteDeltaMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetWriteDeltaMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedDeltaSerializerMethod gsm)
@@ -121,7 +120,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 void CreateWriteFullIf()
                 {
                     ITypeSymbol typeSymbol = item.Value.TypeSymbol;
-                    SerializerMethodData sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    SerializerMethodData sm = _serializerMethods.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     sb.AppendLine(bodyIndent, $"if ({Generated_DeltaSerializerOption_Name}.{FishNetConstants.FastContains_Name}({FishNetConstants.DeltaSerializerOption_FullSerialize_FullName}))");
                     sb.AppendLine(bodyIndent, "{");
@@ -130,9 +129,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     sb.AppendLine(bodyIndent + 1, CodeBuilder.CallMethod(FishNetConstants.Writer_WriteUnsignedPackedWhole_Name, Generated_WriterParameter_Name, true, totalFlagsVariableName));
 
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol));
-                    else
-                        sb.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{sm.MethodName}({_serializers.GetValueParameterName(1)});");
+                        sm = _serializerMethods.CreateWriteDeltaGenericSerializerMethod(typeSymbol, metadataName: false);
+                    //     sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol));
+                    // else
+                        sb.AppendLine(bodyIndent + 1, $"{Generated_WriterParameter_Name}.{sm.MethodName}({_serializerMethods.GetValueParameterName(1)});");
 
                     sb.Append(bodyIndent + 1, $"return true;{NativeConstants.LineFeed}");
                     sb.AppendLine(bodyIndent, "}" + NativeConstants.LineFeed);
@@ -144,40 +144,41 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 //PooledWriter local variable.
                 sb.AppendLine(bodyIndent, GeneralBuilder.CallGetPooledWriter(out string tmpWriterVariableName) + NativeConstants.LineFeed);
 
-                List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
+                List<IFieldSymbol> serializableFieldSymbols = _serializerMethods.GetSerializableFieldSymbols(gsm.TypeSymbol);
 
                 //Call write for all members.
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
-                    SerializerMethodData sm = _serializers.GetWriteMethod(typeSymbol, GetSerializerType.FavorDelta, metadataName: false, out _);
+                    SerializerMethodData sm = _serializerMethods.GetWriteMethod(typeSymbol, GetSerializerType.Delta, metadataName: false, out _);
 
                     //Neither delta nor full could be found.
                     if (!sm.IsValid())
-                    {
-                        sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
-                        continue;
-                    }
+                        sm = _serializerMethods.CreateWriteDeltaGenericSerializerMethod(typeSymbol, metadataName: false);
+                    // {
+                    //     sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
+                    //     continue;
+                    // }
 
-                    //If is a full serializer.
-                    if (!sm.IsDeltaSerializer())
-                    {
-                        sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
-                        //sb.AppendLine(bodyIndent, _generator.GeneratedWriterBuilder.GetWriteCall(sm, tmpWriterVariableName, $"{_methods.GetValueParameterName(0)}.{fieldSymbol.Name}", closeCall: true));
-                    }
-                    else
-                    {
+                    // //If is a full serializer.
+                    // if (!sm.IsDeltaSerializer())
+                    // {
+                    //     sb.AppendLine(bodyIndent + 1, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: true, item.Value.TypeSymbol, fieldSymbol));
+                    //     //sb.AppendLine(bodyIndent, _generator.GeneratedWriterBuilder.GetWriteCall(sm, tmpWriterVariableName, $"{_methods.GetValueParameterName(0)}.{fieldSymbol.Name}", closeCall: true));
+                    // }
+                    // else
+                    // {
                         //If here then is a delta serializer.
                         DeltaSerializerMethod dsm = sm as DeltaSerializerMethod;
 
                         /* if (writer.WriteDeltaXYZ(p0, p1))
                             totalFlags += x */
                         //string writeDeltaText = GetWriteDeltaCall(dsm, tmpWriterVariableName, fieldSymbol.Name, closeCall: false);
-                        string previousValueName = $"{_serializers.GetValueParameterName(0)}.{fieldSymbol.Name}";
-                        string valueName = $"{_serializers.GetValueParameterName(1)}.{fieldSymbol.Name}";
+                        string previousValueName = $"{_serializerMethods.GetValueParameterName(0)}.{fieldSymbol.Name}";
+                        string valueName = $"{_serializerMethods.GetValueParameterName(1)}.{fieldSymbol.Name}";
                         string writeDeltaText = GetWriteDeltaCall(dsm, fieldSymbol, tmpWriterVariableName, previousValueName, valueName, closeCall: false);
                         sb.AppendLine(bodyIndent, $"if ({writeDeltaText})");
-                    }
+                    //}
 
                     AppendIncreaseTotalFlags(4);
 
@@ -231,7 +232,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             int addedSerializers = 0;
 
-            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetWriteDeltaMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetWriteDeltaMethods())
             {
                 if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
 

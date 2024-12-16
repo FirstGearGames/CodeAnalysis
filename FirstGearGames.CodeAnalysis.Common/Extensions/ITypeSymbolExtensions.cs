@@ -59,7 +59,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <param name="metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolFullNameWithNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName, GenericArgumentType.PreferNamed);
-        
+
         /// <summary>
         /// Returns full name with generic arguments as generic types (System.Collections.Generic.List<T0>).
         /// </summary>
@@ -74,21 +74,32 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <returns></returns>
         public static string GetTypeSymbolFullNameWithArguments(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType argumentType)
         {
-            string fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
+            string fullName;
+            string genericArguments;
 
-            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments();
+            /* If is an array then just use the extension method
+             * to return the type named as an array. */
+            if (typeSymbol is IArrayTypeSymbol)
+            {
+                fullName = string.Empty;
+                genericArguments = typeSymbol.GetTypeSymbolNameAsArray(metadataName: false, GenericArgumentType.PreferNamed);
+            }
+            //Otherwise return full name with generic arguments.
+            else
+            {
+                fullName = typeSymbol.GetTypeSymbolFullName(metadataName);
+                genericArguments = typeSymbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments();
+            }
 
             return $"{fullName}{genericArguments}";
         }
-
 
         /// <summary>
         /// Returns arguments as named types (eg: <int, bool>).
         /// </summary>
         /// <param name="metadataName">True to return name as metadata.</param>
         /// <returns></returns>
-        public static string GetTypeSymbolNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolArguments(metadataName, GenericArgumentType.PreferNamed); 
-
+        public static string GetTypeSymbolNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolArguments(metadataName, GenericArgumentType.PreferNamed);
 
         /// <summary>
         /// Returns full name with generic arguments as named types (System.Collections.Generic.List<System.String>).
@@ -101,20 +112,21 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             return $"{genericArguments}";
         }
-        
-        
+
         /// <summary>
         /// Returns type as a generic array, if an array (T0[], T0[][]). If not an array empty is returned.
         /// </summary>
         /// <param name="metadataName">True to return name as metadata.</param>
         /// <returns></returns>
-        public static string GetTypeSymbolAsGenericArray(this ITypeSymbol typeSymbol, bool metadataName)
+        public static string GetTypeSymbolNameAsArray(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType genericArgumentType)
         {
             if (typeSymbol is not IArrayTypeSymbol arrayTypeSymbol)
                 return string.Empty;
 
             _stringBuilder.Clear();
-            _stringBuilder.Append($"{NativeConstants.FirstGenericParameter_Name}[");
+
+            string symbolName = (genericArgumentType == GenericArgumentType.ForceGeneric) ? NativeConstants.FirstGenericParameter_Name : arrayTypeSymbol.ElementType.GetTypeSymbolFullName(metadataName);
+            _stringBuilder.Append($"{symbolName}[");
 
             AppendMultidimensionalAndJagged(arrayTypeSymbol);
 
@@ -132,18 +144,14 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             _stringBuilder.Append("]");
 
-            Debugg.Log($"Tuple? {arrayTypeSymbol.IsTupleType}. Element type? {arrayTypeSymbol.ElementType.TypeKind}");
-
             return _stringBuilder.ToString();
         }
 
-        
-        public static string GetTypeSymbolCombinedGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType) 
+        public static string GetTypeSymbolCombinedGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType)
         {
             return $"{symbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments()}";
         }
 
-        
         public static List<string> GetTypeSymbolGenericArgumentsString(this ITypeSymbol symbol, GenericArgumentType argumentType)
         {
             List<string> results = new();
@@ -227,37 +235,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 _stringBuilder.Append($".{fieldSymbol.GetSymbolFullName(metadataName)}");
 
             return _stringBuilder.ToString();
-        }
-
-        public static IEnumerable<ITypeSymbol> EnumerateTypeHierarchy(this ITypeSymbol thisTypeSymbol)
-        {
-            for (ITypeSymbol typeSymbol = thisTypeSymbol; typeSymbol != null; typeSymbol = typeSymbol.BaseType) yield return typeSymbol;
-        }
-
-        public static bool IsSubtypeOf(this ITypeSymbol thisTypeSymbol, string fullyQualifiedTypeName)
-        {
-            foreach (ITypeSymbol typeSymbol in thisTypeSymbol.EnumerateTypeHierarchy())
-            {
-                if (typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == fullyQualifiedTypeName) return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsSubtypeOf(this ITypeSymbol thisTypeSymbol, ImmutableHashSet<string> fullyQualifiedTypeNames, out ITypeSymbol? result)
-        {
-            result = null;
-
-            foreach (ITypeSymbol typeSymbol in thisTypeSymbol.EnumerateTypeHierarchy())
-            {
-                if (!fullyQualifiedTypeNames.Contains(typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))) continue;
-
-                result = typeSymbol;
-
-                return true;
-            }
-
-            return false;
         }
 
         private static void Log(string txt)

@@ -17,7 +17,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-				//Delta serializer not found for ClientAssembly.SimpleStructA.ClientAssembly.SimpleStructA.TheNumber; full serializer will be used.
+			if (pooledWriter.WriteDelta<System.Int32>(value0.TheNumber, value1.TheNumber))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -44,7 +44,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-				//Delta serializer not found for ClientAssembly.SimpleStructB.ClientAssembly.SimpleStructB.TheNumber; full serializer will be used.
+			if (pooledWriter.WriteDelta<System.Int32>(value0.TheNumber, value1.TheNumber))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -71,7 +71,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-				//Delta serializer not found for ClientAssembly.SimpleStructC.ClientAssembly.SimpleStructC.TheNumber; full serializer will be used.
+			if (pooledWriter.WriteDelta<System.Int32>(value0.TheNumber, value1.TheNumber))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -122,7 +122,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-				//Delta serializer not found for ClientAssembly.Player.BroadcastStruct.ClientAssembly.Player.BroadcastStruct.IsBroadcast; full serializer will be used.
+			if (pooledWriter.WriteDelta<System.Boolean>(value0.IsBroadcast, value1.IsBroadcast))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -149,34 +149,9 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.GWrite___WriteDeltaClientAssembly_Player_EmptyStruct(value0.Struct, value1.Struct))
+			if (pooledWriter.WriteDelta<System.String>(value0.String, value1.String))
 				totalFlags += 4;
 
-			if (pooledWriter.WriteDeltaUInt8Array(value0.ByteArr, value1.ByteArr))
-				totalFlags += 8;
-
-			if (pooledWriter.WriteDeltaArray<ClientAssembly.Player.NestedStruct>(value0.StructArr, value1.StructArr))
-				totalFlags += 16;
-
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrMultiDimensional. Value will not be serialized.
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrJagged. Value will not be serialized.
-			if (pooledWriter.WriteDeltaList<ClientAssembly.Player.NestedStruct>(value0.StructLst, value1.StructLst))
-				totalFlags += 32;
-
-			if (pooledWriter.WriteDeltaList<System.ValueTuple<System.Boolean, System.String>>(value0.TupleLst, value1.TupleLst))
-				totalFlags += 64;
-
-			if (pooledWriter.WriteDeltaDictionary<ClientAssembly.Player.NestedStruct, System.String>(value0.StructDict, value1.StructDict))
-				totalFlags += 128;
-
-			if (pooledWriter.WriteDeltaArraySegment(value0.ArrSegment, value1.ArrSegment))
-				totalFlags += 256;
-
-				//Delta serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.String; full serializer will be used.
-				totalFlags += 512;
-
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.ObjectType. Value will not be serialized.
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.GenericObjectType. Value will not be serialized.
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
 			if (changed)
 			{
@@ -201,7 +176,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-				//Delta serializer not found for ClientAssembly.Player.MyStructC.ClientAssembly.Player.MyStructC.Works; full serializer will be used.
+			if (pooledWriter.WriteDelta<System.Boolean>(value0.Works, value1.Works))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);

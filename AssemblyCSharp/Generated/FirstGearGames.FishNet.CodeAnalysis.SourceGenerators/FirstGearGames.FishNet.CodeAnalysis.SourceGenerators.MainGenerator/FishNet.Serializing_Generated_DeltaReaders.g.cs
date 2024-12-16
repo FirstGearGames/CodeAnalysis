@@ -117,54 +117,10 @@
 			}
 
 			if ((totalFlags & 4) == 4)
-				result.Struct = reader.ReadDelta<ClientAssembly.Player.EmptyStruct>(value0.Struct);
-			else
-				result.Struct = value0.Struct;
-
-			if ((totalFlags & 8) == 8)
-				result.ByteArr = reader.ReadDelta<System.Byte[]>(value0.ByteArr);
-			else
-				result.ByteArr = value0.ByteArr;
-
-			if ((totalFlags & 16) == 16)
-				result.StructArr = reader.ReadDelta<ClientAssembly.Player.NestedStruct[]>(value0.StructArr);
-			else
-				result.StructArr = value0.StructArr;
-
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.StructArrMultiDimensional. Value will not be serialized.
-			if ((totalFlags & 32) == 32)
-				result.StructArrJagged = reader.ReadDelta<[]>(value0.StructArrJagged);
-			else
-				result.StructArrJagged = value0.StructArrJagged;
-
-			if ((totalFlags & 64) == 64)
-				result.StructLst = reader.ReadDelta<System.Collections.Generic.List<ClientAssembly.Player.NestedStruct>>(value0.StructLst);
-			else
-				result.StructLst = value0.StructLst;
-
-			if ((totalFlags & 128) == 128)
-				result.TupleLst = reader.ReadDelta<System.Collections.Generic.List<System.ValueTuple<System.Boolean, System.String>>>(value0.TupleLst);
-			else
-				result.TupleLst = value0.TupleLst;
-
-			if ((totalFlags & 256) == 256)
-				result.StructDict = reader.ReadDelta<System.Collections.Generic.Dictionary<ClientAssembly.Player.NestedStruct, System.String>>(value0.StructDict);
-			else
-				result.StructDict = value0.StructDict;
-
-			if ((totalFlags & 512) == 512)
-				result.ArrSegment = reader.ReadDelta<System.ArraySegment<System.Byte>>(value0.ArrSegment);
-			else
-				result.ArrSegment = value0.ArrSegment;
-
-			if ((totalFlags & 1024) == 1024)
-				//Delta serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.String; full serializer will be used.
-				result.String = reader.ReadString();
+				result.String = reader.ReadDelta<System.String>(value0.String);
 			else
 				result.String = value0.String;
 
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.ObjectType. Value will not be serialized.
-			//Serializer not found for ClientAssembly.Player.NestedStruct.ClientAssembly.Player.NestedStruct.GenericObjectType. Value will not be serialized.
 			return result;
 		}
 

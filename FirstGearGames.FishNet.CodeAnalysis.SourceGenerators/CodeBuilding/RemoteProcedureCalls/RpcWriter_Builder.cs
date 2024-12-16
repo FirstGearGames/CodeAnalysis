@@ -17,14 +17,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 
         private StringBuilder _stringBuilder = new();
         private List<string> _stringList = new();
-        private SerializableGenerator _generator;
+        private MainGenerator _generator;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, MainGenerator generator)
         {
             Log("");
             Log("Initialize.");
@@ -97,7 +97,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                 _stringBuilder.AppendLine();
 
                 GeneratedWriter_Builder generatedWriterBuilder = _generator.GeneratedWriterBuilder;
-                SerializableMethods serializerMethods = _generator.SerializerMethods;
+                SerializerMethods serializerMethods = _generator.SerializerMethods;
 
                 foreach (IParameterSymbol symbol in methodData.SerializableParameters)
                 {

@@ -9,16 +9,16 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
     {
         private static StringBuilder _stringBuilder = new();
 
-        /// <summary>
-        /// Appends a line to stringBuilder indicating a serializer could not be found.
-        /// </summary>
-        public static string GetMissingSerializerComment(bool deltaSerializer, ITypeSymbol typeSymbol, IFieldSymbol? fieldSymbol = null)
-        {
-            if (deltaSerializer)
-                return $"//Delta serializer not found for {typeSymbol.ToReadable(fieldSymbol)}; full serializer will be used.";
-            else
-                return $"//Serializer not found for {typeSymbol.ToReadable(fieldSymbol)}. Value will not be serialized.";
-        }
+        // /// <summary>
+        // /// Appends a line to stringBuilder indicating a serializer could not be found.
+        // /// </summary>
+        // public static string GetMissingSerializerComment(bool deltaSerializer, ITypeSymbol typeSymbol, IFieldSymbol? fieldSymbol = null)
+        // {
+        //     if (deltaSerializer)
+        //         return $"//Delta serializer not found for {typeSymbol.ToReadable(fieldSymbol)}; full serializer will be used.";
+        //     else
+        //         return $"//Serializer not found for {typeSymbol.ToReadable(fieldSymbol)}. Value will not be serialized.";
+        // }
 
         /// <summary>
         /// Calls WriterPool to return a pooled writer.

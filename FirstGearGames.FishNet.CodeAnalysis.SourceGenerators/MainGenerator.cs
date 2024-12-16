@@ -11,11 +11,11 @@ using FirstGearGames.CodeAnalysis.Helpers;
 namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
 {
     [Generator]
-    public sealed class SerializableGenerator : ISourceGenerator
+    public sealed class MainGenerator : ISourceGenerator
     {
         public GeneratorSyntaxReceiver GeneratorSyntaxReceiver;
 
-        public SerializableMethods SerializerMethods;
+        public SerializerMethods SerializerMethods;
 
         public GeneratedDeltaWriter_Builder GeneratedDeltaWriterBuilder;
         public GeneratedDeltaReader_Builder GeneratedDeltaReaderBuilder;

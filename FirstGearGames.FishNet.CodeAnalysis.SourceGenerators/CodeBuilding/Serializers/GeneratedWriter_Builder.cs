@@ -20,13 +20,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
         private static StringBuilder _stringBuilder = new();
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private SerializableMethods _methods => _generator.SerializerMethods;
-        private SerializableGenerator _generator;
+        private SerializerMethods _serializerMethods => _generator.SerializerMethods;
+        private MainGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, MainGenerator generator)
         {
             Log("");
             Log("Initialize.");
@@ -63,17 +63,17 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             string typeFullName = serializableType.FullName;
             Log($"Checking to create a writer for {typeFullName}.");
             //Already exist either in FishNet or already created.
-            if (_methods.GetWriteMethod(typeFullName, GetSerializerType.Full).IsValid())
+            if (_serializerMethods.GetWriteMethod(typeFullName, GetSerializerType.Full).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
             if (namedTypeSymbol == null)
                 return;
 
-            if (!_methods.CanCreateSerializer(namedTypeSymbol))
+            if (!_serializerMethods.CanCreateSerializer(namedTypeSymbol))
                 return;
 
-            List<IFieldSymbol> serializableFields = _methods.GetSerializableFieldSymbols(namedTypeSymbol);
+            List<IFieldSymbol> serializableFields = _serializerMethods.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
@@ -82,7 +82,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             string header = GetMethodHeader(out string methodName);
             //Add to writers.
-            _methods.AddWriteMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
+            _serializerMethods.AddWriteMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
 
             string GetMethodHeader(out string mName)
             {
@@ -91,7 +91,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 string inText = namedTypeSymbol.IsUserDefinedStruct() ? "in " : string.Empty;
                 inText = "";
                 //public static bool WriteType(Type valueA) { }
-                sb.Append(2, $"public static void {mName}" + $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," + $" {inText}{typeFullName} {_methods.GetValueParameterName(0)})");
+                sb.Append(2, $"public static void {mName}" + $"(this {FishNetConstants.Writer_FullName} {Generated_WriterParameter_Name}," + $" {inText}{typeFullName} {_serializerMethods.GetValueParameterName(0)})");
 
                 return sb.ToString();
             }
@@ -103,7 +103,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver SyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, SerializerMethodData> item in _methods.GetWriteMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetWriteMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
@@ -113,7 +113,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
 
-                List<IFieldSymbol> serializableFieldSymbols = _methods.GetSerializableFieldSymbols(gsm.TypeSymbol);
+                List<IFieldSymbol> serializableFieldSymbols = _serializerMethods.GetSerializableFieldSymbols(gsm.TypeSymbol);
 
                 //Call write for all members.
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
@@ -121,14 +121,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethodData sm = _methods.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    SerializerMethodData sm = _serializerMethods.GetWriteMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     //Serializer not found.
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
-                    //Serializer found.
-                    else
-                        sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol, $"{_methods.GetValueParameterName(0)}.{fieldSymbol.Name}", closeCall: true));
+                        sm = _serializerMethods.CreateWriteGenericSerializerMethod(typeSymbol, metadataName: false);
+                    //     sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
+                    // //Serializer found.
+                    // else
+                        sb.AppendLine(bodyIndent, GetWriteCall(sm, Generated_WriterParameter_Name, fieldSymbol, $"{_serializerMethods.GetValueParameterName(0)}.{fieldSymbol.Name}", closeCall: true));
                 }
 
                 gsm.MethodContent.Body = sb;
@@ -151,7 +152,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             int addedSerializers = 0;
 
-            foreach (KeyValuePair<string, SerializerMethodData> item in _methods.GetWriteMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetWriteMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
 

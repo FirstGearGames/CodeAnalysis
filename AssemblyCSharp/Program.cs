@@ -99,18 +99,18 @@ namespace ClientAssembly
 
         public struct NestedStruct : IReplicateData
         {
-            public EmptyStruct Struct;
-            public byte[] ByteArr;
-            public NestedStruct[] StructArr;
-            public NestedStruct[,,] StructArrMultiDimensional;
-            public NestedStruct[][] StructArrJagged;
-            public List<NestedStruct> StructLst;
-            public List<(bool, string)> TupleLst;
-            public Dictionary<NestedStruct, string> StructDict;
-            public ArraySegment<byte> ArrSegment;
+            // public EmptyStruct Struct;
+            // public byte[] ByteArr;
+            // public NestedStruct[] StructArr;
+            // public NestedStruct[,,] StructArrMultiDimensional;
+            // public NestedStruct[][] StructArrJagged;
+            // public List<NestedStruct> StructLst;
+            // public List<(bool, string)> TupleLst;
+            // public Dictionary<NestedStruct, string> StructDict;
+            // public ArraySegment<byte> ArrSegment;
             public string String;
-            public System.Object ObjectType;
-            public AnyType<bool> GenericObjectType;
+            // public System.Object ObjectType;
+            // public AnyType<bool> GenericObjectType;
         }
 
         //[IncludeSerialization]

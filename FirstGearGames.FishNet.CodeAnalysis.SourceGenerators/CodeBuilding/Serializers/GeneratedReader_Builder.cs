@@ -20,13 +20,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         public const string InitializeOnLoad_Method_Name = GeneratedWriter_Builder.InitializeOnLoad_Method_Name;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private SerializableMethods _serializers => _generator.SerializerMethods;
-        private SerializableGenerator _generator;
+        private SerializerMethods _serializerMethods => _generator.SerializerMethods;
+        private MainGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, SerializableGenerator generator)
+        public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, MainGenerator generator)
         {
             Log("");
             Log("Initialize");
@@ -63,7 +63,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             string typeFullName = serializableType.FullName;
             Log($"Checking to create a reader for {typeFullName}.");
             //Already exist either in FishNet or already created.
-            if (_serializers.GetReadMethod(typeFullName, GetSerializerType.Full).IsValid())
+            if (_serializerMethods.GetReadMethod(typeFullName, GetSerializerType.Full).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
@@ -72,13 +72,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 Log($"NamedTypeSymbol is null for fullMetaName {serializableType.FullMetadataName}");
                 return;
             }
-            if (!_serializers.CanCreateSerializer(namedTypeSymbol))
+            if (!_serializerMethods.CanCreateSerializer(namedTypeSymbol))
             {
                 Log($"Cannot create serializer.");
                 return;
             }
 
-            List<IFieldSymbol> serializableFields = _serializers.GetSerializableFieldSymbols(namedTypeSymbol);
+            List<IFieldSymbol> serializableFields = _serializerMethods.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
                 ITypeSymbol typeSymbol = item.Type;
@@ -88,7 +88,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             string header = GetMethodHeader(out string methodName);
             //Add to readers.
-            _serializers.AddReadMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
+            _serializerMethods.AddReadMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
 
             string GetMethodHeader(out string mName)
             {
@@ -108,7 +108,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateSerializerBodies(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver)
         {
             //Iterate all serializers and if they are generated then complete them.
-            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetReadMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadMethods())
             {
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
@@ -122,20 +122,21 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 const string resultVariableName = "result";
                 sb.AppendLine(bodyIndent, $"{CodeBuilder.CreateLocalVariable(item.Key, resultVariableName, "new()")}{NativeConstants.LineFeed}");
 
-                List<IFieldSymbol> serializableFieldSymbols = _serializers.GetSerializableFieldSymbols(gsm.TypeSymbol);
+                List<IFieldSymbol> serializableFieldSymbols = _serializerMethods.GetSerializableFieldSymbols(gsm.TypeSymbol);
 
                 foreach (IFieldSymbol fieldSymbol in serializableFieldSymbols)
                 {
                     ITypeSymbol typeSymbol = fieldSymbol.Type;
 
                     //Get serializer method for the field.
-                    SerializerMethodData sm = _serializers.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
+                    SerializerMethodData sm = _serializerMethods.GetReadMethod(typeSymbol, GetSerializerType.Full, metadataName: false, out _);
 
                     //Serializer not found.
                     if (!sm.IsValid())
-                        sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
-                    //Serializer found.
-                    else
+                        sm = _serializerMethods.CreateReadGenericSerializerMethod(typeSymbol, metadataName: false);
+                    //     sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
+                    // //Serializer found.
+                    // else
                         sb.AppendLine(bodyIndent, GetReadCall(sm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", closeCall: true));
                 }
 
@@ -161,7 +162,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             int addedSerializers = 0;
 
-            foreach (KeyValuePair<string, SerializerMethodData> item in _serializers.GetReadMethods())
+            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadMethods())
             {
                 if (item.Value is not GeneratedSerializerMethod dsm) continue;
 
