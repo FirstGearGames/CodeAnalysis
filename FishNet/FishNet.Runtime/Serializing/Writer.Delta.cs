@@ -1,23 +1,37 @@
 ﻿using FishNet.CodeGenerating;
-using System.Runtime.CompilerServices;
 using FishNet.Managing;
+using FishNet.Object;
+using FishNet.Object.Prediction;
 using FishNet.Runtime.Unity_Stuff;
 
 namespace FishNet.Serializing
 {
+    public struct TransformProperties { }
+    
+
     public partial class Writer
     {
-        private const double LARGEST_DELTA_PRECISION_INT8 = (sbyte.MaxValue / DOUBLE_ACCURACY);
-        private const double LARGEST_DELTA_PRECISION_INT16 = (short.MaxValue / DOUBLE_ACCURACY);
-        private const double LARGEST_DELTA_PRECISION_INT32 = (int.MaxValue / DOUBLE_ACCURACY);
-        private const double LARGEST_DELTA_PRECISION_INT64 = (long.MaxValue / DOUBLE_ACCURACY);
+        #region Types.
+        [System.Flags]
+        internal enum UnsignedVector3DeltaFlag : int
+        {
+            Unset = 0,
+            More = (1 << 0),
+            X1 = (1 << 1),
+            NextXIsLarger = (1 << 2),
+            Y1 = (1 << 3),
+            NextYIsLarger = (1 << 4),
+            Z1 = (1 << 5),
+            NextZIsLarger = (1 << 6),
+            X2 = (1 << 8),
+            X4 = (1 << 9),
+            Y2 = (1 << 10),
+            Y4 = (1 << 11),
+            Z2 = (1 << 12),
+            Z4 = (1 << 13),
+        }
+        #endregion
 
-        private const double LARGEST_DELTA_PRECISION_UINT8 = (byte.MaxValue / DOUBLE_ACCURACY);
-        private const double LARGEST_DELTA_PRECISION_UINT16 = (ushort.MaxValue / DOUBLE_ACCURACY);
-        private const double LARGEST_DELTA_PRECISION_UINT32 = (uint.MaxValue / DOUBLE_ACCURACY);
-        private const double LARGEST_DELTA_PRECISION_UINT64 = (ulong.MaxValue / DOUBLE_ACCURACY);
-        internal const double DOUBLE_ACCURACY = 1000d;
-        internal const decimal DECIMAL_ACCURACY = 1000m;
 
         #region Other.
         /// <summary>
@@ -25,9 +39,15 @@ namespace FishNet.Serializing
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        public bool WriteDeltaBoolean(bool valueA, bool valueB)
+        public bool WriteDeltaBoolean(bool valueA, bool valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
+            bool valuesMatch = (valueA == valueB);
+            if (valuesMatch && option == DeltaSerializerOption.Unset)
+                return false;
+
+            WriteBoolean(valueB);
+
+            return true;
         }
         #endregion
 
@@ -37,35 +57,31 @@ namespace FishNet.Serializing
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaInt8(sbyte valueA, sbyte valueB) => WriteDifference8_16_32(valueA, valueB);
+        public bool WriteDeltaInt8(sbyte valueA, sbyte valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
-        public bool WriteDeltaUInt8(byte valueA, byte valueB) => WriteDifference8_16_32(valueA, valueB);
+        public bool WriteDeltaUInt8(byte valueA, byte valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool WriteDeltaInt16(short valueA, short valueB) => WriteDifference8_16_32(valueA, valueB);
+        public bool WriteDeltaInt16(short valueA, short valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool WriteDeltaUInt16(ushort valueA, ushort valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
@@ -73,7 +89,6 @@ namespace FishNet.Serializing
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool WriteDeltaInt32(int valueA, int valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
@@ -81,7 +96,6 @@ namespace FishNet.Serializing
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool WriteDeltaUInt32(uint valueA, uint valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDifference8_16_32(valueA, valueB, option);
 
         /// <summary>
@@ -89,7 +103,6 @@ namespace FishNet.Serializing
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool WriteDeltaInt64(long valueA, long valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDeltaUInt64((ulong)valueA, (ulong)valueB, option);
 
         /// <summary>
@@ -97,10 +110,18 @@ namespace FishNet.Serializing
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool WriteDeltaUInt64(ulong valueA, ulong valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
+            bool unchangedValue = (valueA == valueB);
+            if (unchangedValue && option == DeltaSerializerOption.Unset) return false;
+
+            bool bLargerThanA = (valueB > valueA);
+            ulong next = (bLargerThanA) ? (valueB - valueA) : (valueA - valueB);
+
+            WriteBoolean(bLargerThanA);
+            WriteUnsignedPackedWhole(next);
+
+            return true;
         }
 
         /// <summary>
@@ -108,235 +129,291 @@ namespace FishNet.Serializing
         /// </summary>
         private bool WriteDifference8_16_32(long valueA, long valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
+            bool unchangedValue = (valueA == valueB);
+            if (unchangedValue && option == DeltaSerializerOption.Unset) return false;
+
+            long next = (valueB - valueA);
+            WriteSignedPackedWhole(next);
+
+            return true;
         }
         #endregion
 
         #region Single.
         /// <summary>
-        /// Writes a single using DeltaPrecisionType.
-        /// </summary>
-        private void WriteDeltaSingle(DeltaPrecisionType dpt, float value) { }
-
-        /// <summary>
-        /// Writes a single using DeltaPrecisionType.
-        /// </summary>
-        private void WriteUDeltaSingle(UDeltaPrecisionType dpt, float positiveValue) { }
-
-        /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        public bool WriteUDeltaSingle(float valueA, float valueB)
+        public bool WriteUDeltaSingle(float valueA, float valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
+            UDeltaPrecisionType dpt = GetUDeltaPrecisionType(valueA, valueB, out float unsignedDifference);
+
+            if (dpt == UDeltaPrecisionType.Unset && option == DeltaSerializerOption.Unset)
+                return false;
+
+            WriteUInt8Unpacked((byte)dpt);
+            WriteDeltaSingle(dpt, unsignedDifference, unsigned: true);
+
+            return true;
         }
+
+        /// <summary>
+        /// Writes a delta value using a compression type.
+        /// </summary>
+        private void WriteDeltaSingle(UDeltaPrecisionType dpt, float value, bool unsigned) { }
 
         /// <summary>
         /// Returns DeltaPrecisionType for the difference of two values.
         /// Value returned should be written as signed.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private DeltaPrecisionType GetDeltaPrecisionType(float valueA, float valueB, out float difference)
+        public UDeltaPrecisionType GetSDeltaPrecisionType(float valueA, float valueB, out float signedDifference)
         {
-            difference = 0;
-            return default;
+            signedDifference = (valueB - valueA);
+            float posValue = (signedDifference < 0f) ? (signedDifference * -1f) : signedDifference;
+
+            return GetDeltaPrecisionType(posValue, unsigned: false);
         }
 
         /// <summary>
         /// Returns DeltaPrecisionType for the difference of two values.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private UDeltaPrecisionType GetUDeltaPrecisionType(float valueA, float valueB, out float difference)
+        public UDeltaPrecisionType GetUDeltaPrecisionType(float valueA, float valueB, out float unsignedDifference)
         {
-            difference = 0;
-            return default;
+            bool bIsLarger = (valueB > valueA);
+            if (bIsLarger)
+                unsignedDifference = (valueB - valueA);
+            else
+                unsignedDifference = (valueA - valueB);
+
+            UDeltaPrecisionType result = GetDeltaPrecisionType(unsignedDifference, unsigned: true);
+            //If result is set then set if bIsLarger.
+            if (bIsLarger && result != UDeltaPrecisionType.Unset)
+                result |= UDeltaPrecisionType.NextValueIsLarger;
+
+            return result;
         }
 
         /// <summary>
         /// Returns DeltaPrecisionType for a value.
         /// </summary>
-        private DeltaPrecisionType GetDeltaPrecisionType(float positiveValue)
-        {
-            return default;
-        }
-
-        /// <summary>
-        /// Returns DeltaPrecisionType for a value.
-        /// </summary>
-        private UDeltaPrecisionType GetUDeltaPrecisionType(float positiveValue)
-        {
-            return default;
-        }
+        public UDeltaPrecisionType GetDeltaPrecisionType(float positiveValue, bool unsigned) => default;
         #endregion
 
         #region Double.
         /// <summary>
-        /// Writes a decimal using DeltaPrecisionType.
+        /// Writes a delta value.
         /// </summary>
-        private void WriteDeltaDouble(DeltaPrecisionType dpt, double value) { }
+        /// <returns>True if written.</returns>
+        [DefaultDeltaWriter]
+        public bool WriteUDeltaDouble(double valueA, double valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
+        {
+            UDeltaPrecisionType dpt = GetUDeltaPrecisionType(valueA, valueB, out double positiveDifference);
+
+            if (dpt == UDeltaPrecisionType.Unset && option == DeltaSerializerOption.Unset) return false;
+
+            WriteUInt8Unpacked((byte)dpt);
+            WriteDeltaDouble(dpt, positiveDifference, unsigned: true);
+
+            return true;
+        }
 
         /// <summary>
         /// Writes a double using DeltaPrecisionType.
         /// </summary>
-        private void WriteUDeltaDouble(UDeltaPrecisionType dpt, double positiveValue) { }
-
-        /// <summary>
-        /// Writes a delta value.
-        /// </summary>
-        /// <returns>True if written.</returns>
-        public bool WriteDeltaDouble(double valueA, double valueB)
-        {
-            return default;
-        }
-
-        /// <summary>
-        /// Writes a delta value.
-        /// </summary>
-        /// <returns>True if written.</returns>
-        [DefaultDeltaWriter]
-        public bool WriteUDeltaDouble(double valueA, double valueB)
-        {
-            return default;
-        }
+        private void WriteDeltaDouble(UDeltaPrecisionType dpt, double value, bool unsigned) { }
 
         /// <summary>
         /// Returns DeltaPrecisionType for the difference of two values.
-        /// Value returned should be written as signed.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private DeltaPrecisionType GetDeltaPrecisionType(double valueA, double valueB, out double difference)
+        public UDeltaPrecisionType GetSDeltaPrecisionType(double valueA, double valueB, out double signedDifference)
         {
-            difference = (valueB - valueA);
-            double posValue = (difference < 0d) ? (difference * -1d) : difference;
-            return GetDeltaPrecisionType(posValue);
+            signedDifference = (valueB - valueA);
+            double posValue = (signedDifference < 0d) ? (signedDifference * -1d) : signedDifference;
+
+            return GetDeltaPrecisionType(posValue, unsigned: false);
         }
 
         /// <summary>
         /// Returns DeltaPrecisionType for the difference of two values.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private UDeltaPrecisionType GetUDeltaPrecisionType(double valueA, double valueB, out double difference)
+        public UDeltaPrecisionType GetUDeltaPrecisionType(double valueA, double valueB, out double unsignedDifference)
         {
-            difference = 0;
-            return default;
+            bool bIsLarger = (valueB > valueA);
+            if (bIsLarger)
+                unsignedDifference = (valueB - valueA);
+            else
+                unsignedDifference = (valueA - valueB);
+
+            UDeltaPrecisionType result = GetDeltaPrecisionType(unsignedDifference, unsigned: true);
+            if (bIsLarger && result != UDeltaPrecisionType.Unset)
+                result |= UDeltaPrecisionType.NextValueIsLarger;
+
+            return result;
         }
 
         /// <summary>
         /// Returns DeltaPrecisionType for a value.
         /// </summary>
-        private DeltaPrecisionType GetDeltaPrecisionType(double positiveValue)
-        {
-            return default;
-        }
-
-        /// <summary>
-        /// Returns DeltaPrecisionType for a value.
-        /// </summary>
-        private UDeltaPrecisionType GetUDeltaPrecisionType(double positiveValue)
-        {
-            return default;
-        }
+        public UDeltaPrecisionType GetDeltaPrecisionType(double positiveValue, bool unsigned) => default;
         #endregion
 
         #region Decimal
         /// <summary>
-        /// Writes a decimal using DeltaPrecisionType.
-        /// </summary>
-        private void WriteDeltaDecimal(DeltaPrecisionType dpt, decimal value) { }
-
-        /// <summary>
-        /// Writes a decimal using DeltaPrecisionType.
-        /// </summary>
-        private void WriteUDeltaDecimal(UDeltaPrecisionType dpt, decimal positiveValue) { }
-
-        /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
-        public bool WriteDeltaDecimal(decimal valueA, decimal valueB)
+        [DefaultDeltaWriter]
+        public bool WriteUDeltaDecimal(decimal valueA, decimal valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
+            UDeltaPrecisionType dpt = GetUDeltaPrecisionType(valueA, valueB, out decimal positiveDifference);
+
+            if (dpt == UDeltaPrecisionType.Unset && option == DeltaSerializerOption.Unset) return false;
+
+            WriteUInt8Unpacked((byte)dpt);
+            WriteDeltaDecimal(dpt, positiveDifference, unsigned: true);
+
+            return true;
         }
 
+        /// <summary>
+        /// Writes a double using DeltaPrecisionType.
+        /// </summary>
+        private void WriteDeltaDecimal(UDeltaPrecisionType dpt, decimal value, bool unsigned) { }
+
+        /// <summary>
+        /// Returns DeltaPrecisionType for the difference of two values.
+        /// </summary>
+        public UDeltaPrecisionType GetSDeltaPrecisionType(decimal valueA, decimal valueB, out decimal signedDifference)
+        {
+            signedDifference = (valueB - valueA);
+            decimal posValue = (signedDifference < 0m) ? (signedDifference * -1m) : signedDifference;
+
+            return GetDeltaPrecisionType(posValue, unsigned: false);
+        }
+
+        /// <summary>
+        /// Returns DeltaPrecisionType for the difference of two values.
+        /// </summary>
+        public UDeltaPrecisionType GetUDeltaPrecisionType(decimal valueA, decimal valueB, out decimal unsignedDifference)
+        {
+            bool bIsLarger = (valueB > valueA);
+            if (bIsLarger)
+                unsignedDifference = (valueB - valueA);
+            else
+                unsignedDifference = (valueA - valueB);
+
+            UDeltaPrecisionType result = GetDeltaPrecisionType(unsignedDifference, unsigned: true);
+            if (bIsLarger && result != UDeltaPrecisionType.Unset)
+                result |= UDeltaPrecisionType.NextValueIsLarger;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns DeltaPrecisionType for a value.
+        /// </summary>
+        public UDeltaPrecisionType GetDeltaPrecisionType(decimal positiveValue, bool unsigned) => default;
+        #endregion
+
+        #region FishNet Types.
         /// <summary>
         /// Writes a delta value.
         /// </summary>
         /// <returns>True if written.</returns>
         [DefaultDeltaWriter]
-        public bool WriteUDeltaDecimal(decimal valueA, decimal valueB)
+        public bool WriteDeltaNetworkBehaviour(NetworkBehaviour valueA, NetworkBehaviour valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
-        }
+            bool unchangedValue = (valueA == valueB);
+            if (unchangedValue && option == DeltaSerializerOption.Unset) return false;
 
-        /// <summary>
-        /// Returns DeltaPrecisionType for the difference of two values.
-        /// Value returned should be written as signed.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private DeltaPrecisionType GetDeltaPrecisionType(decimal valueA, decimal valueB, out decimal difference)
-        {
-            difference = 0;
-            return default;
-        }
-
-        /// <summary>
-        /// Returns DeltaPrecisionType for the difference of two values.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private UDeltaPrecisionType GetUDeltaPrecisionType(decimal valueA, decimal valueB, out decimal difference)
-        {
-            difference = 0;
-            return default;
-        }
-
-        /// <summary>
-        /// Returns DeltaPrecisionType for a value.
-        /// </summary>
-        private DeltaPrecisionType GetDeltaPrecisionType(decimal positiveValue)
-        {
-            return default;
-        }
-
-        /// <summary>
-        /// Returns DeltaPrecisionType for a value.
-        /// </summary>
-        private UDeltaPrecisionType GetUDeltaPrecisionType(decimal positiveValue)
-        {
-            return default;
+            WriteNetworkBehaviour(valueB);
+            return true;
         }
         #endregion
+
+        public struct TransformProperties { }
 
         #region Unity.
         /// <summary>
-        /// Writes a delta Vector3.
+        /// Writes delta position, rotation, and scale of a transform.
+        /// </summary>
+        public bool WriteDeltaTransformProperties(TransformProperties valueA, TransformProperties valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)  => default;
+
+        
+        /// <summary>
+        /// Writes a delta value.
         /// </summary>
         [DefaultDeltaWriter]
-        public bool WriteDeltaVector3(Vector3 valueA, Vector3 valueB)
+        public bool WriteDeltaQuaternion(Quaternion valueA, Quaternion valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
+
+        /// <summary>
+        /// Writes a delta value.
+        /// </summary>
+        [DefaultDeltaWriter]
+        public bool WriteDeltaVector2(Vector2 valueA, Vector2 valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset)  => default;
+
+        [DefaultDeltaWriter]
+        public bool WriteDeltaVector3(Vector3 valueA, Vector3 valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
+        
+        /// <summary>
+        /// Writes a delta value.
+        /// </summary>
+        //[DefaultDeltaWriter]
+        public bool WriteDeltaVector3_New(Vector3 valueA, Vector3 valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
+        #endregion
+
+        #region Prediction.
+        /// <summary>
+        /// Writes a delta reconcile.
+        /// </summary>
+        internal void WriteDeltaReconcile<T>(T lastReconcile, T value, DeltaSerializerOption option = DeltaSerializerOption.Unset) => WriteDelta(lastReconcile, value, option);
+
+        /// <summary>
+        /// Writes a delta replicate using a list.
+        /// </summary>
+        internal void WriteDeltaReplicate<T>(List<T> values, int offset, DeltaSerializerOption option = DeltaSerializerOption.Unset) where T : IReplicateData
         {
-            return default;
+            int collectionCount = values.Count;
+            //Replicate list will never be null, no need to write null check.
+            //Number of entries being written.
+            byte count = (byte)(collectionCount - offset);
+            WriteUInt8Unpacked(count);
+
+            T prev;
+            //Set previous if not full and if enough room in the collection to go back.
+            if (option != DeltaSerializerOption.FullSerialize && collectionCount > count)
+                prev = values[offset - 1];
+            else
+                prev = default;
+
+            for (int i = offset; i < collectionCount; i++)
+            {
+                T v = values[i];
+                WriteDelta(prev, v, option);
+
+                prev = v;
+                //After the first loop the deltaOption can be set to root, if not already.
+                option = DeltaSerializerOption.RootSerialize;
+            }
         }
         #endregion
- 
-        [DefaultDeltaWriter]
-        public bool WriteDeltaDictionary<TKey, TValue>(Dictionary<TKey, TValue> valueA, Dictionary<TKey, TValue> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
-        [DefaultDeltaWriter]
-        public bool WriteDeltaList<T0>(List<T0> valueA, List<T0> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
-
-        [DefaultDeltaWriter]
-        public bool WriteDeltaUInt8Array(byte[] valueA, byte[] valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
-        [DefaultDeltaWriter]
-        public bool WriteDeltaArray<T0>(T0[] valueA, T0[] valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
-
-        [DefaultDeltaWriter]
-        public bool WriteDeltaArraySegment(ArraySegment<byte> valueA, ArraySegment<byte> valueB, DeltaSerializerOption option = DeltaSerializerOption.Unset) => default;
-
 
         #region Generic.
         public bool WriteDelta<T>(T prev, T next, DeltaSerializerOption option = DeltaSerializerOption.Unset)
         {
-            return default;
+            Func<Writer, T, T, DeltaSerializerOption, bool> del = GenericDeltaWriter<T>.Write;
+
+            if (del == null)
+            {
+                NetworkManager.LogError($"Write delta method not found for {typeof(T).FullName}. Use a supported type or create a custom serializer.");
+
+                return false;
+            }
+            else
+            {
+                return del.Invoke(this, prev, next, option);
+            }
         }
         #endregion
     }

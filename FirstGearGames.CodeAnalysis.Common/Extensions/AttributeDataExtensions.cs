@@ -28,12 +28,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             return ret;
         }
 
-        public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
-        {
-            SemanticModel model = compilation.GetSemanticModel(node.SyntaxTree);
-            return model.GetDeclaredSymbol(node);
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T? GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
         {
@@ -53,15 +47,15 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             return default;
         }
-
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName)
+        
+        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
+        
+        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T defaultValue)
         {
             foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
-            {
                 if (namedArgument.Key == argumentName) return (T)namedArgument.Value.Value;
-            }
 
-            return default;
+            return defaultValue;;
         }
     }
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

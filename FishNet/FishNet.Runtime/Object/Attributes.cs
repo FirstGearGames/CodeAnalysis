@@ -88,7 +88,6 @@ namespace FishNet.Object
         /// Use this field with caution as it may create undesired results when set to false.
         /// </summary>
         public bool ValidateTarget = true;
-
     }
 
     /// <summary>

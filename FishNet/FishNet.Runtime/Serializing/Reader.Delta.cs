@@ -9,9 +9,6 @@ namespace FishNet.Serializing
 {
     public partial class Reader
     {
-        internal double DOUBLE_ACCURACY => Writer.DOUBLE_ACCURACY;
-        internal decimal DECIMAL_ACCURACY => Writer.DECIMAL_ACCURACY;
-
         #region Other.
 
         /// <summary>
@@ -146,23 +143,7 @@ namespace FishNet.Serializing
         /// <summary>
         /// Reads a difference, appending it onto a value.
         /// </summary>
-        private double ReadUDeltaDouble(UDeltaPrecisionType dpt, double valueA)
-        {
-            double diff = 0;
-            if (dpt.FastContains(UDeltaPrecisionType.UInt8))
-                diff = (ReadUInt8Unpacked() / DOUBLE_ACCURACY);
-            else if (dpt.FastContains(UDeltaPrecisionType.UInt16))
-                diff = (ReadUInt16Unpacked() / DOUBLE_ACCURACY);
-            else if (dpt.FastContains(UDeltaPrecisionType.UInt32))
-                diff = (ReadUInt32Unpacked() / DOUBLE_ACCURACY);
-            else if (dpt.FastContains(UDeltaPrecisionType.Unset))
-                diff = ReadDoubleUnpacked();
-            else
-                NetworkManager.LogError($"Unhandled precision type of {dpt}.");
-
-            bool bLargerThanA = dpt.FastContains(UDeltaPrecisionType.NextValueIsLarger);
-            return (bLargerThanA) ? (valueA + diff) : (valueA - diff);
-        }
+        private double ReadUDeltaDouble(UDeltaPrecisionType dpt, double valueA)  => default;
 
         /// <summary>
         /// Reads a difference, appending it onto a value.

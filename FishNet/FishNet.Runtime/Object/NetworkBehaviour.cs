@@ -1,6 +1,6 @@
 ﻿namespace FishNet.Object
 {
-    public class NetworkBehaviour
+    public partial class NetworkBehaviour
     {
     }
 }

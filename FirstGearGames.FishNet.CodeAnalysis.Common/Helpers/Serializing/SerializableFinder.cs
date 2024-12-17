@@ -189,8 +189,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         }
 
         /// <summary>
-        /// Returns possible serializables in a Rpc.
+        /// Returns possible serializables in over all RPC attributes for a method.
         /// </summary>
+        /// <remarks>If there are multiple attributes on the RPC then serializers will be added accordingly for each attribute.</remarks>
         public List<IParameterSymbol> GetRpcSerializableParameters(object context, IMethodSymbol methodSymbol)
         {
             List<IParameterSymbol> serializableResults = new();
@@ -203,53 +204,63 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             const bool metadataName = false;
 
             foreach (RpcAttributeData item in results)
+                serializableResults.AddRange(GetRpcSerializableParameters(context, methodSymbol, item));
+
+            return parameters;
+        }
+
+        public List<IParameterSymbol> GetRpcSerializableParameters(object context, IMethodSymbol methodSymbol, RpcAttributeData rpcAttributeData)
+        {
+            List<IParameterSymbol> parameters = methodSymbol.Parameters.ToList();
+            int parametersCount = parameters.Count;
+
+            const bool metadataName = false;
+
+            //ServerRpc.
+            if (rpcAttributeData.RPCType == RPCType.Server)
             {
-                //ServerRpc.
-                if (item.RPCType == RPCType.Server)
-                {
-                    RemoveTrailingNetworkConnection();
-                    RemoveTrailingChannel();
-                }
-                //TargetRpc.
-                else if (item.RPCType == RPCType.Target)
-                {
-                    RemoveTrailingChannel();
-                    RemoveLeadingNetworkConnection();
-                }
-                //ObserversRpc.
-                else if (item.RPCType == RPCType.Observers)
-                {
-                    RemoveTrailingChannel();
-                    RemoveLeadingNetworkConnection();
-                }
+                RemoveTrailingNetworkConnection();
+                RemoveTrailingChannel();
+            }
+            //TargetRpc.
+            else if (rpcAttributeData.RPCType == RPCType.Target)
+            {
+                RemoveTrailingChannel();
+                RemoveLeadingNetworkConnection();
+            }
+            //ObserversRpc.
+            else if (rpcAttributeData.RPCType == RPCType.Observers)
+            {
+                RemoveTrailingChannel();
+                RemoveLeadingNetworkConnection();
+            }
 
-                //Removes networkConnection if the first parameter.
-                void RemoveLeadingNetworkConnection()
-                {
-                    if (parametersCount == 0) return;
-                    //Remove channel from serializable.
-                    if (parameters[0].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
-                        parameters.RemoveAt(--parametersCount);
-                }
+            //Removes networkConnection if the first parameter.
+            void RemoveLeadingNetworkConnection()
+            {
+                if (parametersCount == 0) return;
+                //Remove channel from serializable.
+                if (parameters[0].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
+                    parameters.RemoveAt(--parametersCount);
+            }
 
-                //Removes networkConnection if the last parameter.
-                void RemoveTrailingNetworkConnection()
-                {
-                    if (parametersCount == 0) return;
-                    //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
-                        parameters.RemoveAt(--parametersCount);
-                }
+            //Removes networkConnection if the last parameter.
+            void RemoveTrailingNetworkConnection()
+            {
+                if (parametersCount == 0) return;
+                //Remove channel from serializable.
+                if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
+                    parameters.RemoveAt(--parametersCount);
+            }
 
-                //Removes channel if the last parameter.
-                void RemoveTrailingChannel()
-                {
-                    if (parametersCount == 0) return;
-                    if (!parameters[parametersCount - 1].IsOptional) return;
-                    //Remove channel from serializable.
-                    if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
-                        parameters.RemoveAt(--parametersCount);
-                }
+            //Removes channel if the last parameter.
+            void RemoveTrailingChannel()
+            {
+                if (parametersCount == 0) return;
+                if (!parameters[parametersCount - 1].IsOptional) return;
+                //Remove channel from serializable.
+                if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
+                    parameters.RemoveAt(--parametersCount);
             }
 
             for (int i = 0; i < parameters.Count; i++)

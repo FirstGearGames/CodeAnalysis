@@ -9,6 +9,13 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class SyntaxNodeExtensions
     {
+        public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
+        {
+            SemanticModel model = compilation.GetSemanticModel(node.SyntaxTree);
+            return model.GetDeclaredSymbol(node);
+        }
+
+
         public static bool TryGetParentSyntax<T>(this SyntaxNode syntaxNode, out T result) where T : SyntaxNode
         {
             // set defaults

@@ -17,10 +17,16 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             _generatorSyntaxReceiver = generatorSyntaxReceiver;
         }
 
+        /// <summary>
+        /// Invoked during analysis when a class is not partial.
+        /// </summary>
         public event Action<SyntaxNodeAnalysisContext> OnClassIsNotPartial;
 
-        public readonly HashSet<RpcMethodDatas> MethodsNeedingSerializers = new();
-
+        /// <summary>
+        /// All RPC methods which need to be generated.
+        /// </summary>
+        public readonly HashSet<RpcMethodDatas> RpcMethodDatas = new();
+        
         private GeneratorSyntaxReceiver _generatorSyntaxReceiver;
 
         /// <summary>
@@ -48,7 +54,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         }
 
         /// <summary>
-        /// Finds serializables for methods which implement RPC attributes.
+        /// Checks if a method is a RPC and builds data for it if so.
         /// </summary>
         private void CheckRpcMethod(object context, IMethodSymbol methodSymbol)
         {
@@ -65,19 +71,16 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
                 return;
             }
 
-            List<IParameterSymbol> serializables = _generatorSyntaxReceiver.SerializableFinder.GetRpcSerializableParameters(context, methodSymbol);
-
-            for (int i = 0; i < serializables.Count; i++)
+            //Iterate each rpcAttribute and make method data for it.
+            foreach (RpcAttributeData data in results)
             {
-                if (serializables[i].Type is not INamedTypeSymbol)
-                    serializables.RemoveAt(i--);
+                List<IParameterSymbol> serializables = _generatorSyntaxReceiver.SerializableFinder.GetRpcSerializableParameters(context, methodSymbol, data);
+
+                //Build RpcMethodData here.
+                RpcMethodDatas rmd = new(methodSymbol, serializables, data);
+                RpcMethodDatas.Add(rmd);
             }
-
-            //Build RpcMethodData here.
-            RpcMethodDatas rmd = new(methodSymbol, serializables);
-            MethodsNeedingSerializers.Add(rmd);
         }
-
 
         private void Log(string txt)
         {

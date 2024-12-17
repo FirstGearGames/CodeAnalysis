@@ -45,7 +45,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
         /// </summary>
         private void CreateEmptyRpcMethods(GeneratorExecutionContext context, GeneratorSyntaxReceiver syntaxReceiver)
         {
-            foreach (RpcMethodDatas item in syntaxReceiver.RpcFinder.MethodsNeedingSerializers)
+            foreach (RpcMethodDatas item in syntaxReceiver.RpcFinder.RpcMethodDatas)
                 CreateEmptyRpcMethod(context, item);
         }
 

@@ -122,7 +122,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDelta<System.Boolean>(value0.IsBroadcast, value1.IsBroadcast))
+			if (pooledWriter.WriteDeltaBoolean(value0.IsBroadcast, value1.IsBroadcast))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
@@ -176,7 +176,7 @@ namespace FishNet.Serializing
 
 			FishNet.Serializing.PooledWriter pooledWriter = FishNet.Serializing.WriterPool.Retrieve();
 
-			if (pooledWriter.WriteDelta<System.Boolean>(value0.Works, value1.Works))
+			if (pooledWriter.WriteDeltaBoolean(value0.Works, value1.Works))
 				totalFlags += 4;
 
 			System.Boolean changed = (totalFlags != 0 || options == FishNet.Serializing.DeltaSerializerOption.RootSerialize);
