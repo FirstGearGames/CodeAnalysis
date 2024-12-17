@@ -1,4 +1,6 @@
-﻿namespace FirstGearGames.FishNet.CodeAnalysis.Constants
+﻿using FishNetTypes.Managing.Logging;
+
+namespace FirstGearGames.FishNet.CodeAnalysis.Constants
 {
     public class FishNetConstants
     {
@@ -322,35 +324,39 @@
         /// <summary>
         /// LoggingType.Off enum value.
         /// </summary>
-        public const string LoggingType_Off_Name = $"LoggingType.Off";
+        public static string LoggingType_Off_Name => LoggingType.Off.GetEnumName();
         /// <summary>
         /// LoggingType.Error enum value.
         /// </summary>
-        public const string LoggingType_Error_Name = $"LoggingType.Error";
+        public static string LoggingType_Error_Name => LoggingType.Error.GetEnumName();
         /// <summary>
         /// LoggingType.Warning enum value.
         /// </summary>
-        public const string LoggingType_Warning_Name = $"LoggingType.Warning";
+        public static string LoggingType_Warning_Name  => LoggingType.Warning.GetEnumName();
         /// <summary>
         /// LoggingType.Common enum value.
         /// </summary>
-        public const string LoggingType_Common_Name = $"LoggingType.Common";
+        public static string LoggingType_Common_Name  => LoggingType.Common.GetEnumName();
+        /// <summary>
+        /// LoggingType value to use when none is specified.
+        /// </summary>
+        public const LoggingType Default_LoggingType = LoggingType.Warning;        
         /// <summary>
         /// LoggingType.Off numeric value.
         /// </summary>
-        public const int LoggingType_Off_NumericValue = 0;
+        public const int LoggingType_Off_NumericValue= (int)LoggingType.Off;
         /// <summary>
         /// LoggingType.Error numeric value.
         /// </summary>
-        public const int LoggingType_Error_NumericValue = 1;
+        public const int LoggingType_Error_NumericValue= (int)LoggingType.Error;
         /// <summary>
         /// LoggingType.Warning numeric value.
         /// </summary>
-        public const int LoggingType_Warning_NumericValue = 2;
+        public const int LoggingType_Warning_NumericValue= (int)LoggingType.Warning;
         /// <summary>
         /// LoggingType.Common numeric value.
         /// </summary>
-        public const int LoggingType_Common_NumericValue = 3;
+        public const int LoggingType_Common_NumericValue= (int)LoggingType.Common;
         /// <summary>
         /// LoggingType value to use when none is specified.
         /// </summary>

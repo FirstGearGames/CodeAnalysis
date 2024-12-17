@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using FirstGearGames.CodeAnalysis.Extensions;
+using FishNetTypes.Managing.Logging;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
 {
@@ -60,7 +61,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
         /// <summary>
         /// Gets the logging type specified on a RPC attribute.
         /// </summary>
-        public static int GetLoggingTypeNumericValue(this RpcAttributeData rpcAttributeData)
+        public static LoggingType GetLoggingType(this RpcAttributeData rpcAttributeData)
         {
             KeyValuePair<string, TypedConstant> loggingArgument = rpcAttributeData.AttributeData.NamedArguments.FirstOrDefault(arg => arg.Key == FishNetConstants.RpcAttribute_Logging_Name);
 
@@ -68,32 +69,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
             if (loggingArgument.Key != null && loggingArgument.Value.Value != null)
             {
                 if (loggingArgument.Value.Value is byte loggingTypeValue)
-                    return loggingTypeValue;
+                    return (LoggingType)loggingTypeValue;
             }
 
-            return FishNetConstants.Default_LoggingType_NumericValue;
+            return FishNetConstants.Default_LoggingType;
         }
-
-        /// <summary>
-        /// Returns if Logging is set to off within a RPC attribute.
-        /// </summary>
-        public static bool IsLoggingOff(this RpcAttributeData rpcAttributeData) => rpcAttributeData.IsLoggingValue(FishNetConstants.LoggingType_Off_NumericValue);
-
-        /// <summary>
-        /// Returns if Logging is set to error within a RPC attribute.
-        /// </summary>
-        public static bool IsLoggingWarning(this RpcAttributeData rpcAttributeData) => rpcAttributeData.IsLoggingValue(FishNetConstants.LoggingType_Warning_NumericValue);
-
-        /// <summary>
-        /// Returns if Logging is set to error within a RPC attribute.
-        /// </summary>
-        public static bool IsLoggingError(this RpcAttributeData rpcAttributeData) => rpcAttributeData.IsLoggingValue(FishNetConstants.LoggingType_Error_NumericValue);
-
-        /// <summary>
-        /// Returns if Logging is set to common within a RPC attribute.
-        /// </summary>
-        public static bool IsLoggingCommon(this RpcAttributeData rpcAttributeData) => rpcAttributeData.IsLoggingValue(FishNetConstants.LoggingType_Common_NumericValue);
-
+        
         /// <summary>
         /// Returns if Logging is a certain value.
         /// </summary>
@@ -106,6 +87,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
                 return (byteValue == numericValue);
 
             return false;
+        }
+        
+        /// <summary>
+        /// Returns if Logging is a certain value.
+        /// </summary>
+        public static bool IsLoggingType(this RpcAttributeData rpcAttributeData, LoggingType loggingType)
+        {
+            int numericValue = (int)loggingType;
+            return rpcAttributeData.IsLoggingValue(numericValue);
         }
     }
 }

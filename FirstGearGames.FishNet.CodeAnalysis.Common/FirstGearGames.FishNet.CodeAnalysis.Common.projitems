@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Constants\FishNetConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Constants\UnityConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNetTypes\Managing\Logging\LoggingType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FishNetTypes\Object\Attributes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\RemoteProcedureCalls\RpcMethodDatas.cs" />
