@@ -1,8 +1,28 @@
 ﻿using System;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using FishNetTypes.Managing.Logging;
 
 namespace FishNetTypes.Object
 {
+    
+    public static class DataOrderTypeExtensions
+    {
+        /// <summary>
+        /// Returns a DataOrderType enum value while containing the enum name (eg: DataOrderType.Last).
+        /// </summary>
+        public static string GetEnumName(this byte orderTypeValue)
+        {
+            DataOrderType orderType = (DataOrderType)orderTypeValue;
+            return orderType.GetEnumName();
+        }
+
+        /// <summary>
+        /// Returns a DataOrderType enum value while containing the enum name (eg: DataOrderType.Last).
+        /// </summary>
+        public static string GetEnumName(this DataOrderType orderType) => $"{FishNetConstants.DataOrderType_FullName}.{orderType.ToString()}";
+    }
+
+    
     public enum DataOrderType
     {
         /// <summary>

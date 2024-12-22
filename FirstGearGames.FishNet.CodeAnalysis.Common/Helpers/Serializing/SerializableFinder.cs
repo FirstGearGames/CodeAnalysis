@@ -218,23 +218,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
             //ServerRpc.
             if (rpcAttributeData.RPCType == RPCType.Server)
-            {
                 RemoveTrailingNetworkConnection();
-                RemoveTrailingChannel();
-            }
             //TargetRpc.
             else if (rpcAttributeData.RPCType == RPCType.Target)
-            {
-                RemoveTrailingChannel();
                 RemoveLeadingNetworkConnection();
-            }
-            //ObserversRpc.
-            else if (rpcAttributeData.RPCType == RPCType.Observers)
-            {
-                RemoveTrailingChannel();
-                RemoveLeadingNetworkConnection();
-            }
-
+            
+            //All Rpcs support optional channel.
+            RemoveTrailingChannel();
+            
             //Removes networkConnection if the first parameter.
             void RemoveLeadingNetworkConnection()
             {
@@ -257,7 +248,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             void RemoveTrailingChannel()
             {
                 if (parametersCount == 0) return;
-                if (!parameters[parametersCount - 1].IsOptional) return;
                 //Remove channel from serializable.
                 if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
                     parameters.RemoveAt(--parametersCount);

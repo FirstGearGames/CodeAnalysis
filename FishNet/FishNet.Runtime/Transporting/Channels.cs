@@ -1,5 +1,6 @@
 ﻿namespace FishNet.Transporting
 {
+    
     /// <summary>
     /// Channel which data is sent or received.
     /// </summary>

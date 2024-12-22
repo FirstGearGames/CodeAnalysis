@@ -1,4 +1,6 @@
 ﻿using FishNetTypes.Managing.Logging;
+using FishNetTypes.Object;
+using FishNetTypes.Transporting;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.Constants
 {
@@ -37,6 +39,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// FishNet.Managing.Logging namespace.
         /// </summary>
         public const string Logging_Namespace = $"FishNet.Managing.Logging";
+        /// <summary>
+        /// FishNet.Transporting namespace.
+        /// </summary>
+        public const string Transporting_Namespace = $"FishNet.Transporting";
         #endregion
 
         #region Prediction.
@@ -92,6 +98,30 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// RpcAttribute.Logging name.
         /// </summary>
         public const string RpcAttribute_Logging_Name = $"Logging";
+        /// <summary>
+        /// SendServerRpc Name.
+        /// </summary>
+        public const string SendServerRpc_Name = $"SendServerRpc";
+        /// <summary>
+        /// SendObserversRpc Name.
+        /// </summary>
+        public const string SendObserversRpc_Name = $"SendObserversRpc";
+        /// <summary>
+        /// SendObserversRpc Name.
+        /// </summary>
+        public const string SendTargetRpc_Name = $"SendTargetRpc";
+        /// <summary>
+        /// Default channel for RPCs.
+        /// </summary>
+        public static string Default_Rpc_Channel_FullName => Channel_Reliable_FullName;
+        /// <summary>
+        /// DataOrderType enum.
+        /// </summary>
+        public static string DataOrderType_FullName = $"{Object_Namespace}.{nameof(DataOrderType)}";
+        /// <summary>
+        /// Default DataOrderType enum value.
+        /// </summary>
+        public static string Default_DataOrderType_FullName => DataOrderType.Default.GetEnumName();
         #endregion
 
         #region Broadcasts.
@@ -308,19 +338,19 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// <summary>
         /// LoggingType.Off enum value.
         /// </summary>
-        public const string LoggingType_Off_FullName = $"{Logging_Namespace}.LoggingType.Off";
+        public static string LoggingType_Off_FullName = $"{Logging_Namespace}.{LoggingType.Off.GetEnumName()}";
         /// <summary>
         /// LoggingType.Error enum value.
         /// </summary>
-        public const string LoggingType_Error_FullName = $"{Logging_Namespace}.LoggingType.Error";
+        public static string LoggingType_Error_FullName = $"{Logging_Namespace}.{LoggingType.Error.GetEnumName()}";
         /// <summary>
         /// LoggingType.Warning enum value.
         /// </summary>
-        public const string LoggingType_Warning_FullName = $"{Logging_Namespace}.LoggingType.Warning";
+        public static string LoggingType_Warning_FullName = $"{Logging_Namespace}.{LoggingType.Warning.GetEnumName()}";
         /// <summary>
         /// LoggingType.Common enum value.
         /// </summary>
-        public const string LoggingType_Common_FullName = $"{Logging_Namespace}.LoggingType.Common";
+        public static string LoggingType_Common_FullName = $"{Logging_Namespace}.{LoggingType.Common.GetEnumName()}";
         /// <summary>
         /// LoggingType.Off enum value.
         /// </summary>
@@ -332,31 +362,31 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// <summary>
         /// LoggingType.Warning enum value.
         /// </summary>
-        public static string LoggingType_Warning_Name  => LoggingType.Warning.GetEnumName();
+        public static string LoggingType_Warning_Name => LoggingType.Warning.GetEnumName();
         /// <summary>
         /// LoggingType.Common enum value.
         /// </summary>
-        public static string LoggingType_Common_Name  => LoggingType.Common.GetEnumName();
+        public static string LoggingType_Common_Name => LoggingType.Common.GetEnumName();
         /// <summary>
         /// LoggingType value to use when none is specified.
         /// </summary>
-        public const LoggingType Default_LoggingType = LoggingType.Warning;        
+        public const LoggingType Default_LoggingType = LoggingType.Warning;
         /// <summary>
         /// LoggingType.Off numeric value.
         /// </summary>
-        public const int LoggingType_Off_NumericValue= (int)LoggingType.Off;
+        public const int LoggingType_Off_NumericValue = (int)LoggingType.Off;
         /// <summary>
         /// LoggingType.Error numeric value.
         /// </summary>
-        public const int LoggingType_Error_NumericValue= (int)LoggingType.Error;
+        public const int LoggingType_Error_NumericValue = (int)LoggingType.Error;
         /// <summary>
         /// LoggingType.Warning numeric value.
         /// </summary>
-        public const int LoggingType_Warning_NumericValue= (int)LoggingType.Warning;
+        public const int LoggingType_Warning_NumericValue = (int)LoggingType.Warning;
         /// <summary>
         /// LoggingType.Common numeric value.
         /// </summary>
-        public const int LoggingType_Common_NumericValue= (int)LoggingType.Common;
+        public const int LoggingType_Common_NumericValue = (int)LoggingType.Common;
         /// <summary>
         /// LoggingType value to use when none is specified.
         /// </summary>
@@ -375,7 +405,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// <summary>
         /// Channel enum.
         /// </summary>
-        public const string Channel_FullName = "FishNet.Transporting.Channel";
+        public const string Channel_FullName = $"{Transporting_Namespace}.{nameof(Channel)}";
+        /// <summary>
+        /// Channel.Reliable value.
+        /// </summary>
+        public static string Channel_Reliable_FullName = $"{Transporting_Namespace}.{Channel.Reliable.GetEnumName()}";
         #endregion
     }
 }

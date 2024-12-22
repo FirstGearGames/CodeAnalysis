@@ -75,9 +75,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             foreach (RpcAttributeData data in results)
             {
                 List<IParameterSymbol> serializables = _generatorSyntaxReceiver.SerializableFinder.GetRpcSerializableParameters(context, methodSymbol, data);
-
+                
                 //Build RpcMethodData here.
-                RpcMethodDatas rmd = new(methodSymbol, serializables, data);
+                string defaultChannelValue = RpcHelper.GetDefaultChannelValue(methodSymbol, data.RPCType);
+                RpcMethodDatas rmd = new(methodSymbol, defaultChannelValue, serializables, data);
+             
+                Log("yxyxyxy " + defaultChannelValue);
                 RpcMethodDatas.Add(rmd);
             }
         }

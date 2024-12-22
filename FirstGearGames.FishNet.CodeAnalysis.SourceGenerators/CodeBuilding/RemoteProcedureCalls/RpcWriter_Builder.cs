@@ -4,9 +4,12 @@ using FirstGearGames.CodeAnalysis.CodeBuilding;
 using FirstGearGames.CodeAnalysis.Extensions;
 using FirstGearGames.CodeAnalysis.Helpers;
 using FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls;
 using FirstGearGames.FishNet.CodeAnalysis.Receivers;
+using FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls;
 using FirstGearGames.FishNet.CodeAnalysis.SourceGenerators;
+using FishNetTypes.Object;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
@@ -57,7 +60,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
             Log($"Processing rpc method name {methodData.MethodName}.");
 
             const int indent = 3;
-
+            const string channelVariableName = "channel";
+            
             string header = CreateMethodHeader();
             string writeBody = CreateBody();
 
@@ -82,7 +86,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                     string symbolTypeName = symbol.Type.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
                     _stringList.Add($"{symbolTypeName} {GENERATED_PAREMETER_PREFIX}{symbol.Name}");
                 }
-
+                
+                /* Always add channel. The default will be optional as reliable. If the user
+                 * specified their own optional then that is used instead. */
+                _stringList.Add($"{FishNetConstants.Channel_FullName} {channelVariableName} = {methodData.DefaultChannelValue}");
+                
                 //Add parameters to header.
                 _stringBuilder.Append(string.Join(", ", _stringList));
                 //Close header off and return it.
@@ -113,12 +121,50 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                     _stringBuilder.AppendLine(indent + 1, generatedWriterBuilder.GetWriteCall(smd, writerVariableName, typeSymbol, $"{GENERATED_PAREMETER_PREFIX}{symbol.Name}", closeCall: true));
                 }
 
-                //todo: call the 'sendRpc' method before pooling.
-
+                //Call base.Send Rpc.
+                _stringBuilder.AppendLine();
+                _stringBuilder.AppendLine(indent + 1, CreateCallRpc());
+                
                 _stringBuilder.AppendLine();
                 _stringBuilder.AppendLine(indent + 1, GeneralBuilder.CallStorePooledWriter(writerVariableName, closeCall: true));
 
                 return _stringBuilder.ToString();
+                
+                string CreateCallRpc()
+                {
+                    StringBuilder sb = new();
+                    sb.Append($"base.");
+
+                    if (methodData.RpcAttributeData.RPCType == RPCType.Server)
+                        sb.Append(FishNetConstants.SendServerRpc_Name);
+                    else if (methodData.RpcAttributeData.RPCType == RPCType.Observers)
+                        sb.Append(FishNetConstants.SendObserversRpc_Name);
+                    else if (methodData.RpcAttributeData.RPCType == RPCType.Target)
+                        sb.Append(FishNetConstants.SendTargetRpc_Name);
+
+                    //TODO needs to be a thing.
+                    string hash = "-1";
+                    //TODO needs to be a thing as well.
+                    string dataOrderType = FishNetConstants.Default_DataOrderType_FullName;
+                    
+                    //The following is used by all RPCs.
+                    sb.Append($"({hash}, {writerVariableName}, {channelVariableName}, {dataOrderType}");
+
+                    RPCType rpcType = methodData.RpcAttributeData.RPCType;
+                    if (rpcType == RPCType.Server) 
+                    {
+                        //Nothing else needs to be done for server rpc.
+                    }
+                    else if (rpcType == RPCType.Observers) { }
+                    else if (rpcType == RPCType.Target) { }
+                    
+                    //Close off call.
+                    sb.Append(");");
+                     //observerRpc //bool bufferLast, bool excludeServer, bool excludeOwner) { }
+                    //targetRpc //NetworkConnection target, bool excludeServer, bool validateTarget = true) { }
+                    
+                    return sb.ToString();
+                }
             }
             
         }

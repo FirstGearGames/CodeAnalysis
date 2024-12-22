@@ -121,8 +121,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
 
     public class RpcMethodDatas
     {
-        //    public readonly RpcAttributeData RpcAttributeData;
-        
         /// <summary>
         /// Data about the attribute for this Rpc.
         /// </summary>
@@ -136,6 +134,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// </summary>
         public readonly string MethodName;
         /// <summary>
+        /// Default value for the channel parameter.
+        /// </summary>
+        public string DefaultChannelValue;
+        /// <summary>
         /// Types needed to be serialized within the RPC.
         /// </summary>
         public List<IParameterSymbol> SerializableParameters;
@@ -144,13 +146,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// </summary>
         public RpcMethodContent MethodContent;
 
-        public RpcMethodDatas() { }
-
         /// <param name="rpcAttributeData">RpcAttributeData to use for this RpcMethod. When a Rpc has multiple attributes a RpcMethodData should be made for each attribute.</param>
-        public RpcMethodDatas(IMethodSymbol methodSymbol, List<IParameterSymbol> serializableParameters, RpcAttributeData rpcAttributeData)
+        public RpcMethodDatas(IMethodSymbol methodSymbol, string defaultChannelValue, List<IParameterSymbol> serializableParameters, RpcAttributeData rpcAttributeData)
         {
             RpcAttributeData = rpcAttributeData;
             MethodSymbol = methodSymbol;
+            DefaultChannelValue = defaultChannelValue;
             MethodName = methodSymbol.Name;
             SerializableParameters = serializableParameters;
         }

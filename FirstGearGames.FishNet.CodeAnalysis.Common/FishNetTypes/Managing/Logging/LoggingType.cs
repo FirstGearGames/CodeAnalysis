@@ -1,11 +1,13 @@
-﻿namespace FishNetTypes.Managing.Logging
+﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
+
+namespace FishNetTypes.Managing.Logging
 {
     public static class LoggingTypeExtensions 
     {
         /// <summary>
         /// Returns a LoggingType enum value while containing the enum name (eg: LoggingType.Common).
         /// </summary>
-        public static string GetEnumName(this LoggingType loggingType) => $"{nameof(LoggingType)}.{nameof(loggingType)}";
+        public static string GetEnumName(this LoggingType loggingType) => $"{FishNetConstants.LoggingType_FullName}.{loggingType.ToString()}";
     }
 
     /// <summary>
