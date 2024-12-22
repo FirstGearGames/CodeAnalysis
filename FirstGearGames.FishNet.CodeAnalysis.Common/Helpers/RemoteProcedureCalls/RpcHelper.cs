@@ -1,4 +1,5 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
+﻿using System;
+using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,7 +125,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
                 //Find optional value.
                 object? value = lastParameter.ExplicitDefaultValue;
                 //Should never be null in this case; check for safety.
-                if (value == null || value.GetType() != typeof(System.Byte))
+                if (value == null || value.GetType() != Enum.GetUnderlyingType(typeof(Channel)))
                     return FishNetConstants.Default_Rpc_Channel.GetEnumName();
 
                 byte channelValue = (byte)value;
