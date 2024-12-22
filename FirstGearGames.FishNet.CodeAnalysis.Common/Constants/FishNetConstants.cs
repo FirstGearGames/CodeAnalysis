@@ -93,7 +93,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// [ObserversRpc] class.
         /// </summary>
         public const string ObserversRpcAttribute_FullName = $"{Object_Namespace}.ObserversRpcAttribute";
-
+        /// <summary>
+        /// RpcAttribute.Logging name.
+        /// </summary>
+        public const string RpcAttribute_OrderType_Name = $"OrderType";
         /// <summary>
         /// RpcAttribute.Logging name.
         /// </summary>

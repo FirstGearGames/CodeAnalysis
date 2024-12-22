@@ -80,7 +80,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
                 string defaultChannelValue = RpcHelper.GetDefaultChannelValue(methodSymbol, data.RPCType);
                 RpcMethodDatas rmd = new(methodSymbol, defaultChannelValue, serializables, data);
              
-                Log("yxyxyxy " + defaultChannelValue);
                 RpcMethodDatas.Add(rmd);
             }
         }

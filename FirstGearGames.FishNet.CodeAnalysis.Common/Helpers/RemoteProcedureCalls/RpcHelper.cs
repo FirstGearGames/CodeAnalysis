@@ -6,6 +6,7 @@ using System.Linq;
 using FirstGearGames.CodeAnalysis.Extensions;
 using FirstGearGames.CodeAnalysis.Helpers;
 using FishNetTypes.Managing.Logging;
+using FishNetTypes.Object;
 using FishNetTypes.Transporting;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
@@ -116,20 +117,17 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
             }
 
             IParameterSymbol? lastParameter = (parametersCount > 0) ? parameters[parametersCount - 1] : null;
-            if (lastParameter != null && lastParameter.Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName) 
+            if (lastParameter?.Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName) 
             {
                 //Not optional, default is reliable.
-                if (!lastParameter.IsOptional)
-                    return FishNetConstants.Default_Rpc_Channel.GetEnumName();
+                if (!lastParameter.IsOptional) return FishNetConstants.Default_Rpc_Channel.GetEnumName();
                 
                 //Find optional value.
                 object? value = lastParameter.ExplicitDefaultValue;
                 //Should never be null in this case; check for safety.
-                if (value == null || value.GetType() != Enum.GetUnderlyingType(typeof(Channel)))
-                    return FishNetConstants.Default_Rpc_Channel.GetEnumName();
+                if (value?.GetType() != Enum.GetUnderlyingType(typeof(Channel))) return FishNetConstants.Default_Rpc_Channel.GetEnumName();
 
-                byte channelValue = (byte)value;
-                return channelValue.GetEnumName();
+                return ChannelExtensions.GetEnumName(((byte)value));
             }
 
             //Fall through, no parameters or last is not channel.
@@ -172,44 +170,5 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
             return (results.Count > 0);
         }
 
-        /// <summary>
-        /// Gets the logging type specified on a RPC attribute.
-        /// </summary>
-        public static LoggingType GetLoggingType(this RpcAttributeData rpcAttributeData)
-        {
-            KeyValuePair<string, TypedConstant> loggingArgument = rpcAttributeData.AttributeData.NamedArguments.FirstOrDefault(arg => arg.Key == FishNetConstants.RpcAttribute_Logging_Name);
-
-            //Argument found. Check if value matches.
-            if (loggingArgument.Key != null && loggingArgument.Value.Value != null)
-            {
-                if (loggingArgument.Value.Value is byte loggingTypeValue)
-                    return (LoggingType)loggingTypeValue;
-            }
-
-            return FishNetConstants.Default_LoggingType;
-        }
-
-        /// <summary>
-        /// Returns if Logging is a certain value.
-        /// </summary>
-        private static bool IsLoggingValue(this RpcAttributeData rpcAttributeData, int numericValue)
-        {
-            KeyValuePair<string, TypedConstant> loggingArgument = rpcAttributeData.AttributeData.NamedArguments.FirstOrDefault(arg => arg.Key == FishNetConstants.RpcAttribute_Logging_Name);
-
-            //Argument found. Check if value matches.
-            if (loggingArgument.Key != null && loggingArgument.Value.Value != null && loggingArgument.Value.Value is byte byteValue)
-                return (byteValue == numericValue);
-
-            return false;
-        }
-
-        /// <summary>
-        /// Returns if Logging is a certain value.
-        /// </summary>
-        public static bool IsLoggingType(this RpcAttributeData rpcAttributeData, LoggingType loggingType)
-        {
-            int numericValue = (int)loggingType;
-            return rpcAttributeData.IsLoggingValue(numericValue);
-        }
     }
 }

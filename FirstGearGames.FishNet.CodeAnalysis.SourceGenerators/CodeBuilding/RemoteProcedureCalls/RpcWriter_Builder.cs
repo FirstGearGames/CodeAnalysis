@@ -144,8 +144,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 
                     //TODO needs to be a thing.
                     string hash = "-1";
-                    //TODO needs to be a thing as well.
-                    string dataOrderType = FishNetConstants.Default_DataOrderType.GetEnumName();
+
+                    string dataOrderType = methodData.RpcAttributeData.AttributeData.GetNamedArgument(FishNetConstants.RpcAttribute_OrderType_Name, FishNetConstants.Default_DataOrderType).GetEnumName();
                     
                     //The following is used by all RPCs.
                     sb.Append($"({hash}, {writerVariableName}, {channelVariableName}, {dataOrderType}");
