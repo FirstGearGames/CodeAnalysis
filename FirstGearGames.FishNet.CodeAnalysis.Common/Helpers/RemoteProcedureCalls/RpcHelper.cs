@@ -119,20 +119,20 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
             {
                 //Not optional, default is reliable.
                 if (!lastParameter.IsOptional)
-                    return FishNetConstants.Default_Rpc_Channel_FullName;
+                    return FishNetConstants.Default_Rpc_Channel.GetEnumName();
                 
                 //Find optional value.
                 object? value = lastParameter.ExplicitDefaultValue;
                 //Should never be null in this case; check for safety.
                 if (value == null || value.GetType() != typeof(System.Byte))
-                    return FishNetConstants.Default_Rpc_Channel_FullName;
+                    return FishNetConstants.Default_Rpc_Channel.GetEnumName();
 
                 byte channelValue = (byte)value;
                 return channelValue.GetEnumName();
             }
 
             //Fall through, no parameters or last is not channel.
-            return FishNetConstants.Default_Rpc_Channel_FullName;
+            return FishNetConstants.Default_Rpc_Channel.GetEnumName();
         }
 
         
