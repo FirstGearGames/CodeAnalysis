@@ -72,6 +72,22 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// NetworkBehaviour class.
         /// </summary>
         public const string NetworkBehaviour_FullName = $"{Object_Namespace}.NetworkBehaviour";
+        /// <summary>
+        /// Field for NetworkManager.
+        /// </summary>
+        public const string NetworkManager_Field_Name = $"NetworkManager";
+        /// <summary>
+        /// Field for base.NetworkManager.
+        /// </summary>
+        public const string Base_NetworkManager_Field_Name = $"base.{NetworkManager_Field_Name}";
+        /// <summary>
+        /// Field for base.IsClientInitialized.
+        /// </summary>
+        public const string Base_IsClient_Initialized_Field_Name = $"base.IsClientInitialized";
+        /// <summary>
+        /// Field for base.IsServerInitialized.
+        /// </summary>
+        public const string Base_IsServer_Initialized_Field_Name = $"base.IsServerInitialized";
         #endregion
 
         #region RPCs.
@@ -357,6 +373,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// Channel enum.
         /// </summary>
         public const string Channel_FullName = $"{Transporting_Namespace}.{nameof(Channel)}";
+        /// <summary>
+        /// NetworkManagerExtensions class.
+        /// </summary>
+        public const string NetworkManagerExtensions_Name = "NetworkManagerExtensions";
         #endregion
     }
 }

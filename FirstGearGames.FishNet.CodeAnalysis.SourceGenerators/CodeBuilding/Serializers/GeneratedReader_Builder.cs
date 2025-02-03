@@ -79,11 +79,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 CreateEmptySerializerMethod(context, new SerializableType(typeSymbol));
             }
 
-            string header = GetMethodHeader(out string methodName);
+            string header = CreateSignature(out string methodName);
             //Add to readers.
             _serializerMethods.AddReadMethod(new GeneratedSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Full);
 
-            string GetMethodHeader(out string mName)
+            string CreateSignature(out string mName)
             {
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();

@@ -75,11 +75,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 CreateEmptyDeltaSerializerMethod(context, new SerializableType(typeSymbol), recursiveCount + 1);
             }
 
-            string header = GetMethodHeader(out string methodName);
+            string header = CreateSignature(out string methodName);
             //Add to writers.
             _serializerMethods.AddWriteMethod(new GeneratedDeltaSerializerMethod(namedTypeSymbol, methodName, header, string.Empty), AddSerializerType.Delta);
 
-            string GetMethodHeader(out string mName)
+            string CreateSignature(out string mName)
             {
                 mName = $"{Generated_Method_Prefix}{typeFullName.RemovePeriods("_")}";
                 StringBuilder sb = new();

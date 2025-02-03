@@ -138,7 +138,7 @@ namespace ClientAssembly
         //{
         //}
 
-        [ServerRpc(OrderType = DataOrderType.Last)]
+        [ServerRpc(OrderType = DataOrderType.Last, Logging = LoggingType.Common)]
         public void MyRpcTwo(MyStructC ms, string txt, Dictionary<string, byte> dict, Channel channel = Channel.Unreliable) { }
 
         // [ServerRpc]
