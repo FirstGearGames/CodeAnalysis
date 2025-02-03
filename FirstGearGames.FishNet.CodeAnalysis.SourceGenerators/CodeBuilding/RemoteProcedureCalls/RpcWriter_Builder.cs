@@ -107,7 +107,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
             {
                 StringBuilder sb = PerformanceHelper.RetrieveStringBuilder();
 
-                sb.AppendLine(CreateCallerCheck());
+                sb.AppendLine(CreateCallerChecks());
                 
                 sb.AppendLine(indent + 1, GeneralBuilder.CallGetPooledWriter(out string writerVariableName));
                 sb.AppendLine();
@@ -139,6 +139,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 
                 string CreateCallRpc()
                 {
+                    StringBuilder fullLSb = PerformanceHelper.RetrieveStringBuilder();
+
                     StringBuilder lSb = PerformanceHelper.RetrieveStringBuilder();
 
                     lSb.Append($"base.");
@@ -176,29 +178,56 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                     return lResult;
                 }
 
-                string CreateCallerCheck()
+                string CreateCallerChecks()
                 {
-                    StringBuilder lSb = PerformanceHelper.RetrieveStringBuilder();
+                    StringBuilder fullLSb = PerformanceHelper.RetrieveStringBuilder();
 
                     bool isServerRpc = (methodData.RpcAttributeData.RPCType == RPCType.Server);
+
+                    fullLSb.Append(CreateInitializedCheck());
+
+                    string ownerCheck = CreateOwnerCheck();
+                    if (ownerCheck != string.Empty)
+                        fullLSb.Append(ownerCheck);
+
+                    string result = fullLSb.ToString();
+                    PerformanceHelper.StoreStringBuilder(fullLSb);
+                    return result;
                     
-                    //Get logging type. If set then add logging text.
-                    LoggingType loggingType = methodData.RpcAttributeData.AttributeData.GetNamedArgument(FishNetConstants.RpcAttribute_Logging_Name, FishNetConstants.Default_LoggingType);
-                    if (loggingType != LoggingType.Off)
+                    /* This is a mandatory initialized check. */
+                    string CreateInitializedCheck()
                     {
-                        string requiredInitializer = (isServerRpc) ? "Client" : "Server";
-                        string text = $"Rpc {methodData.MethodName} cannot be run while {requiredInitializer} has not initialized the object. This commonly occurs when the {requiredInitializer} is not started or has not yet spawned the object.";
-                        lSb.AppendLine(indent + 2, loggingType.CreateLog(FishNetConstants.Base_NetworkManager_Field_Name, text));
+                        StringBuilder lSb = PerformanceHelper.RetrieveStringBuilder();
+
+                        //Get logging type. If set then add logging text.
+                        LoggingType loggingType = methodData.RpcAttributeData.AttributeData.GetNamedArgument(FishNetConstants.RpcAttribute_Logging_Name, FishNetConstants.Default_LoggingType);
+                        if (loggingType != LoggingType.Off)
+                        {
+                            string requiredInitializer = (isServerRpc) ? "Client" : "Server";
+                            string text = $"Rpc {methodData.MethodName} cannot be run while {requiredInitializer} has not initialized the object. This commonly occurs when the {requiredInitializer} is not started or has not yet spawned the object.";
+                            lSb.AppendLine(indent + 2, loggingType.CreateLog(FishNetConstants.Base_NetworkManager_Field_Name, text));
+                        }
+
+                        lSb.Append(indent + 2, "return;");
+
+                        string conditionalStatement = "!";
+                        conditionalStatement += (isServerRpc) ? FishNetConstants.Base_IsClient_Initialized_Field_Name : FishNetConstants.Base_IsServer_Initialized_Field_Name;
+
+                        string ifBlock = (CodeBuilder.CreateMultiLineIf(indent + 1, conditionalStatement, lSb));
+
+                        PerformanceHelper.StoreStringBuilder(lSb);
+
+                        return ifBlock;
+                    }
+
+                    /* This next check is for if ServerRpc only, and is an owner check, only if
+                     * authority is required, which is default. */
+                    string CreateOwnerCheck()
+                    {
+                        //Todo. This needs to have the requireauthority check
                     }
                     
-                    lSb.Append(indent + 2, "return;");
-
-                    string conditionalStatement = "!";
-                    conditionalStatement += (isServerRpc) ? FishNetConstants.Base_IsClient_Initialized_Field_Name : FishNetConstants.Base_IsServer_Initialized_Field_Name;
-                    string ifBlock = CodeBuilder.CreateMultiLineIf(indent + 1, conditionalStatement, lSb);
                     
-                    PerformanceHelper.StoreStringBuilder(lSb);
-                    return ifBlock;
                 }
             }
         }
