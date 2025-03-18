@@ -224,6 +224,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                      * authority is required, which is default. */
                     string CreateOwnerCheck()
                     {
+                        return default;
                         //Todo. This needs to have the requireauthority check
                     }
                     

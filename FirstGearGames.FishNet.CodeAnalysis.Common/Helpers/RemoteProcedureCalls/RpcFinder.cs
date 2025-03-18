@@ -89,7 +89,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             if (txt.Length == 0)
                 Debugg.Log(txt);
             else
-                Debugg.Log($"   [SerializerReceiver] {txt}");
+                Debugg.Log($"   [RpcFinder] {txt}");
         }
     }
 }

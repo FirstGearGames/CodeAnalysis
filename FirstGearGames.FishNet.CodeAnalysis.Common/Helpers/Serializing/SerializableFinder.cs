@@ -32,7 +32,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            CheckNamedTypeSymbolSerializables(context, namedTypeSymbol, checkForSerializableIdentifier: false);
+            AddNamedTypeSymbolSerializablesWithIdentifier(context, namedTypeSymbol);
         }
 
         public void CheckStructSerializables(SyntaxNodeAnalysisContext context, StructDeclarationSyntax structDeclaration)
@@ -41,7 +41,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
             if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
 
-            CheckNamedTypeSymbolSerializables(context, namedTypeSymbol, checkForSerializableIdentifier: false);
+            AddNamedTypeSymbolSerializablesWithIdentifier(context, namedTypeSymbol);
         }
 
         public void CheckClassSerializables(GeneratorSyntaxContext context, ClassDeclarationSyntax classDeclaration)
@@ -70,7 +70,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// <param name="semanticModel"></param>
         private void CheckClassSerializables(object context, INamedTypeSymbol namedTypeSymbol, SemanticModel semanticModel)
         {
-            //Find syncTypes. This only runs if not a NetworkBehaviour.
+            //Find syncTypes. This only runs if is a NetworkBehaviour.
             CheckSyncTypeSerializables(context, namedTypeSymbol, semanticModel);
         }
 
@@ -123,7 +123,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                     if (typeSymbol is not INamedTypeSymbol genericArgumentNamedTypeSymbol)
                         continue;
 
-                    RecursivelyAddSerializables(context, genericArgumentNamedTypeSymbol, addedFullNames);
+                    AddBaseTypeSerializables(context, genericArgumentNamedTypeSymbol, addedFullNames);
                 }
             }
 
@@ -146,7 +146,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                  * This is used to prevent endless loops. */
                 HashSet<string> addedFullNames = new();
                 //Add first entry.
-                RecursivelyAddSerializables(context, returnedNamedTypeSymbol, addedFullNames);
+                AddBaseTypeSerializables(context, returnedNamedTypeSymbol, addedFullNames);
             }
         }
 
@@ -222,10 +222,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             //TargetRpc.
             else if (rpcAttributeData.RPCType == RPCType.Target)
                 RemoveLeadingNetworkConnection();
-            
+
             //All Rpcs support optional channel.
             RemoveTrailingChannel();
-            
+
             //Removes networkConnection if the first parameter.
             void RemoveLeadingNetworkConnection()
             {
@@ -264,17 +264,16 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
         /// <summary>
         /// Finds serializables for an INamedTypeSymbol which may not be bound to specific mechanics, such as RPC.
-        /// This method will ignore symbols which inherit NetworkBehaviour.
         /// </summary>
-        public void CheckNamedTypeSymbolSerializables(object context, INamedTypeSymbol namedTypeSymbol, bool checkForSerializableIdentifier)
+        public void AddNamedTypeSymbolSerializablesWithIdentifier(object context, INamedTypeSymbol namedTypeSymbol)
         {
-            if (checkForSerializableIdentifier && !namedTypeSymbol.HasSerializableIdentifier())
+            if (!namedTypeSymbol.HasSerializableIdentifier())
                 return;
 
             /* FullNames added this iteration.
              * This is used to prevent endless loops. */
             HashSet<string> addedFullNames = new();
-            RecursivelyAddSerializables(context, namedTypeSymbol, addedFullNames);
+            AddBaseTypeSerializables(context, namedTypeSymbol, addedFullNames);
         }
 
         /// <summary>
@@ -314,14 +313,21 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         }
 
         /// <summary>
-        /// Recursively iterates a namedTypeSymbol adding serializable types within.
+        /// Iterates up the base types of a named symbol and adds them to serializables.
         /// </summary>
         /// <param name="foundNames">A collection reference to store already found serializables during the iteration.</param>
-        private void RecursivelyAddSerializables(object context, INamedTypeSymbol namedTypeSymbol, HashSet<string> foundNames)
+        private void AddBaseTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol, HashSet<string> foundNames)
         {
             while (true)
             {
+                namedTypeSymbol = namedTypeSymbol.BaseType;
+
+                //No more base types, or cannot be serialized.s
+                if (namedTypeSymbol is not INamedTypeSymbol)
+                    return;
+
                 string fullName = namedTypeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
+
                 //Already added.
                 if (foundNames.Contains(fullName))
                     break;
@@ -329,14 +335,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                 /* The method indicated it could not add some reason.
                  * Maybe the type had an attribute. */
                 if (!AddSerializableType(context, namedTypeSymbol))
-                    break;
-                else
-                    foundNames.Add(fullName);
-
-                if (namedTypeSymbol.BaseType is not INamedTypeSymbol nts)
-                    break;
-                else
-                    namedTypeSymbol = nts;
+                    return;
+                
+                foundNames.Add(fullName);
             }
         }
 

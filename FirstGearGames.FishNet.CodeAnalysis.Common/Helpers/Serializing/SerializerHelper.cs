@@ -1,7 +1,9 @@
 ﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using System.Collections.Generic;
 using FirstGearGames.CodeAnalysis.Extensions;
+using FirstGearGames.CodeAnalysis.Helpers;
 using FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls;
+using FishNetTypes.Managing.Logging;
 using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
