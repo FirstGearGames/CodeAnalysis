@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace FirstGearGames.CodeAnalysis.Extensions
 {
@@ -36,6 +37,19 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 return fieldSymbol;
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns the SemanticModel for context if context is a supported type.
+        /// </summary>
+        public static SemanticModel GetSemanticModel(this object context)
+        {
+            if (context is GeneratorSyntaxContext gsc)
+                return gsc.SemanticModel;
+            else if (context is SyntaxNodeAnalysisContext snac)
+                return snac.SemanticModel;
+            else
+                return null;
         }
     }
 #pragma warning restore CS8603 // Possible null reference return.

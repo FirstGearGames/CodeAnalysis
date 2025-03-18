@@ -62,7 +62,7 @@ namespace ClientAssembly
         public List<T> Lst;
     }
 
-    public struct SimpleStructA
+    internal struct SimpleStructA
     {
         public int TheNumber;
     }
@@ -87,7 +87,7 @@ namespace ClientAssembly
 
     public partial class Player : NetworkBehaviour
     {
-        public SyncDictionary<SimpleStructA, SimpleStructB> _syncDictionary = new();
+        internal SyncDictionary<SimpleStructA, SimpleStructB> _syncDictionary = new();
         public MyCustomSync _customSync = new();
 
         public struct EmptyStruct { }

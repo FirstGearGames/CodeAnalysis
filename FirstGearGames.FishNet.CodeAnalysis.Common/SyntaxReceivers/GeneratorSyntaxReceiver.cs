@@ -16,24 +16,25 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Receivers
             SyntaxNode syntaxNode = context.Node;
 
             if (SerializableFinder == null)
-                SerializableFinder = new(this);
+                SerializableFinder = new();
+            
             if (RpcFinder == null)
                 RpcFinder = new(this);
 
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             {
                 LogVisit();
-                SerializableFinder.CheckClassSerializables(context, classDeclaration);
+                SerializableFinder.AddClassSerializables(context, classDeclaration);
             }
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
             {
                 LogVisit();
-                SerializableFinder.CheckStructSerializables(context, structDeclaration);
+                SerializableFinder.AddStructSerializables(context, structDeclaration);
             }
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
             {
                 LogVisit();
-                SerializableFinder.CheckRpcSerializables(context, methodDeclaration);
+                SerializableFinder.AddRpcSerializables(context, methodDeclaration);
                 RpcFinder.CheckRpcMethod(context, methodDeclaration);
             }
 
