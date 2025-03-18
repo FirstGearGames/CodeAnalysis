@@ -246,11 +246,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                 if (st.TypeSymbol == namedTypeSymbol)
                     return false;
             }
-
-            if (namedTypeSymbol.BaseType != null)
-                namedTypeSymbol.BaseType.IsPartial();
-            //bool partialBaseType = namedTypeSymbol.BaseType.IsPartial();
-            if (!namedTypeSymbol.HasPublicAccessibility())// && !partialBaseType)
+            
+            if (!namedTypeSymbol.HasPublicAccessibility() && !namedTypeSymbol.BaseType.IsPartial())
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnIsNotSerializableAccessible?.Invoke(analysisContext, source, string.Empty);
