@@ -175,7 +175,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     // {
                     //If here then is a delta serializer.
                     DeltaSerializerMethod dsm = sm as DeltaSerializerMethod;
-                    
+
                     string previousValueName = $"{_serializerMethods.GetValueParameterName(0)}.{fieldSymbol.Name}";
                     sb.AppendLine(bodyIndent + 1, GetReadDeltaCall(dsm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", previousValueName, closeCall: true));
                     //}
@@ -198,31 +198,91 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         /// </summary>
         private void CreateGeneratedSerializersClass(GeneratorExecutionContext context)
         {
-            StringBuilder sb = new();
+            CreateForPublicTypes();
+            CreateForPartialTypes();
 
-            string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
-            sb.AppendLine(clsText);
-
-            const int initializeIndent = 2;
-            SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
-
-            foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadDeltaMethods())
+            //Creates file for types that have public scope.
+            void CreateForPublicTypes()
             {
-                if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
+                StringBuilder sb = new();
 
-                sb.AppendLine(dsm.MethodContent.ToString(2));
+                string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+                sb.AppendLine(clsText);
 
-                //Add return if body already contains value. This is just to make neater formatting.
-                if (initializeMethod.Body.Length > 0)
-                    initializeMethod.Body.AppendLine();
+                const int initializeIndent = 2;
 
-                initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
+                SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+
+                foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadDeltaMethods())
+                {
+                    if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol) continue;
+                    if (!namedTypeSymbol.HasPublicAccessibility()) continue;
+
+                    if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
+
+                    sb.AppendLine(dsm.MethodContent.ToString(2));
+
+                    //Add return if body already contains value. This is just to make neater formatting.
+                    if (initializeMethod.Body.Length > 0)
+                        initializeMethod.Body.AppendLine();
+
+                    initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
+                }
+
+                sb.Append(initializeMethod.ToString(initializeIndent));
+                sb.AppendLine(footer);
+
+                context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
             }
 
-            sb.Append(initializeMethod.ToString(initializeIndent));
-            sb.AppendLine(footer);
+            //Creates file for types that have do not have public scope, but the containing type is partial.
+            void CreateForPartialTypes()
+            {
+                StringBuilder sb = new();
 
-            context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
+                const int initializeIndent = 2;
+
+                foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadDeltaMethods())
+                {
+                    if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol) continue;
+                    if (namedTypeSymbol.HasPublicAccessibility() || !namedTypeSymbol.ContainingType.IsPartial()) continue;
+
+                    if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
+
+                    /* //todo CreatePublicStaticClass needs to instead create class same as containingType.
+                     * className should be the same.
+                     *
+                     * The only difference is the output file should have the name of the type
+                     * the generate is for. EG: if one containing class has two nonPublic members that need
+                     * serializers and their names are.. S1 and S2, and containing class is CC then this is the result..
+                     *
+                     * //Saved as Generated_CC_S1.g.cs
+                     * //As well for the second type Generated_CC_s2.g.cs
+                     * public partial class CC //assuming containingType is public.
+                     * {
+                     * //Serializers here.
+                     * }
+                     *
+                     */
+                    string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
+                    sb.AppendLine(clsText);
+
+                    SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+
+                    sb.AppendLine(dsm.MethodContent.ToString(2));
+
+                    //Add return if body already contains value. This is just to make neater formatting.
+                    if (initializeMethod.Body.Length > 0)
+                        initializeMethod.Body.AppendLine();
+
+                    initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
+
+                    sb.Append(initializeMethod.ToString(initializeIndent));
+                    sb.AppendLine(footer);
+
+                    context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
+                }
+            }
         }
 
         /// <summary>
@@ -263,7 +323,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         {
             if (!sm.IsValid())
                 return string.Empty;
-            
+
             string arguments = sm.GetReadOrWriteArgumentString(typeSymbol);
 
             //Uses Read/Write<T>.
