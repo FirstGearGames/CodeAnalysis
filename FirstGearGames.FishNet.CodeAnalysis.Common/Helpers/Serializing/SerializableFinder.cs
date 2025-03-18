@@ -16,7 +16,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
     {
         public event IsNotSerializableAccessibleDel OnIsNotSerializableAccessible;
 
-        public delegate void IsNotSerializableAccessibleDel(SyntaxNodeAnalysisContext context, string message = "", IFieldSymbol fs = null);
+        public delegate void IsNotSerializableAccessibleDel(SyntaxNodeAnalysisContext context, ISymbol source, string message = "");
 
         public readonly HashSet<SerializableType> TypesNeedingSerializers = new();
 
@@ -247,12 +247,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                     return false;
             }
 
-            if (!namedTypeSymbol.HasPublicAccessibility())
+            if (namedTypeSymbol.BaseType != null)
+                namedTypeSymbol.BaseType.IsPartial();
+            //bool partialBaseType = namedTypeSymbol.BaseType.IsPartial();
+            if (!namedTypeSymbol.HasPublicAccessibility())// && !partialBaseType)
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
-                {
-                    OnIsNotSerializableAccessible?.Invoke(analysisContext, string.Empty, source as IFieldSymbol);
-                }
+                    OnIsNotSerializableAccessible?.Invoke(analysisContext, source, string.Empty);
+
                 return false;
             }
 

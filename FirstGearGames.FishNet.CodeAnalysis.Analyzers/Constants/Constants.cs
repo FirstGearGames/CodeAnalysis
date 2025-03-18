@@ -3,7 +3,7 @@
     public static class DiagnosticIds
     {
         /// <summary>
-        /// Network serializable types must be declared public. This limitation will be removed in a later release.
+        /// Network serializable types must be declared public or their base type must be partial.
         /// </summary>
         public const string FN0001 = nameof(FN0001);
     }
@@ -11,8 +11,8 @@
     public static class DiagnosticCategories
     {
         /// <summary>
-        /// Indicates a change in usage is required.
+        /// Indicates a change in scope is required.
         /// </summary>
-        public const string Usage = "Usage";
+        public const string Scope = "Scope";
     }
 }

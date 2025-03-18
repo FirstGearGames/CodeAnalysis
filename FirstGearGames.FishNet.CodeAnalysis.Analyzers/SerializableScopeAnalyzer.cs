@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using FirstGearGames.CodeAnalysis.Extensions;
 using FirstGearGames.FishNet.CodeAnalysis.Constants;
 using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
 using Microsoft.CodeAnalysis;
@@ -14,7 +13,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal sealed class SerializableScopeAnalyzer : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor Descriptor1 = new(DiagnosticIds.FN0001, "Invalid scope of serializable type.", "{0}", DiagnosticCategories.Usage, DiagnosticSeverity.Error, true, customTags: WellKnownDiagnosticTags.NotConfigurable);
+        public static readonly DiagnosticDescriptor Descriptor1 = new(DiagnosticIds.FN0001, "Invalid scope", "{0}", DiagnosticCategories.Scope, DiagnosticSeverity.Error, true, customTags: WellKnownDiagnosticTags.NotConfigurable);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
 
@@ -27,7 +26,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
             if (_defaultMessages == null)
             {
                 _defaultMessages = new();
-                _defaultMessages.Add(Descriptor1, "Network serializable types must be declared public. One or more used types are not declared public. If you do not wish to serialize the type use the ExcludeSerialization attribute on the member or type.");
+                _defaultMessages.Add(Descriptor1, "Network serializable types must be declared public or have their containing type as partial. If you do not wish to serialize the type use the ExcludeSerialization attribute on the member or type.");
             }
             
             if (SerializableFinder == null)
@@ -55,12 +54,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
                 SerializableFinder.AddRpcSerializables(context, methodDeclaration);
         }
 
-        private void SerializableReceiver_OnIsNotSerializableAccessible(SyntaxNodeAnalysisContext context, string message, IFieldSymbol fs)
+        private void SerializableReceiver_OnIsNotSerializableAccessible(SyntaxNodeAnalysisContext context, ISymbol source, string messageOverride)
         {
             SyntaxNode syntaxNode = context.Node;
 
             Location location = null;
-            if (fs != null)
+            if (source is IFieldSymbol fs)
                 location = fs.Locations[0];
             else if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
                 location = classDeclarationSyntax.GetLocation();
@@ -73,7 +72,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
 
             if (location != null)
             {
-                string msg = String.IsNullOrEmpty(message) ? _defaultMessages[Descriptor1] : message;
+                string msg = String.IsNullOrEmpty(messageOverride) ? _defaultMessages[Descriptor1] : messageOverride;
                 Diagnostic diagnostic = Diagnostic.Create(Descriptor1, location, msg);
                 context.ReportDiagnostic(diagnostic);
             }

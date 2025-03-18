@@ -76,14 +76,20 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// </summary>
         public static bool IsPartial(this INamedTypeSymbol namedTypeSymbol)
         {
+            if (namedTypeSymbol == null) return false;
+
             ImmutableArray<SyntaxReference> syntaxReferences = namedTypeSymbol.DeclaringSyntaxReferences;
 
             //If there's more than one reference then we know it's partial
             if (syntaxReferences.Length > 1) return true;
 
-            //If there is at least 1(which there should be) check if it's partial.
-            ClassDeclarationSyntax? classDeclarationSyntax = syntaxReferences.FirstOrDefault().GetSyntax() as ClassDeclarationSyntax;
-            return classDeclarationSyntax?.Modifiers.Any(SyntaxKind.PartialKeyword) ?? false;
+            SyntaxReference firstSyntaxReference = syntaxReferences.FirstOrDefault();
+            if (firstSyntaxReference == null) return false;
+
+            if (firstSyntaxReference.GetSyntax() is not ClassDeclarationSyntax classDeclarationSyntax) return false;
+
+            bool hasPartialKeyword = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
+            return hasPartialKeyword;
         }
     }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
