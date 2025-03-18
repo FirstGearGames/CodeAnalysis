@@ -3,6 +3,27 @@
 	public static class Generated_DeltaReaders
 	{
 
+		public static ClientAssembly.Player.SimpleStructA GRead___ReadDeltaClientAssembly_Player_SimpleStructA(this FishNet.Serializing.Reader reader, ClientAssembly.Player.SimpleStructA value0)
+		{
+			ClientAssembly.Player.SimpleStructA result = new();
+			System.UInt64 totalFlags = reader.ReadUnsignedPackedWhole();
+
+			FishNet.Serializing.DeltaSerializerOption options = (FishNet.Serializing.DeltaSerializerOption)totalFlags;
+			if (options.FastContains(FishNet.Serializing.DeltaSerializerOption.FullSerialize))
+			{
+				result = reader.GRead___ReadClientAssembly_Player_SimpleStructA();
+
+				return result;
+			}
+
+			if ((totalFlags & 4) == 4)
+				result.TheNumber = reader.ReadDeltaInt32(value0.TheNumber);
+			else
+				result.TheNumber = value0.TheNumber;
+
+			return result;
+		}
+
 		public static ClientAssembly.SimpleStructB GRead___ReadDeltaClientAssembly_SimpleStructB(this FishNet.Serializing.Reader reader, ClientAssembly.SimpleStructB value0)
 		{
 			ClientAssembly.SimpleStructB result = new();
@@ -111,6 +132,7 @@
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
+			FishNet.Serializing.GenericDeltaReader<ClientAssembly.Player.SimpleStructA>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.SimpleStructA, ClientAssembly.Player.SimpleStructA>(GRead___ReadDeltaClientAssembly_Player_SimpleStructA));
 			FishNet.Serializing.GenericDeltaReader<ClientAssembly.SimpleStructB>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructB, ClientAssembly.SimpleStructB>(GRead___ReadDeltaClientAssembly_SimpleStructB));
 			FishNet.Serializing.GenericDeltaReader<ClientAssembly.SimpleStructC>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructC, ClientAssembly.SimpleStructC>(GRead___ReadDeltaClientAssembly_SimpleStructC));
 			FishNet.Serializing.GenericDeltaReader<ClientAssembly.Player.BroadcastStruct>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.BroadcastStruct, ClientAssembly.Player.BroadcastStruct>(GRead___ReadDeltaClientAssembly_Player_BroadcastStruct));

@@ -9,7 +9,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// <summary>
         /// Type the serializable is for.
         /// </summary>
-        public ITypeSymbol TypeSymbol;
+        public INamedTypeSymbol NamedTypeSymbol;
         /// <summary>
         /// Full name of the type.
         /// </summary>
@@ -18,12 +18,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// Full meta name of the type.
         /// </summary>
         public string FullMetadataName;
-
-        public SerializableType(ITypeSymbol typeSymbol)
+        
+        public SerializableType(INamedTypeSymbol namedTypeSymbol)
         {
-            TypeSymbol = typeSymbol;
-            FullName = typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
-            FullMetadataName = typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: true);
+            NamedTypeSymbol = namedTypeSymbol;
+            FullName = namedTypeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false);
+            FullMetadataName = namedTypeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: true);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using FirstGearGames.CodeAnalysis.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -86,10 +87,12 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             SyntaxReference firstSyntaxReference = syntaxReferences.FirstOrDefault();
             if (firstSyntaxReference == null) return false;
 
-            if (firstSyntaxReference.GetSyntax() is not ClassDeclarationSyntax classDeclarationSyntax) return false;
+            if (firstSyntaxReference.GetSyntax() is ClassDeclarationSyntax classDeclarationSyntax)
+                return classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
+            if (firstSyntaxReference.GetSyntax() is StructDeclarationSyntax structDeclarationSyntax)
+                return structDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
 
-            bool hasPartialKeyword = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
-            return hasPartialKeyword;
+            return false;
         }
     }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.

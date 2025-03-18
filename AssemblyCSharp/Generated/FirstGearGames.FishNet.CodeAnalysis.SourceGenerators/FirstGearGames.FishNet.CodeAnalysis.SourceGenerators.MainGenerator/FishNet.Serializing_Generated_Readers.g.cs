@@ -4,6 +4,14 @@ namespace FishNet.Serializing
 	public static class Generated_Readers
 	{
 
+		public static ClientAssembly.Player.SimpleStructA GRead___ReadClientAssembly_Player_SimpleStructA(this FishNet.Serializing.Reader reader)
+		{
+			ClientAssembly.Player.SimpleStructA result = new();
+
+			result.TheNumber = reader.ReadInt32();
+			return result;
+		}
+
 		public static ClientAssembly.SimpleStructB GRead___ReadClientAssembly_SimpleStructB(this FishNet.Serializing.Reader reader)
 		{
 			ClientAssembly.SimpleStructB result = new();
@@ -47,6 +55,7 @@ namespace FishNet.Serializing
 		[UnityEngine.RuntimeInitializeOnLoadMethod]
 		public static void InitializeSerializers()
 		{
+			FishNet.Serializing.GenericReader<ClientAssembly.Player.SimpleStructA>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.SimpleStructA>(GRead___ReadClientAssembly_Player_SimpleStructA));
 			FishNet.Serializing.GenericReader<ClientAssembly.SimpleStructB>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructB>(GRead___ReadClientAssembly_SimpleStructB));
 			FishNet.Serializing.GenericReader<ClientAssembly.SimpleStructC>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.SimpleStructC>(GRead___ReadClientAssembly_SimpleStructC));
 			FishNet.Serializing.GenericReader<ClientAssembly.Player.BroadcastStruct>.SetRead(new System.Func<FishNet.Serializing.Reader, ClientAssembly.Player.BroadcastStruct>(GRead___ReadClientAssembly_Player_BroadcastStruct));

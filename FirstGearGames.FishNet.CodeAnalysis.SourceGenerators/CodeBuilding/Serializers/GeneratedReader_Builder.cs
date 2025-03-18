@@ -63,7 +63,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             string typeFullName = serializableType.FullName;
 
             //Already exist either in FishNet or already created.
-            if (_serializerMethods.GetReadMethod(typeFullName, GetSerializerType.Full).IsValid())
+            if (_serializerMethods.GetReadMethod(serializableType.NamedTypeSymbol, GetSerializerType.Full, metadataName: false, out _).IsValid())
                 return;
 
             INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
@@ -75,8 +75,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             List<IFieldSymbol> serializableFields = _serializerMethods.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
-                ITypeSymbol typeSymbol = item.Type;
-                CreateEmptySerializerMethod(context, new SerializableType(typeSymbol));
+                if (item.Type is not INamedTypeSymbol fieldNamedTypeSymbol) continue;
+                
+                CreateEmptySerializerMethod(context, new SerializableType(fieldNamedTypeSymbol));
             }
 
             string header = CreateSignature(out string methodName);

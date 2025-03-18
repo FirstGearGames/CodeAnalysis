@@ -22,22 +22,18 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
         public void AddStructSerializables(object context, StructDeclarationSyntax structDeclarationSyntax)
         {
-            SemanticModel sm = context.GetSemanticModel();
-
-            ISymbol? symbol = sm?.GetDeclaredSymbol(structDeclarationSyntax);
-
-            if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
+            if (context.GetSemanticModel() is not SemanticModel sm) return;
+            
+            if (sm.GetDeclaredSymbol(structDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol) return;
 
             AddNamedTypeSymbolSerializablesWithIdentifier(context, namedTypeSymbol, null);
         }
 
         public void AddClassSerializables(object context, ClassDeclarationSyntax classDeclarationSyntax)
         {
-            SemanticModel sm = context.GetSemanticModel();
+            if (context.GetSemanticModel() is not SemanticModel sm) return;
 
-            ISymbol? symbol = sm?.GetDeclaredSymbol(classDeclarationSyntax);
-
-            if (symbol is not INamedTypeSymbol namedTypeSymbol) return;
+            if (sm.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol) return;
 
             //Find syncTypes. This only runs if is a NetworkBehaviour.
             CheckSyncTypeSerializables(context, namedTypeSymbol, sm);
@@ -243,11 +239,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             //Check if already added.
             foreach (SerializableType st in TypesNeedingSerializers)
             {
-                if (st.TypeSymbol == namedTypeSymbol)
+                if (st.NamedTypeSymbol == namedTypeSymbol)
                     return false;
             }
             
-            if (!namedTypeSymbol.HasPublicAccessibility() && !namedTypeSymbol.BaseType.IsPartial())
+            if (!namedTypeSymbol.HasPublicAccessibility() && !namedTypeSymbol.ContainingType.IsPartial())
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnIsNotSerializableAccessible?.Invoke(analysisContext, source, string.Empty);
