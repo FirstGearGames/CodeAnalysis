@@ -61,7 +61,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
 
             //Check scope to ensure class holding method is partial.
-            if (!methodSymbol.ContainingType.IsPartial())
+            if (!methodSymbol.ContainingType.HasPartialModifier())
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnClassIsNotPartial?.Invoke(analysisContext);

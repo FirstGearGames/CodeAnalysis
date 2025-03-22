@@ -83,7 +83,7 @@ namespace ClientAssembly
     public partial class Player : NetworkBehaviour
     {
         
-        internal partial struct SimpleStructA
+        public struct SimpleStructA
         {
             public int TheNumber;
         }

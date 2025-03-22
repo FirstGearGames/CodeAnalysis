@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Text;
 using FirstGearGames.CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
@@ -46,6 +47,38 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
             }
 
             _stringBuilder.AppendLine(indent, $"public static class {className}");
+            _stringBuilder.AppendLine(indent, "{");
+
+            StringBuilder footerSb = new();
+
+            if (hasNamespace)
+            {
+                footerSb.AppendLine(indent, "}");
+                footerSb.Append('}');
+            }
+
+            footer = footerSb.ToString();
+            return _stringBuilder.ToString();
+        }
+        
+              
+        /// <summary>
+        /// Creates a class optionally wrapping it in a namespace.
+        /// </summary>
+        public static string CreateClassCopy(INamedTypeSymbol originalClassNamedTypeSymbol, out string footer, string namespaceName = "")
+        {
+            _stringBuilder.Clear();
+
+            int indent = 0;
+            bool hasNamespace = namespaceName.Length > 0;
+            if (hasNamespace)
+            {
+                _stringBuilder.AppendLine($"namespace {namespaceName}");
+                _stringBuilder.AppendLine("{");
+                indent++;
+            }
+
+            _stringBuilder.AppendLine(indent, originalClassNamedTypeSymbol.GetClassOrStructHeader());
             _stringBuilder.AppendLine(indent, "{");
 
             StringBuilder footerSb = new();

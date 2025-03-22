@@ -11,7 +11,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class INamedTypeSymbolExtensions
     {
-        private static List<IMethodSymbol> _methodSymbols = new();
 
         /// <summary>
         /// Returns field members of a named symbol.
@@ -75,7 +74,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns if a type has public accessibility.
         /// </summary>
-        public static bool IsPartial(this INamedTypeSymbol namedTypeSymbol)
+        public static bool HasPartialModifier(this INamedTypeSymbol namedTypeSymbol)
         {
             if (namedTypeSymbol == null) return false;
 
@@ -93,6 +92,39 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 return structDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
 
             return false;
+        }
+        
+        /// <summary>
+        /// Returns a types header as a string. (Eg: public partial class MyClass).
+        /// </summary>
+        /// <param name="classSymbol"></param>
+        /// <returns></returns>
+        public static string GetClassOrStructHeader(this INamedTypeSymbol namedTypeSymbol)
+        {
+            string keywordText;
+            if (!IsAllowedKeyword(out keywordText))
+                return string.Empty;
+            
+            //Public, internal, etc. 
+            string modifiersText = namedTypeSymbol.DeclaredAccessibility.ToString().ToLower();
+            //Partial check.
+            string partialText = HasPartialModifier(namedTypeSymbol) ? "partial " : string.Empty;
+
+            bool IsAllowedKeyword(out string lKeyword)
+            {
+                lKeyword = string.Empty;
+                
+                if (namedTypeSymbol.TypeKind == TypeKind.Class)
+                    lKeyword = "class";
+                else if (namedTypeSymbol.TypeKind == TypeKind.Struct)
+                    lKeyword = "struct";
+                else
+                    return false;
+
+                return true;
+            }
+
+            return $"{modifiersText} {partialText}{keywordText} {namedTypeSymbol.Name}";
         }
     }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.

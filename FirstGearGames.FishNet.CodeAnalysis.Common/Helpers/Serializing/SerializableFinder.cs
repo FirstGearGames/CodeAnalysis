@@ -243,7 +243,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                     return false;
             }
             
-            if (!namedTypeSymbol.HasPublicAccessibility() && !namedTypeSymbol.ContainingType.IsPartial())
+            if (!namedTypeSymbol.HasPublicAccessibility())// && !namedTypeSymbol.ContainingType.HasPartialModifier())
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnIsNotSerializableAccessible?.Invoke(analysisContext, source, string.Empty);

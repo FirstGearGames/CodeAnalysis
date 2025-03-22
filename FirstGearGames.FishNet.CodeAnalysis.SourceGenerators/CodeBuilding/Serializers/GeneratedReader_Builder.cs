@@ -157,8 +157,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadMethods())
             {
-                if (item.Value is not GeneratedSerializerMethod dsm) continue;
+                if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol) continue;
+                if (!namedTypeSymbol.HasPublicAccessibility()) continue;
 
+                if (item.Value is not GeneratedSerializerMethod dsm) continue;
+                
                 sb.AppendLine(dsm.MethodContent.ToString(2));
 
                 //Add return if body already contains value. This is just to make neater formatting.

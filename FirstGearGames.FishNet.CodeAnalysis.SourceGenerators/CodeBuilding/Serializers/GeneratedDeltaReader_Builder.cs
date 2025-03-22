@@ -199,7 +199,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private void CreateGeneratedSerializersClass(GeneratorExecutionContext context)
         {
             CreateForPublicTypes();
-            CreateForPartialTypes();
+            //CreateForPartialTypes();
 
             //Creates file for types that have public scope.
             void CreateForPublicTypes()
@@ -234,55 +234,57 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
                 context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
             }
-
-            //Creates file for types that have do not have public scope, but the containing type is partial.
-            void CreateForPartialTypes()
-            {
-                StringBuilder sb = new();
-
-                const int initializeIndent = 2;
-
-                foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadDeltaMethods())
-                {
-                    if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol) continue;
-                    if (namedTypeSymbol.HasPublicAccessibility() || !namedTypeSymbol.ContainingType.IsPartial()) continue;
-
-                    if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
-
-                    /* //todo CreatePublicStaticClass needs to instead create class same as containingType.
-                     * className should be the same.
-                     *
-                     * The only difference is the output file should have the name of the type
-                     * the generate is for. EG: if one containing class has two nonPublic members that need
-                     * serializers and their names are.. S1 and S2, and containing class is CC then this is the result..
-                     *
-                     * //Saved as Generated_CC_S1.g.cs
-                     * //As well for the second type Generated_CC_s2.g.cs
-                     * public partial class CC //assuming containingType is public.
-                     * {
-                     * //Serializers here.
-                     * }
-                     *
-                     */
-                    string clsText = CodeBuilder.CreatePublicStaticClass(Generated_Class_Name, out string footer, FishNetConstants.Serializing_Namespace);
-                    sb.AppendLine(clsText);
-
-                    SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
-
-                    sb.AppendLine(dsm.MethodContent.ToString(2));
-
-                    //Add return if body already contains value. This is just to make neater formatting.
-                    if (initializeMethod.Body.Length > 0)
-                        initializeMethod.Body.AppendLine();
-
-                    initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
-
-                    sb.Append(initializeMethod.ToString(initializeIndent));
-                    sb.AppendLine(footer);
-
-                    context.AddSource($"{FishNetConstants.Serializing_Namespace}_{Generated_Class_Name}.g.cs", sb.ToString());
-                }
-            }
+            //
+            // //Creates file for types that have do not have public scope, but the containing type is partial.
+            // void CreateForPartialTypes()
+            // {
+            //     StringBuilder sb = new();
+            //
+            //     const int initializeIndent = 2;
+            //
+            //     foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadDeltaMethods())
+            //     {
+            //         if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol) continue;
+            //         if (namedTypeSymbol.HasPublicAccessibility() || !namedTypeSymbol.ContainingType.IsPartial()) continue;
+            //
+            //         if (item.Value is not GeneratedDeltaSerializerMethod dsm) continue;
+            //
+            //         /* //todo CreatePublicStaticClass needs to instead create class same as containingType.
+            //          * className should be the same.
+            //          *
+            //          * The only difference is the output file should have the name of the type
+            //          * the generate is for. EG: if one containing class has two nonPublic members that need
+            //          * serializers and their names are.. S1 and S2, and containing class is CC then this is the result..
+            //          *
+            //          * //Saved as Generated_CC_S1.g.cs
+            //          * //As well for the second type Generated_CC_s2.g.cs
+            //          * public partial class CC //assuming containingType is public.
+            //          * {
+            //          * //Serializers here.
+            //          * }
+            //          *
+            //          */
+            //         INamedTypeSymbol containingType = namedTypeSymbol.ContainingType;
+            //         string clsText = CodeBuilder.CreateClassCopy(containingType, out string footer, containingType.GetNamespace());
+            //
+            //         sb.AppendLine(clsText);
+            //
+            //         SerializerMethodContent initializeMethod = GeneralBuilder.CreatePublicRuntimeInitializeOnLoadMethod(initializeIndent, InitializeOnLoad_Method_Name);
+            //
+            //         sb.AppendLine(dsm.MethodContent.ToString(2));
+            //
+            //         //Add return if body already contains value. This is just to make neater formatting.
+            //         if (initializeMethod.Body.Length > 0)
+            //             initializeMethod.Body.AppendLine();
+            //
+            //         initializeMethod.Body.Append(initializeIndent + 1, CreateInitializeFunction(dsm));
+            //
+            //         sb.Append(initializeMethod.ToString(initializeIndent));
+            //         sb.AppendLine(footer);
+            //
+            //         context.AddSource($"{containingType.GetNamespace()}_{containingType.Name}_{namedTypeSymbol.Name}.g.cs", sb.ToString());
+            //     }
+            // }
         }
 
         /// <summary>

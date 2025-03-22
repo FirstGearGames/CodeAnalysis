@@ -147,13 +147,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         public RpcMethodContent MethodContent;
 
         /// <param name="rpcAttributeData">RpcAttributeData to use for this RpcMethod. When a Rpc has multiple attributes a RpcMethodData should be made for each attribute.</param>
-        public RpcMethodDatas(IMethodSymbol methodSymbol, string defaultChannelValue, List<IParameterSymbol> serializableParameters, RpcAttributeData rpcAttributeData)
+        public RpcMethodDatas(IMethodSymbol methodSymbol, string defaultChannelValue, List<IParameterSymbol> serializableParameters, RpcAttributeData rpcAttributeData, RpcMethodContent methodContent = null)
         {
             RpcAttributeData = rpcAttributeData;
             MethodSymbol = methodSymbol;
             DefaultChannelValue = defaultChannelValue;
             MethodName = methodSymbol.Name;
             SerializableParameters = serializableParameters;
+            MethodContent = methodContent;
         }
     }
 }
