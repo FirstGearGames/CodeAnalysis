@@ -28,7 +28,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         {
             _stringBuilder.Clear();
             writerVariableName = $"{variablePrefix}pooledWriter";
-            _stringBuilder.Append($"{_stringBuilder.ToString()}{FishNetConstants.PooledWriter_FullName} {writerVariableName} = {FishNetConstants.WriterPool_Retrieve_Name}()");
+            _stringBuilder.Append($"{FishNetConstants.PooledWriter_FullName} {writerVariableName} = {FishNetConstants.WriterPool_Retrieve_Name}()");
             if (closeCall)
                 _stringBuilder.Append(';');
 
