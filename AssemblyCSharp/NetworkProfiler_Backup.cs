@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System;
 using FishNet.Managing;
 using FishNet.Managing.Statistic;
+using FishNet.Managing.Timing;
+using FishNet.Transporting;
 using GameKit.Dependencies.Utilities;
 using UnityEditor;
 using UnityEngine;
@@ -13,19 +15,169 @@ namespace FishNet.Editing
     {
         #region Types.
         /// <summary>
+        /// Bytes collected for each packet type.
+        /// </summary>
+        /// <remarks>A class is used rather than a struct so values can be modified via reference.</remarks>
+        private class PacketTotalBytes : IResettable
+        {
+            /// <summary>
+            /// PacketId bytes are for.
+            /// </summary>
+            public PacketId PacketId = PacketId.Unset;
+            /// <summary>
+            /// Total inbound bytes for PacketId.
+            /// </summary>
+            public ulong InboundBytes;
+            /// <summary>
+            /// Total outbound bytes for PacketId.
+            /// </summary>
+            public ulong OutboundBytes;
+            
+            /// <summary>
+            /// True if has been Initialized with a PacketId.
+            /// </summary>
+            /// <remarks>True does not indicate all bytes have been added.</remarks>
+            public bool IsInitialized => PacketId != PacketId.Unset;
+
+            /// <summary>
+            /// True if the packetId is for data which is not known or handled.
+            /// </summary>
+            /// <returns></returns>
+            public bool IsOtherPacketId() => (ushort)PacketId == NetworkProfilerWindow.UnspecifiedPacketId;
+
+            public PacketTotalBytes() { }
+
+            public void Initialize(PacketId packetId) 
+            {
+                PacketId = packetId;
+            }
+
+            /// <summary>
+            /// Adds onto inbound bytes.
+            /// </summary>
+            public void AddInboundBytes(ulong bytes) => InboundBytes = bytes;
+
+            /// <summary>
+            /// Adds onto inbound bytes.
+            /// </summary>
+            public void AddOutboundBytes(ulong bytes) => OutboundBytes = bytes;
+
+            public void ResetState()
+            {
+                PacketId = PacketId.Unset;
+                InboundBytes = 0;
+            }
+
+            public void InitializeState() { }
+        }
+
+        /// <summary>
         /// Data for a profiled tick. 
         /// </summary>
-        private struct ProfiledTickData
+        private class ProfiledTickData
         {
+            /// <summary>
+            /// Tick this is for.
+            /// </summary>
             public uint Tick;
-            public MultiwayTrafficCollection ServerTraffic;
-            public MultiwayTrafficCollection ClientTraffic;
+            /// <summary>
+            /// Total bytes for each packet for the server.
+            /// </summary>
+            private Dictionary<PacketId, PacketTotalBytes> _serverPacketTotalBytes;
+            /// <summary>
+            /// Total bytes for each packet for the client.
+            /// </summary>
+            private Dictionary<PacketId, PacketTotalBytes> _clientPacketTotalBytes;
+            /// <summary>
+            /// Traffic collection for the server.
+            /// </summary>
+            private MultiwayTrafficCollection _serverTraffic;
+            /// <summary>
+            /// Traffic collection for the client.
+            /// </summary>
+            private MultiwayTrafficCollection _clientTraffic;
+
+            /// <summary>
+            /// Returns data for server or client.
+            /// </summary>
+            public void GetValues(out MultiwayTrafficCollection trafficCollection, out Dictionary<PacketId, PacketTotalBytes> packetTotalBytes, bool asServer)
+            {
+                if (asServer)
+                {
+                    trafficCollection = _serverTraffic;
+                    packetTotalBytes = _serverPacketTotalBytes;
+                }
+                else
+                {
+                    trafficCollection = _clientTraffic;
+                    packetTotalBytes = _clientPacketTotalBytes;
+                }
+            }
 
             public ProfiledTickData(uint tick, MultiwayTrafficCollection serverTraffic, MultiwayTrafficCollection clientTraffic)
             {
                 Tick = tick;
-                ServerTraffic = serverTraffic.CloneUsingCache();
-                ClientTraffic = clientTraffic.CloneUsingCache();
+                
+                _serverTraffic = serverTraffic.CloneUsingCache();
+                _clientTraffic = clientTraffic.CloneUsingCache();
+            }
+
+            /// <summary>
+            /// Initializes total bytes for each packet in traffic if not already done.
+            /// </summary>
+            private Dictionary<PacketId, PacketTotalBytes> GetPopulatedPacketTotalBytes(bool asServer)
+            {
+                Dictionary<PacketId, PacketTotalBytes> collection;
+
+                if (asServer) 
+                {
+                    if (_serverPacketTotalBytes == null)
+                        PopulateCollectionUsingCache(ref _serverPacketTotalBytes, _serverTraffic);
+                        
+                    collection = _serverPacketTotalBytes;
+                }
+                else
+                {
+                    if (_clientPacketTotalBytes == null)
+                        PopulateCollectionUsingCache(ref _clientPacketTotalBytes, _clientTraffic);
+                        
+                    collection = _serverPacketTotalBytes;
+                }
+
+                return collection;
+
+                //Sets value to lPidBytes using cache and populates using trafficCollection.
+                static void PopulateCollectionUsingCache(ref Dictionary<PacketId, PacketTotalBytes> lPidBytes, MultiwayTrafficCollection trafficCollection)
+                {
+                    lPidBytes = ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.RetrieveDictionary();
+
+                    
+                }
+
+            }
+
+            /// <summary>
+            /// Returns collection for total bytes for each packet.
+            /// </summary>
+            public Dictionary<PacketId, PacketTotalBytes> GetPacketTotalBytes(bool asServer) 
+            {
+                PopulatePacketTotalBytesIfNeeded(asServer);
+                
+                
+            }
+
+            /// <summary>
+            /// Resets all values and stores to caches as needed.
+            /// </summary>
+            public void ResetState()
+            {
+                Tick = TimeManager.UNSET_TICK;
+                
+                ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref _serverTraffic);
+                ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref _clientTraffic);
+
+                ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _serverPacketTotalBytes);
+                ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _clientPacketTotalBytes);
             }
         }
 
@@ -60,11 +212,6 @@ namespace FishNet.Editing
         private int hoveredSampleIndex = -1;
         private const float barWidth = 20f;
         private const float labelWidth = 50f;
-
-        // // Graph data
-        // private readonly List<float> _sentRpcBytes = new(100);
-        // private readonly List<float> _sentBroadcastBytes = new(100);
-        // private readonly List<float> _sentSyncTypeBytes = new(100);
         /// <summary>
         /// Expanded state of details trees.
         /// </summary>
@@ -73,11 +220,6 @@ namespace FishNet.Editing
         /// Expanded state of packet trees.
         /// </summary>
         private readonly Dictionary<string, bool> _packetTreeStates = new(32);
-
-        // Cache for the most recently used RPC data
-        private string lastRpcDataString;
-        private Type lastRpcType;
-        private string lastRpcMethod;
 
         // private RPCType lastRpcRpcType;
         // private BitPacker lastRpcPacker;
@@ -104,6 +246,10 @@ namespace FishNet.Editing
         #endregion
 
         #region Consts/readonly.
+        /// <summary>
+        /// Id for unspecified packets.
+        /// </summary>
+        internal const ushort UnspecifiedPacketId = ushort.MaxValue;
         /// <summary>
         /// Name of this window.
         /// </summary>
@@ -510,8 +656,8 @@ namespace FishNet.Editing
         /// </summary>
         private void ClearProfiledTickData(ProfiledTickData value)
         {
-            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref value.ClientTraffic);
-            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref value.ServerTraffic);
+            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref value._clientTraffic);
+            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref value._serverTraffic);
         }
 
         #region Sample Management
