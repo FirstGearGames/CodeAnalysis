@@ -73,7 +73,7 @@ namespace FishNet.Editing
         /// <summary>
         /// Data for a profiled tick. 
         /// </summary>
-        private class ProfiledTickData
+        private class ProfiledTickData : IResettable
         {
             /// <summary>
             /// Tick this is for.
@@ -96,6 +96,14 @@ namespace FishNet.Editing
             /// </summary>
             private MultiwayTrafficCollection _clientTraffic;
 
+            public void Initialize(uint tick, MultiwayTrafficCollection serverTraffic, MultiwayTrafficCollection clientTraffic)
+            {
+                Tick = tick;
+
+                _serverTraffic = serverTraffic.CloneUsingCache();
+                _clientTraffic = clientTraffic.CloneUsingCache();
+            }
+
             /// <summary>
             /// Returns data for server or client.
             /// </summary>
@@ -111,14 +119,6 @@ namespace FishNet.Editing
                     trafficCollection = _clientTraffic;
                     packetTotalBytes = _clientPacketTotalBytes;
                 }
-            }
-
-            public ProfiledTickData(uint tick, MultiwayTrafficCollection serverTraffic, MultiwayTrafficCollection clientTraffic)
-            {
-                Tick = tick;
-
-                _serverTraffic = serverTraffic.CloneUsingCache();
-                _clientTraffic = clientTraffic.CloneUsingCache();
             }
 
             /// <summary>
@@ -164,7 +164,7 @@ namespace FishNet.Editing
                         foreach (TrafficCollection.TrafficEntry entry in entries)
                         {
                             PacketId packetId = entry.PacketId;
-                            
+
                             if (!collection.TryGetValueIL2CPP(packetId, out PacketTotalBytes packetTotalBytes))
                             {
                                 packetTotalBytes = ResettableObjectCaches<PacketTotalBytes>.Retrieve();
@@ -215,6 +215,8 @@ namespace FishNet.Editing
                 ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _serverPacketTotalBytes);
                 ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _clientPacketTotalBytes);
             }
+
+            public void InitializeState() { }
         }
 
         /// <summary>
@@ -361,11 +363,15 @@ namespace FishNet.Editing
 
         private void NetworkTrafficStatisticsOnOnNetworkTraffic(uint tick, MultiwayTrafficCollection serverTraffic, MultiwayTrafficCollection clientTraffic)
         {
-            ProfiledTickData tickData = new(tick, serverTraffic, clientTraffic);
+            ProfiledTickData tickData = ResettableObjectCaches<ProfiledTickData>.Retrieve();
+            tickData.Initialize(tick, serverTraffic, clientTraffic);
+
             /* Make sure data is not already added. This should not be possible. */
             if (!_profiledTickData.TryAdd(tick, tickData))
             {
                 NetworkManagerExtensions.LogError($"Tick [{tick}] has already been added to data.");
+                StoreProfiledTickData(tickData);
+                
                 return;
             }
 
@@ -670,7 +676,7 @@ namespace FishNet.Editing
 
                 keysToRemove.Add(tick);
 
-                ClearProfiledTickData(kvp.Value);
+                StoreProfiledTickData(kvp.Value);
             }
 
             //Quick clear if to remove all.
@@ -690,11 +696,7 @@ namespace FishNet.Editing
         /// <summary>
         /// Clears a ProfiledTickData.
         /// </summary>
-        private void ClearProfiledTickData(ProfiledTickData value)
-        {
-            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref value._clientTraffic);
-            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref value._serverTraffic);
-        }
+        private void StoreProfiledTickData(ProfiledTickData value) => ResettableObjectCaches<ProfiledTickData>.Store(value);
 
         #region Sample Management
         private void DrawSelectedSample(MultiwayTrafficCollection trafficCollection)
