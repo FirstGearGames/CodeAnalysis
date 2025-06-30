@@ -69,6 +69,24 @@ namespace FishNet.Editing
     /// </summary>
     internal class ProfiledTickData : IResettable
     {
+
+Read below.
+// Todo -- This has to be done so we can sort details panel as well so we can draw lines on graph window.
+
+// Todo -- This needs to set the percentiles of each packet after all packets have been 
+// Todo -- There is probably no reason to have PacketTotalBytes, given it's intended to cover inbound/outbound in a single class.
+// Todo -- ^ Get rid of these variables below.
+
+// Todo -- Instead, within TrafficCollection, have a public dictionary (PacketSums), name not final) with PacketId as the key, and a class
+// Todo -- (TotalDetails, name not final) which has: PacketId, TotalBytes, Percentage. 
+
+// Todo -- In a new method, after all Entries are added to TrafficCollection, iterate the entries and storing them to PacketSums.
+// Todo -- When iterating entries increase the a local entriesTotalBytes with each iteration.
+// Todo -- Note: percentage on TotalDetails cannot be calculated in PacketSums until all Entries are iterated.
+
+// Todo -- Reiterate PacketSums dictionary now setting the Percentage on TotalDetails based on it's total bytes vs the
+// Todo -- entriesTotalBytes we've been increasing.
+
         /// <summary>
         /// Tick this is for.
         /// </summary>
