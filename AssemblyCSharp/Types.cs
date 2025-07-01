@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using FishNet.Managing;
+using FishNet.Managing.Editing;
 using FishNet.Managing.Statistic;
 using FishNet.Managing.Timing;
 using FishNet.Transporting;
@@ -13,7 +13,7 @@ namespace FishNet.Editing
     /// <summary>
     /// Used to store Inbound and Outbound traffic details.
     /// </summary>
-    internal class BidirectionalNetworkTraffic : IResettable
+    public class BidirectionalNetworkTraffic : IResettable
     {
         /// <summary>
         /// Received traffic.
@@ -30,6 +30,12 @@ namespace FishNet.Editing
         /// <returns></returns>
         public BidirectionalNetworkTraffic CloneUsingCache()
         {
+            if (_inboundTraffic == null) 
+            {
+                NetworkManagerExtensions.LogError($"One or more NetworkTraffic values is null. {nameof(BidirectionalNetworkTraffic)} cannot be cloned.");
+                return null;
+            }
+            
             BidirectionalNetworkTraffic traffic = ResettableObjectCaches<BidirectionalNetworkTraffic>.Retrieve();
             
             traffic._inboundTraffic = _inboundTraffic;
@@ -239,12 +245,17 @@ namespace FishNet.Editing
         /// </summary>
         private BidirectionalNetworkTraffic _clientTraffic;
 
-        public void Initialize(uint tick, BidirectionalNetworkTraffic serverTraffic, BidirectionalNetworkTraffic clientTraffic)
+        /// <summary>
+        /// Initializes and returns if successful.
+        /// </summary>
+        public bool TryInitialize(uint tick, BidirectionalNetworkTraffic serverTraffic, BidirectionalNetworkTraffic clientTraffic)
         {
             Tick = tick;
 
             _serverTraffic = serverTraffic.CloneUsingCache();
             _clientTraffic = clientTraffic.CloneUsingCache();
+            
+            return _serverTraffic != null && _clientTraffic != null;
         }
 
         /// <summary>
