@@ -77,10 +77,6 @@ namespace FishNet.Editing
 
         #region Consts/readonly.
         /// <summary>
-        /// Id for unspecified packets.
-        /// </summary>
-        internal const ushort UnspecifiedPacketId = ushort.MaxValue;
-        /// <summary>
         /// Name of this window.
         /// </summary>
         private const string WINDOW_NAME = "FishNet Network Profiler";
@@ -132,7 +128,7 @@ namespace FishNet.Editing
                 return;
 
             if (manager.StatisticsManager.TryGetNetworkTrafficStatistics(out _networkTrafficStatistics))
-                _networkTrafficStatistics.OnNetworkTraffic += NetworkTrafficStatisticsOnOnNetworkTraffic;
+                _networkTrafficStatistics.OnNetworkTraffic += NetworkTrafficStatistics_OnNetworkTraffic;
         }
 
         private void OnEnable()
@@ -149,13 +145,14 @@ namespace FishNet.Editing
             SaveWindowSize(force: true);
 
             if (_networkTrafficStatistics != null)
-                _networkTrafficStatistics.OnNetworkTraffic -= NetworkTrafficStatisticsOnOnNetworkTraffic;
+                _networkTrafficStatistics.OnNetworkTraffic -= NetworkTrafficStatistics_OnNetworkTraffic;
         }
         #endregion
 
-        private void NetworkTrafficStatisticsOnOnNetworkTraffic(uint tick, MultiwayTrafficCollection serverTraffic, MultiwayTrafficCollection clientTraffic)
+        private void NetworkTrafficStatistics_OnNetworkTraffic(uint tick, BidirectionalNetworkTraffic serverTraffic, BidirectionalNetworkTraffic clientTraffic)
         {
             ProfiledTickData tickData = ResettableObjectCaches<ProfiledTickData>.Retrieve();
+            //use TryInitialize -- if failed store tickdata.
             tickData.Initialize(tick, serverTraffic, clientTraffic);
 
             /* Make sure data is not already added. This should not be possible. */
