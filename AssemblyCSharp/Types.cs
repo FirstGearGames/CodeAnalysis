@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using FishNet.Managing.Statistic;
@@ -42,7 +43,6 @@ namespace FishNet.Editing
             /// </summary>
             /// <remarks>GameObject is used rather than a script reference because we do not want to risk unintentionally holding a script in memory. Unity will automatically clean up GameObjects, so they are safe to reference.</remarks>
             public GameObject GameObject;
-            
             public Packet(ulong bytes) : this(details: string.Empty, bytes, gameObject: null) { }
             public Packet(string details, ulong bytes) : this(details, bytes, gameObject: null) { }
             public Packet(ulong bytes, GameObject gameObject) : this(details: string.Empty, bytes, gameObject) { }
@@ -67,29 +67,55 @@ namespace FishNet.Editing
             /// <summary>
             /// Bytes of all packets using PacketId.
             /// </summary>
-            public int Bytes { get; private set; }
+            public ulong Bytes { get; private set; }
             /// <summary>
             /// Percent Bytes is when compared against Bytes of other PacketMetrics.
             /// </summary>
             /// <remarks>This can only be completed after all Packet entries for each PacketId are added.</remarks>
             public float Percent { get; private set; }
-
-            public bool IsUnspecifiedPacketId => (ushort)PacketId == NetworkProfilerWindow.UNSPECIFIED_PACKETID;
-            
+            /// <summary>
+            /// True if PacketId is for unspecified packets.
+            /// </summary>
+            public bool IsUnspecifiedPacketId => PacketId == NetworkTrafficStatistics.UNSPECIFIED_PACKETID;
+            /// <summary>
+            /// Currently added packets.
+            /// </summary>
             private List<Packet> _packets = new();
 
-            public void Initialize(PacketId packetId) 
+            public void Initialize(PacketId packetId)
             {
                 PacketId = packetId;
             }
-            public void Initialize(PacketId packetId, ulong bytes) => Initialize(packetId, details: string.Empty, bytes, gameObject: null);
-            public void Initialize(PacketId packetId, ulong bytes, GameObject gameObject) => Initialize(packetId, details: string.Empty, bytes, gameObject);
-            public void Initialize(PacketId packetId, string details,  ulong bytes) => Initialize(packetId, details, bytes, gameObject: null);
-            public void Initialize(PacketId packetId, string details, ulong bytes, GameObject gameObject) 
+            // public void Initialize(PacketId packetId, ulong bytes) => Initialize(packetId, details: string.Empty, bytes, gameObject: null);
+            // public void Initialize(PacketId packetId, ulong bytes, GameObject gameObject) => Initialize(packetId, details: string.Empty, bytes, gameObject);
+            // public void Initialize(PacketId packetId, string details,  ulong bytes) => Initialize(packetId, details, bytes, gameObject: null);
+            // public void Initialize(PacketId packetId, string details, ulong bytes, GameObject gameObject) 
+            // {
+            //     PacketId = packetId;
+            //     
+            //     _packets.Add(new(details, bytes, gameObject));
+            // }
+
+            /// <summary>
+            /// Adds traffic from a specified packetId.
+            /// </summary>
+            public void AddPacket(string details, ulong bytes, GameObject gameObject)
             {
-                PacketId = packetId;
-                
+                Bytes += bytes;
+
                 _packets.Add(new(details, bytes, gameObject));
+            }
+
+            /// <summary>
+            /// Sets Percent using Bytes against allPacketGroupBytes.
+            /// </summary>
+            public void SetPercent(ulong allPacketGroupBytes)
+            {
+                //Prevent divide by 0.
+                if (Bytes == 0)
+                    Percent = 0;
+                else
+                    Percent = (float)Bytes / allPacketGroupBytes;
             }
 
             public void ResetState()
@@ -104,32 +130,67 @@ namespace FishNet.Editing
         }
         #endregion
 
-        private Dictionary<PacketId, PacketGroup> _packetGroups = new();
+        /// <summary>
+        /// PacketGroup for each PacketId processed.
+        /// </summary>
+        private Dictionary<PacketId, PacketGroup> _packetGroups;
+        /// <summary>
+        /// Total bytes for all PacketGroups.
+        /// </summary>
+        private ulong _bytes;
+
+        /// <summary>
+        /// Adds traffic from a specified packetId.
+        /// </summary>
+        public void AddPacketIdData(PacketId packetId, string details, ulong bytes, GameObject gameObject) => LAddPacketId(packetId, details, bytes, gameObject);
+
+        /// <summary>
+        /// Adds traffic from a specified packetId.
+        /// </summary>
+        public void AddSocketData(PacketId packetId, string details, ulong bytes, GameObject gameObject) => LAddPacketId(NetworkTrafficStatistics.UNSPECIFIED_PACKETID, details, bytes, gameObject);
+
+        /// <summary>
+        /// Adds traffic to a PackerGroup.
+        /// </summary>
+        private void LAddPacketId(PacketId packetId, string details, ulong bytes, GameObject gameObject)
+        {
+            if (!_packetGroups.TryGetValue(packetId, out PacketGroup packetGroup))
+            {
+                packetGroup = ResettableObjectCaches<PacketGroup>.Retrieve();
+                packetGroup.Initialize(packetId);
+
+                _packetGroups[packetId] = packetGroup;
+            }
+
+            _bytes += bytes;
+
+            packetGroup.AddPacket(details, bytes, gameObject);
+        }
+
+        /// <summary>
+        /// Calculates and sets Percentage value on each PacketGroup.
+        /// </summary>
+        /// <remarks>This should only be called after all PacketGroup entries have been created.</remarks>
+        public void SetPacketGroupPercentages()
+        {
+            //Field would probably get cached at runtime during iteration but let's be certain.
+            ulong bytes = _bytes;
+
+            foreach (PacketGroup pg in _packetGroups.Values)
+                pg.SetPercent(bytes);
+        }
 
         public void ResetState()
         {
             ResettableT2CollectionCaches<PacketId, PacketGroup>.StoreAndDefault(ref _packetGroups);
         }
 
-        public void InitializeState() { }
+        public void InitializeState()
+        {
+            _packetGroups = ResettableT2CollectionCaches<PacketId, PacketGroup>.RetrieveDictionary();
+        }
     }
-
-    Read below.
-    // Todo -- This has to be done so we can sort details panel as well so we can draw lines on graph window.
-
-    // Todo -- This needs to set the percentiles of each packet after all packets have been 
-    // Todo -- There is probably no reason to have PacketTotalBytes, given it's intended to cover inbound/outbound in a single class.
-    // Todo -- ^ Get rid of these variables below.
-
-    // Todo -- Instead, within NetworkTraffic, have a public dictionary (PacketSums), name not final) with PacketId as the key, and a class
-    // Todo -- (TotalDetails, name not final) which has: PacketId, TotalBytes, Percentage. 
-
-    // Todo -- In a new method, after all Entries are added to NetworkTraffic, iterate the entries and storing them to PacketSums.
-    // Todo -- When iterating entries increase the a local entriesTotalBytes with each iteration.
-    // Todo -- Note: percentage on TotalDetails cannot be calculated in PacketSums until all Entries are iterated.
-
-    // Todo -- Reiterate PacketSums dictionary now setting the Percentage on TotalDetails based on it's total bytes vs the
-    // Todo -- entriesTotalBytes we've been increasing.
+    
     /// <summary>
     /// Bytes collected for each packet type.
     /// </summary>
