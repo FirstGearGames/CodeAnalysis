@@ -1,13 +1,135 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using FishNet.Managing.Statistic;
 using FishNet.Managing.Timing;
 using FishNet.Transporting;
 using GameKit.Dependencies.Utilities;
+using UnityEngine;
 
 namespace FishNet.Editing
 {
+    /// <summary>
+    /// Used to store Inbound and Outbound traffic details.
+    /// </summary>
+    internal class BidirectionalNetworkTraffic : IResettable
+    {
+        private NetworkTraffic _inboundTraffic;
+        private NetworkTraffic _outboundTraffic;
+        public void ResetState() { }
+        public void InitializeState() { }
+    }
 
+    internal class NetworkTraffic : IResettable
+    {
+        #region Types.
+        /// <summary>
+        /// Information about a single packet.
+        /// </summary>
+        public struct Packet
+        {
+            /// <summary>
+            /// Details about the packet, such as method or class name.
+            /// </summary>
+            /// <remarks>This may be empty.</remarks>
+            public string Details;
+            /// <summary>
+            /// Bytes used.
+            /// </summary>
+            public ulong Bytes;
+            /// <summary>
+            /// Originating GameObject.
+            /// </summary>
+            /// <remarks>GameObject is used rather than a script reference because we do not want to risk unintentionally holding a script in memory. Unity will automatically clean up GameObjects, so they are safe to reference.</remarks>
+            public GameObject GameObject;
+            
+            public Packet(ulong bytes) : this(details: string.Empty, bytes, gameObject: null) { }
+            public Packet(string details, ulong bytes) : this(details, bytes, gameObject: null) { }
+            public Packet(ulong bytes, GameObject gameObject) : this(details: string.Empty, bytes, gameObject) { }
+
+            public Packet(string details, ulong bytes, GameObject gameObject)
+            {
+                Details = details;
+                Bytes = bytes;
+                GameObject = gameObject;
+            }
+        }
+
+        /// <summary>
+        /// Container for multiple Packets of the same type.
+        /// </summary>
+        public class PacketGroup : IResettable
+        {
+            /// <summary>
+            /// PacketId of this metric.
+            /// </summary>
+            public PacketId PacketId { get; private set; } = PacketId.Unset;
+            /// <summary>
+            /// Bytes of all packets using PacketId.
+            /// </summary>
+            public int Bytes { get; private set; }
+            /// <summary>
+            /// Percent Bytes is when compared against Bytes of other PacketMetrics.
+            /// </summary>
+            /// <remarks>This can only be completed after all Packet entries for each PacketId are added.</remarks>
+            public float Percent { get; private set; }
+
+            public bool IsUnspecifiedPacketId => (ushort)PacketId == NetworkProfilerWindow.UNSPECIFIED_PACKETID;
+            
+            private List<Packet> _packets = new();
+
+            public void Initialize(PacketId packetId) 
+            {
+                PacketId = packetId;
+            }
+            public void Initialize(PacketId packetId, ulong bytes) => Initialize(packetId, details: string.Empty, bytes, gameObject: null);
+            public void Initialize(PacketId packetId, ulong bytes, GameObject gameObject) => Initialize(packetId, details: string.Empty, bytes, gameObject);
+            public void Initialize(PacketId packetId, string details,  ulong bytes) => Initialize(packetId, details, bytes, gameObject: null);
+            public void Initialize(PacketId packetId, string details, ulong bytes, GameObject gameObject) 
+            {
+                PacketId = packetId;
+                
+                _packets.Add(new(details, bytes, gameObject));
+            }
+
+            public void ResetState()
+            {
+                PacketId = PacketId.Unset;
+                Bytes = 0;
+                Percent = 0f;
+                _packets.Clear();
+            }
+
+            public void InitializeState() { }
+        }
+        #endregion
+
+        private Dictionary<PacketId, PacketGroup> _packetGroups = new();
+
+        public void ResetState()
+        {
+            ResettableT2CollectionCaches<PacketId, PacketGroup>.StoreAndDefault(ref _packetGroups);
+        }
+
+        public void InitializeState() { }
+    }
+
+    Read below.
+    // Todo -- This has to be done so we can sort details panel as well so we can draw lines on graph window.
+
+    // Todo -- This needs to set the percentiles of each packet after all packets have been 
+    // Todo -- There is probably no reason to have PacketTotalBytes, given it's intended to cover inbound/outbound in a single class.
+    // Todo -- ^ Get rid of these variables below.
+
+    // Todo -- Instead, within NetworkTraffic, have a public dictionary (PacketSums), name not final) with PacketId as the key, and a class
+    // Todo -- (TotalDetails, name not final) which has: PacketId, TotalBytes, Percentage. 
+
+    // Todo -- In a new method, after all Entries are added to NetworkTraffic, iterate the entries and storing them to PacketSums.
+    // Todo -- When iterating entries increase the a local entriesTotalBytes with each iteration.
+    // Todo -- Note: percentage on TotalDetails cannot be calculated in PacketSums until all Entries are iterated.
+
+    // Todo -- Reiterate PacketSums dictionary now setting the Percentage on TotalDetails based on it's total bytes vs the
+    // Todo -- entriesTotalBytes we've been increasing.
     /// <summary>
     /// Bytes collected for each packet type.
     /// </summary>
@@ -36,7 +158,7 @@ namespace FishNet.Editing
         /// True if the packetId is for data which is not known or handled.
         /// </summary>
         /// <returns></returns>
-        public bool IsOtherPacketId() => (ushort)PacketId == NetworkProfilerWindow.UnspecifiedPacketId;
+        public bool IsOtherPacketId() => (ushort)PacketId == NetworkProfilerWindow.UNSPECIFIED_PACKETID;
 
         public PacketTotalBytes() { }
 
@@ -69,24 +191,6 @@ namespace FishNet.Editing
     /// </summary>
     internal class ProfiledTickData : IResettable
     {
-
-Read below.
-// Todo -- This has to be done so we can sort details panel as well so we can draw lines on graph window.
-
-// Todo -- This needs to set the percentiles of each packet after all packets have been 
-// Todo -- There is probably no reason to have PacketTotalBytes, given it's intended to cover inbound/outbound in a single class.
-// Todo -- ^ Get rid of these variables below.
-
-// Todo -- Instead, within TrafficCollection, have a public dictionary (PacketSums), name not final) with PacketId as the key, and a class
-// Todo -- (TotalDetails, name not final) which has: PacketId, TotalBytes, Percentage. 
-
-// Todo -- In a new method, after all Entries are added to TrafficCollection, iterate the entries and storing them to PacketSums.
-// Todo -- When iterating entries increase the a local entriesTotalBytes with each iteration.
-// Todo -- Note: percentage on TotalDetails cannot be calculated in PacketSums until all Entries are iterated.
-
-// Todo -- Reiterate PacketSums dictionary now setting the Percentage on TotalDetails based on it's total bytes vs the
-// Todo -- entriesTotalBytes we've been increasing.
-
         /// <summary>
         /// Tick this is for.
         /// </summary>
@@ -102,35 +206,18 @@ Read below.
         /// <summary>
         /// Traffic collection for the server.
         /// </summary>
-        private MultiwayTrafficCollection _serverTraffic;
+        private BidirectionalNetworkTraffic _serverTraffic;
         /// <summary>
         /// Traffic collection for the client.
         /// </summary>
-        private MultiwayTrafficCollection _clientTraffic;
+        private BidirectionalNetworkTraffic _clientTraffic;
 
-        public void Initialize(uint tick, MultiwayTrafficCollection serverTraffic, MultiwayTrafficCollection clientTraffic)
+        public void Initialize(uint tick, BidirectionalNetworkTraffic serverTraffic, BidirectionalNetworkTraffic clientTraffic)
         {
             Tick = tick;
 
             _serverTraffic = serverTraffic.CloneUsingCache();
             _clientTraffic = clientTraffic.CloneUsingCache();
-        }
-
-        /// <summary>
-        /// Returns data for server or client.
-        /// </summary>
-        public void GetValues(out MultiwayTrafficCollection trafficCollection, out Dictionary<PacketId, PacketTotalBytes> packetTotalBytes, bool asServer)
-        {
-            if (asServer)
-            {
-                trafficCollection = _serverTraffic;
-                packetTotalBytes = _serverPacketTotalBytes;
-            }
-            else
-            {
-                trafficCollection = _clientTraffic;
-                packetTotalBytes = _clientPacketTotalBytes;
-            }
         }
 
         /// <summary>
@@ -158,7 +245,7 @@ Read below.
             return collection;
 
             //Sets value to lPidBytes using cache and populates using trafficCollection.
-            static void PopulateCollectionUsingCache(ref Dictionary<PacketId, PacketTotalBytes> refPidBytes, MultiwayTrafficCollection trafficCollection)
+            static void PopulateCollectionUsingCache(ref Dictionary<PacketId, PacketTotalBytes> refPidBytes, BidirectionalNetworkTraffic trafficCollection)
             {
                 /* We need to pass initial collection as ref so the field can be
                  * populated. Entries can be added using a local reference. */
@@ -171,9 +258,9 @@ Read below.
                 AddBytesForEntries(trafficCollection.Outbound.Entries, inbound: false);
 
                 //Iterates entries and adds bytes to packet total bytes.
-                void AddBytesForEntries(List<TrafficCollection.TrafficEntry> entries, bool inbound)
+                void AddBytesForEntries(List<NetworkTraffic.TrafficEntry> entries, bool inbound)
                 {
-                    foreach (TrafficCollection.TrafficEntry entry in entries)
+                    foreach (NetworkTraffic.TrafficEntry entry in entries)
                     {
                         PacketId packetId = entry.PacketId;
 
@@ -221,8 +308,8 @@ Read below.
         {
             Tick = TimeManager.UNSET_TICK;
 
-            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref _serverTraffic);
-            ResettableObjectCaches<MultiwayTrafficCollection>.StoreAndDefault(ref _clientTraffic);
+            ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref _serverTraffic);
+            ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref _clientTraffic);
 
             ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _serverPacketTotalBytes);
             ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _clientPacketTotalBytes);
@@ -230,6 +317,5 @@ Read below.
 
         public void InitializeState() { }
     }
-
 }
 #endif
