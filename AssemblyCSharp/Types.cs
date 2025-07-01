@@ -15,10 +15,47 @@ namespace FishNet.Editing
     /// </summary>
     internal class BidirectionalNetworkTraffic : IResettable
     {
+        /// <summary>
+        /// Tick traffic is for.
+        /// </summary>
+        public uint Tick;
+        /// <summary>
+        /// Received traffic.
+        /// </summary>
         private NetworkTraffic _inboundTraffic;
+        /// <summary>
+        /// Sent traffic.
+        /// </summary>
         private NetworkTraffic _outboundTraffic;
-        public void ResetState() { }
-        public void InitializeState() { }
+
+        /// <summary>
+        /// Creates a clone of this class using cache.
+        /// </summary>
+        /// <returns></returns>
+        public BidirectionalNetworkTraffic CloneUsingCache()
+        {
+            BidirectionalNetworkTraffic traffic = ResettableObjectCaches<BidirectionalNetworkTraffic>.Retrieve();
+            
+            traffic.Tick = Tick;
+            traffic._inboundTraffic = _inboundTraffic;
+            traffic._outboundTraffic = _outboundTraffic;
+
+            return traffic;
+        }
+        
+        public void ResetState()
+        {
+            Tick = TimeManager.UNSET_TICK;
+            
+            ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref _inboundTraffic);
+            ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref _outboundTraffic);
+        }
+        
+        public void InitializeState()
+        {
+            _inboundTraffic = ResettableObjectCaches<NetworkTraffic>.Retrieve();
+            _outboundTraffic = ResettableObjectCaches<NetworkTraffic>.Retrieve();
+        }
     }
 
     internal class NetworkTraffic : IResettable
@@ -43,10 +80,10 @@ namespace FishNet.Editing
             /// </summary>
             /// <remarks>GameObject is used rather than a script reference because we do not want to risk unintentionally holding a script in memory. Unity will automatically clean up GameObjects, so they are safe to reference.</remarks>
             public GameObject GameObject;
+            
             public Packet(ulong bytes) : this(details: string.Empty, bytes, gameObject: null) { }
             public Packet(string details, ulong bytes) : this(details, bytes, gameObject: null) { }
             public Packet(ulong bytes, GameObject gameObject) : this(details: string.Empty, bytes, gameObject) { }
-
             public Packet(string details, ulong bytes, GameObject gameObject)
             {
                 Details = details;
@@ -192,62 +229,6 @@ namespace FishNet.Editing
     }
     
     /// <summary>
-    /// Bytes collected for each packet type.
-    /// </summary>
-    /// <remarks>A class is used rather than a struct so values can be modified via reference.</remarks>
-    internal class PacketTotalBytes : IResettable
-    {
-        /// <summary>
-        /// PacketId bytes are for.
-        /// </summary>
-        public PacketId PacketId = PacketId.Unset;
-        /// <summary>
-        /// Total inbound bytes for PacketId.
-        /// </summary>
-        public ulong InboundBytes;
-        /// <summary>
-        /// Total outbound bytes for PacketId.
-        /// </summary>
-        public ulong OutboundBytes;
-        /// <summary>
-        /// True if has been Initialized with a PacketId.
-        /// </summary>
-        /// <remarks>True does not indicate all bytes have been added.</remarks>
-        public bool IsInitialized => PacketId != PacketId.Unset;
-
-        /// <summary>
-        /// True if the packetId is for data which is not known or handled.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsOtherPacketId() => (ushort)PacketId == NetworkProfilerWindow.UNSPECIFIED_PACKETID;
-
-        public PacketTotalBytes() { }
-
-        public void Initialize(PacketId packetId)
-        {
-            PacketId = packetId;
-        }
-
-        /// <summary>
-        /// Adds onto inbound bytes.
-        /// </summary>
-        public void AddInboundBytes(ulong bytes) => InboundBytes = bytes;
-
-        /// <summary>
-        /// Adds onto inbound bytes.
-        /// </summary>
-        public void AddOutboundBytes(ulong bytes) => OutboundBytes = bytes;
-
-        public void ResetState()
-        {
-            PacketId = PacketId.Unset;
-            InboundBytes = 0;
-        }
-
-        public void InitializeState() { }
-    }
-
-    /// <summary>
     /// Data for a profiled tick. 
     /// </summary>
     internal class ProfiledTickData : IResettable
@@ -256,14 +237,6 @@ namespace FishNet.Editing
         /// Tick this is for.
         /// </summary>
         public uint Tick;
-        /// <summary>
-        /// Total bytes for each packet for the server.
-        /// </summary>
-        private Dictionary<PacketId, PacketTotalBytes> _serverPacketTotalBytes;
-        /// <summary>
-        /// Total bytes for each packet for the client.
-        /// </summary>
-        private Dictionary<PacketId, PacketTotalBytes> _clientPacketTotalBytes;
         /// <summary>
         /// Traffic collection for the server.
         /// </summary>
