@@ -16,10 +16,6 @@ namespace FishNet.Editing
     internal class BidirectionalNetworkTraffic : IResettable
     {
         /// <summary>
-        /// Tick traffic is for.
-        /// </summary>
-        public uint Tick;
-        /// <summary>
         /// Received traffic.
         /// </summary>
         private NetworkTraffic _inboundTraffic;
@@ -36,7 +32,6 @@ namespace FishNet.Editing
         {
             BidirectionalNetworkTraffic traffic = ResettableObjectCaches<BidirectionalNetworkTraffic>.Retrieve();
             
-            traffic.Tick = Tick;
             traffic._inboundTraffic = _inboundTraffic;
             traffic._outboundTraffic = _outboundTraffic;
 
@@ -45,8 +40,6 @@ namespace FishNet.Editing
         
         public void ResetState()
         {
-            Tick = TimeManager.UNSET_TICK;
-            
             ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref _inboundTraffic);
             ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref _outboundTraffic);
         }
@@ -255,87 +248,6 @@ namespace FishNet.Editing
         }
 
         /// <summary>
-        /// Initializes total bytes for each packet in traffic if not already done.
-        /// </summary>
-        private Dictionary<PacketId, PacketTotalBytes> GetPopulatedPacketTotalBytes(bool asServer)
-        {
-            Dictionary<PacketId, PacketTotalBytes> collection;
-
-            if (asServer)
-            {
-                if (_serverPacketTotalBytes == null)
-                    PopulateCollectionUsingCache(ref _serverPacketTotalBytes, _serverTraffic);
-
-                collection = _serverPacketTotalBytes;
-            }
-            else
-            {
-                if (_clientPacketTotalBytes == null)
-                    PopulateCollectionUsingCache(ref _clientPacketTotalBytes, _clientTraffic);
-
-                collection = _serverPacketTotalBytes;
-            }
-
-            return collection;
-
-            //Sets value to lPidBytes using cache and populates using trafficCollection.
-            static void PopulateCollectionUsingCache(ref Dictionary<PacketId, PacketTotalBytes> refPidBytes, BidirectionalNetworkTraffic trafficCollection)
-            {
-                /* We need to pass initial collection as ref so the field can be
-                 * populated. Entries can be added using a local reference. */
-                refPidBytes = ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.RetrieveDictionary();
-
-                //To access more easily throughout this method since ref cannot be used in this context.
-                Dictionary<PacketId, PacketTotalBytes> collection = refPidBytes;
-
-                AddBytesForEntries(trafficCollection.Inbound.Entries, inbound: true);
-                AddBytesForEntries(trafficCollection.Outbound.Entries, inbound: false);
-
-                //Iterates entries and adds bytes to packet total bytes.
-                void AddBytesForEntries(List<NetworkTraffic.TrafficEntry> entries, bool inbound)
-                {
-                    foreach (NetworkTraffic.TrafficEntry entry in entries)
-                    {
-                        PacketId packetId = entry.PacketId;
-
-                        if (!collection.TryGetValueIL2CPP(packetId, out PacketTotalBytes packetTotalBytes))
-                        {
-                            packetTotalBytes = ResettableObjectCaches<PacketTotalBytes>.Retrieve();
-                            collection[packetId] = packetTotalBytes;
-                        }
-
-                        ulong bytes = (ulong)entry.Bytes;
-
-                        if (inbound)
-                            packetTotalBytes.AddOutboundBytes(bytes);
-                        else
-                            packetTotalBytes.AddInboundBytes(bytes);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns collection for total bytes for each packet.
-        /// </summary>
-        public Dictionary<PacketId, PacketTotalBytes> GetPacketTotalBytes(bool asServer)
-        {
-            return GetPopulatedPacketTotalBytes(asServer);
-        }
-
-        /// <summary>
-        /// Returns PacketTotalBytes for a PacketId.
-        /// </summary>
-        public PacketTotalBytes GetPacketTotalBytes(PacketId packetId, bool asServer)
-        {
-            Dictionary<PacketId, PacketTotalBytes> collection = GetPacketTotalBytes(asServer);
-
-            collection.TryGetValueIL2CPP(packetId, out PacketTotalBytes packetTotalBytes);
-
-            return packetTotalBytes;
-        }
-
-        /// <summary>
         /// Resets all values and stores to caches as needed.
         /// </summary>
         public void ResetState()
@@ -344,9 +256,6 @@ namespace FishNet.Editing
 
             ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref _serverTraffic);
             ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref _clientTraffic);
-
-            ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _serverPacketTotalBytes);
-            ResettableT2CollectionCaches<PacketId, PacketTotalBytes>.StoreAndDefault(ref _clientPacketTotalBytes);
         }
 
         public void InitializeState() { }
