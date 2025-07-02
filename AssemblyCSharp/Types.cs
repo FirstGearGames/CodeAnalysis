@@ -1,7 +1,5 @@
-﻿#if UNITY_EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FishNet.Managing;
-using FishNet.Managing.Editing;
 using FishNet.Managing.Statistic;
 using FishNet.Managing.Timing;
 using FishNet.Transporting;
@@ -11,6 +9,24 @@ using UnityEngine;
 namespace FishNet.Editing
 {
     /// <summary>
+    /// Used to resize a window.
+    /// </summary>
+    internal struct WindowResizeData
+    {
+        public readonly Vector2 CursorStartPosition;
+        public readonly Vector2 WindowStartHeight;
+        public readonly bool IsValid;
+
+        public WindowResizeData(Vector2 cursorPosition, Vector2 windowHeight)
+        {
+            CursorStartPosition = cursorPosition;
+            WindowStartHeight = windowHeight;
+
+            IsValid = true;
+        }
+    }
+    
+    /// <summary>
     /// Used to store Inbound and Outbound traffic details.
     /// </summary>
     public class BidirectionalNetworkTraffic : IResettable
@@ -18,11 +34,11 @@ namespace FishNet.Editing
         /// <summary>
         /// Received traffic.
         /// </summary>
-        private NetworkTraffic _inboundTraffic;
+        internal NetworkTraffic InboundTraffic;
         /// <summary>
         /// Sent traffic.
         /// </summary>
-        private NetworkTraffic _outboundTraffic;
+        internal NetworkTraffic OutboundTraffic;
 
         /// <summary>
         /// Creates a clone of this class using cache.
@@ -30,7 +46,7 @@ namespace FishNet.Editing
         /// <returns></returns>
         public BidirectionalNetworkTraffic CloneUsingCache()
         {
-            if (_inboundTraffic == null) 
+            if (InboundTraffic == null) 
             {
                 NetworkManagerExtensions.LogError($"One or more NetworkTraffic values is null. {nameof(BidirectionalNetworkTraffic)} cannot be cloned.");
                 return null;
@@ -38,22 +54,22 @@ namespace FishNet.Editing
             
             BidirectionalNetworkTraffic traffic = ResettableObjectCaches<BidirectionalNetworkTraffic>.Retrieve();
             
-            traffic._inboundTraffic = _inboundTraffic;
-            traffic._outboundTraffic = _outboundTraffic;
+            traffic.InboundTraffic = InboundTraffic;
+            traffic.OutboundTraffic = OutboundTraffic;
 
             return traffic;
         }
         
         public void ResetState()
         {
-            ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref _inboundTraffic);
-            ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref _outboundTraffic);
+            ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref InboundTraffic);
+            ResettableObjectCaches<NetworkTraffic>.StoreAndDefault(ref OutboundTraffic);
         }
         
         public void InitializeState()
         {
-            _inboundTraffic = ResettableObjectCaches<NetworkTraffic>.Retrieve();
-            _outboundTraffic = ResettableObjectCaches<NetworkTraffic>.Retrieve();
+            InboundTraffic = ResettableObjectCaches<NetworkTraffic>.Retrieve();
+            OutboundTraffic = ResettableObjectCaches<NetworkTraffic>.Retrieve();
         }
     }
 
@@ -173,7 +189,7 @@ namespace FishNet.Editing
         /// <summary>
         /// Total bytes for all PacketGroups.
         /// </summary>
-        private ulong _bytes;
+        public ulong Bytes;
 
         /// <summary>
         /// Adds traffic from a specified packetId.
@@ -183,7 +199,7 @@ namespace FishNet.Editing
         /// <summary>
         /// Adds traffic from a specified packetId.
         /// </summary>
-        public void AddSocketData(PacketId packetId, string details, ulong bytes, GameObject gameObject) => LAddPacketId(NetworkTrafficStatistics.UNSPECIFIED_PACKETID, details, bytes, gameObject);
+        public void AddSocketData( ulong bytes) => LAddPacketId(NetworkTrafficStatistics.UNSPECIFIED_PACKETID, details: string.Empty, bytes, gameObject: null);
 
         /// <summary>
         /// Adds traffic to a PackerGroup.
@@ -198,7 +214,7 @@ namespace FishNet.Editing
                 _packetGroups[packetId] = packetGroup;
             }
 
-            _bytes += bytes;
+            Bytes += bytes;
 
             packetGroup.AddPacket(details, bytes, gameObject);
         }
@@ -210,7 +226,7 @@ namespace FishNet.Editing
         public void SetPacketGroupPercentages()
         {
             //Field would probably get cached at runtime during iteration but let's be certain.
-            ulong bytes = _bytes;
+            ulong bytes = Bytes;
 
             foreach (PacketGroup pg in _packetGroups.Values)
                 pg.SetPercent(bytes);
@@ -239,12 +255,12 @@ namespace FishNet.Editing
         /// <summary>
         /// Traffic collection for the server.
         /// </summary>
-        private BidirectionalNetworkTraffic _serverTraffic;
+        public BidirectionalNetworkTraffic ServerTraffic;
         /// <summary>
         /// Traffic collection for the client.
         /// </summary>
-        private BidirectionalNetworkTraffic _clientTraffic;
-
+        public BidirectionalNetworkTraffic ClientTraffic;
+        
         /// <summary>
         /// Initializes and returns if successful.
         /// </summary>
@@ -252,12 +268,12 @@ namespace FishNet.Editing
         {
             Tick = tick;
 
-            _serverTraffic = serverTraffic.CloneUsingCache();
-            _clientTraffic = clientTraffic.CloneUsingCache();
+            ServerTraffic = serverTraffic.CloneUsingCache();
+            ClientTraffic = clientTraffic.CloneUsingCache();
             
-            return _serverTraffic != null && _clientTraffic != null;
+            return ServerTraffic != null && ClientTraffic != null;
         }
-
+        
         /// <summary>
         /// Resets all values and stores to caches as needed.
         /// </summary>
@@ -265,11 +281,10 @@ namespace FishNet.Editing
         {
             Tick = TimeManager.UNSET_TICK;
 
-            ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref _serverTraffic);
-            ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref _clientTraffic);
+            ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref ServerTraffic);
+            ResettableObjectCaches<BidirectionalNetworkTraffic>.StoreAndDefault(ref ClientTraffic);
         }
 
         public void InitializeState() { }
     }
 }
-#endif

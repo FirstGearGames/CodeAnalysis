@@ -11,25 +11,6 @@ namespace FishNet.Editing
 {
     public class NetworkProfilerWindow : EditorWindow
     {
-        
-        /// <summary>
-        /// Used to resize a window.
-        /// </summary>
-        private struct ResizeData
-        {
-            public readonly Vector2 CursorStartPosition;
-            public readonly Vector2 WindowStartHeight;
-            public readonly bool IsValid;
-
-            public ResizeData(Vector2 cursorPosition, Vector2 windowHeight)
-            {
-                CursorStartPosition = cursorPosition;
-                WindowStartHeight = windowHeight;
-
-                IsValid = true;
-            }
-        }
-
         /// <summary>
         /// Current instances of this window.
         /// </summary>
@@ -66,6 +47,10 @@ namespace FishNet.Editing
         /// </summary>
         private bool _isEnabled;
         /// <summary>
+        /// True if on the server tab, false if on the client.
+        /// </summary>
+        private bool _onServerTab;
+        /// <summary>
         /// Traffic statistics for this instance. 
         /// </summary>
         private NetworkTrafficStatistics _networkTrafficStatistics;
@@ -73,6 +58,10 @@ namespace FishNet.Editing
         /// Currently recorded statistics.
         /// </summary>
         private readonly Dictionary<uint, ProfiledTickData> _profiledTickData = new();
+        /// <summary>
+        /// Data which contains the largest bytes be it in or out.
+        /// </summary>
+        private ProfiledTickData _largestBytesData;
         #endregion
 
         #region Consts/readonly.
@@ -149,11 +138,18 @@ namespace FishNet.Editing
         }
         #endregion
 
+        /// <summary>
+        /// Called when new traffic statistics are received.
+        /// </summary>
         private void NetworkTrafficStatistics_OnNetworkTraffic(uint tick, BidirectionalNetworkTraffic serverTraffic, BidirectionalNetworkTraffic clientTraffic)
         {
             ProfiledTickData tickData = ResettableObjectCaches<ProfiledTickData>.Retrieve();
-            //use TryInitialize -- if failed store tickdata.
-            tickData.Initialize(tick, serverTraffic, clientTraffic);
+
+            if (!tickData.TryInitialize(tick, serverTraffic, clientTraffic)) 
+            {
+                ResettableObjectCaches<ProfiledTickData>.Store(tickData);
+                return;
+            }
 
             /* Make sure data is not already added. This should not be possible. */
             if (!_profiledTickData.TryAdd(tick, tickData))
@@ -165,6 +161,26 @@ namespace FishNet.Editing
             }
 
             Repaint();
+        }
+
+        /// <summary>
+        /// Called when profiled data is added or removed.
+        /// </summary>
+        private void DataAddedOrRemoved(ProfiledTickData tickData, bool wasAdded)
+        {
+            /* If added simply see if the bytes in data are larger than the current
+             * largest data. */
+            if (wasAdded) 
+            {
+
+                void UpdateAgainstLargest(ref ProfiledTickData lCurrentLargest) 
+                {
+                    if (lCurrentLargest == null || tickData.ClientTraffic.
+                }
+            }
+            
+            
+            
         }
 
         #region GUI Rendering
@@ -193,76 +209,20 @@ namespace FishNet.Editing
                 GUILayout.EndHorizontal();
             }
 
-            var samples = Statistics.samples;
 
-            // Update graph data
-            UpdateGraphData();
-
-            // Always draw the graph
             DrawGraph();
 
-            // Draw details view if a sample is selected
-            if (selectedSampleIndex >= 0 && selectedSampleIndex < samples.Count)
-            {
-                DrawSelectedSample(samples[selectedSampleIndex]);
-            }
-            else if (samples.Count > 0)
-            {
-                int idx = samples.Count - 1;
-                DrawSample(samples[idx], idx);
-            }
+            //todo If there is an entry selected or hovered then draw it.
         }
         #endregion
 
         #region Graph Management
-        private void UpdateGraphData()
-        {
-            // Clear existing data
-            receivedRpcData.Clear();
-            _sentRpcBytes.Clear();
-            receivedBroadcastData.Clear();
-            _sentBroadcastBytes.Clear();
-            forwardedBytesData.Clear();
-
-            // Add data from each sample
-            foreach (var sample in Statistics.samples)
-            {
-                receivedRpcData.Add(sample.receivedRpcs.Sum(rpc => rpc.data.length));
-                _sentRpcBytes.Add(sample.sentRpcs.Sum(rpc => rpc.data.length));
-                receivedBroadcastData.Add(sample.receivedBroadcasts.Sum(b => b.data.length));
-                _sentBroadcastBytes.Add(sample.sentBroadcasts.Sum(b => b.data.length));
-                forwardedBytesData.Add(sample.forwardedBytes.Sum());
-            }
-
-            bool isInPlayMode = EditorApplication.isPlaying;
-            bool isPaused = EditorApplication.isPaused;
-            // Auto-scroll to the end when new data is added and actively recording
-            if (receivedRpcData.Count > 0 && isInPlayMode && !isPaused)
-            {
-                float totalWidth = receivedRpcData.Count * barWidth;
-                collectiveScrollViewPosition.x = totalWidth;
-            }
-        }
-
         private void DrawGraph()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.LabelField("Network Traffic Graph", EditorStyles.boldLabel);
 
-            // Get the maximum value for scaling
-            float maxValue = 1f; // Avoid division by zero
-            if (receivedRpcData.Count > 0)
-            {
-                // Calculate the maximum total height for each bar
-                for (int i = 0; i < receivedRpcData.Count; i++)
-                {
-                    float totalBarHeight = receivedRpcData[i] + _sentRpcBytes[i] + receivedBroadcastData[i] + _sentBroadcastBytes[i] + forwardedBytesData[i];
-                    maxValue = Math.Max(maxValue, totalBarHeight);
-                }
-            }
-
-            // Calculate the total width needed for all bars
-            float totalWidth = receivedRpcData.Count * barWidth;
+            float totalWidth = 800f;
 
             // Create a horizontal layout for the graph and labels
             EditorGUILayout.BeginHorizontal();
@@ -271,11 +231,18 @@ namespace FishNet.Editing
             // Draw the Y-axis labels
             EditorGUILayout.BeginVertical(GUILayout.Width(labelWidth));
 
-            // Draw value labels on the left side
+            const float graphHeight = 500f;
+
+            DrawBytesColumn();
+            
+            void DrawBytesColumn() 
+            {
+                ulong totalBytes = 
+            }
             for (int i = 4; i >= 0; i--)
             {
                 float value = maxValue * i / 4;
-                string label = FormatBytes(value);
+                string label = NetworkTrafficStatistics.FormatBytesToLargest(value);
                 EditorGUILayout.LabelField(label, GUILayout.Width(labelWidth), GUILayout.Height(graphHeight / 5));
             }
 
@@ -298,6 +265,8 @@ namespace FishNet.Editing
                 float y = graphRect.y + (graphRect.height - i * gridSegmentHeight);
                 Handles.DrawLine(new(graphRect.x, y, 0), new(graphRect.x + graphRect.width, y, 0));
             }
+            
+            
 
             // Draw data points
             if (receivedRpcData.Count > 0)
