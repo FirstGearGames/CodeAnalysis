@@ -8,7 +8,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirstGearGames.FishNet.CodeAnalysis.Analyzers\FirstGearGames.FishNet.CodeAnalysis.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\FishNet\FishNet.Runtime\FishNet.Runtime.csproj" />
 		<ProjectReference Include="..\FirstGearGames.FishNet.CodeAnalysis.SourceGenerators\FirstGearGames.FishNet.CodeAnalysis.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
