@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR 
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using System;
 using FishNet.Managing;
@@ -145,7 +145,7 @@ namespace FishNet.Editing
         {
             ProfiledTickData tickData = ResettableObjectCaches<ProfiledTickData>.Retrieve();
 
-            if (!tickData.TryInitialize(tick, serverTraffic, clientTraffic)) 
+            if (!tickData.TryInitialize(tick, serverTraffic, clientTraffic))
             {
                 ResettableObjectCaches<ProfiledTickData>.Store(tickData);
                 return;
@@ -156,7 +156,7 @@ namespace FishNet.Editing
             {
                 NetworkManagerExtensions.LogError($"Tick [{tick}] has already been added to data.");
                 StoreProfiledTickData(tickData);
-                
+
                 return;
             }
 
@@ -170,17 +170,13 @@ namespace FishNet.Editing
         {
             /* If added simply see if the bytes in data are larger than the current
              * largest data. */
-            if (wasAdded) 
+            if (wasAdded)
             {
-
-                void UpdateAgainstLargest(ref ProfiledTickData lCurrentLargest) 
+                void UpdateAgainstLargest(ref ProfiledTickData lCurrentLargest)
                 {
                     if (lCurrentLargest == null || tickData.ClientTraffic.
                 }
             }
-            
-            
-            
         }
 
         #region GUI Rendering
@@ -234,11 +230,12 @@ namespace FishNet.Editing
             const float graphHeight = 500f;
 
             DrawBytesColumn();
-            
-            void DrawBytesColumn() 
+
+            void DrawBytesColumn()
             {
                 ulong totalBytes = 
             }
+
             for (int i = 4; i >= 0; i--)
             {
                 float value = maxValue * i / 4;
@@ -265,8 +262,7 @@ namespace FishNet.Editing
                 float y = graphRect.y + (graphRect.height - i * gridSegmentHeight);
                 Handles.DrawLine(new(graphRect.x, y, 0), new(graphRect.x + graphRect.width, y, 0));
             }
-            
-            
+
 
             // Draw data points
             if (receivedRpcData.Count > 0)
