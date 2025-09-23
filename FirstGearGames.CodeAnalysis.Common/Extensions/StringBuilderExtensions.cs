@@ -7,7 +7,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
     {
         public static StringBuilder Indent(this StringBuilder stringBuilder, int count = 1)
         {
-            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
             return count switch
             {
@@ -31,8 +32,5 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             sb.Indent(indentCount).AppendLine($"throw new Exception(\"{text}\");");
         }
-
-
-
     }
 }

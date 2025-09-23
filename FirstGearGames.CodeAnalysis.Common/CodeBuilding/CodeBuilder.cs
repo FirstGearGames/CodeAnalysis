@@ -15,7 +15,7 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
         /// Gets the delcared accessibility of a method and returns it as string to use in code.
         /// </summary>
         /// <returns></returns>
-        public static string GetDeclaredAccessibility(this IMethodSymbol symbol) 
+        public static string GetDeclaredAccessibility(this IMethodSymbol symbol)
         {
             return symbol.DeclaredAccessibility switch
             {
@@ -29,7 +29,7 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
                 _ => "public"
             };
         }
-        
+
         /// <summary>
         /// Creates a class optionally wrapping it in a namespace.
         /// </summary>
@@ -60,8 +60,7 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
             footer = footerSb.ToString();
             return _stringBuilder.ToString();
         }
-        
-              
+
         /// <summary>
         /// Creates a class optionally wrapping it in a namespace.
         /// </summary>
@@ -179,7 +178,7 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
             for (int i = 0; i < types.Length; i++)
             {
                 _stringBuilder.Append($"{types[i]}");
-                if (i < (types.Length - 1))
+                if (i < types.Length - 1)
                     _stringBuilder.Append(", ");
             }
 
@@ -191,11 +190,12 @@ namespace FirstGearGames.CodeAnalysis.CodeBuilding
         /// <summary>
         /// Combines generic argument strings into <str0, str1, str2 ...>
         /// </summary>
-        /// <param name="arguments"></param>
+        /// <param name = "arguments"></param>
         /// <returns></returns>
         public static string GetCombinedGenericArguments(this List<string> arguments)
         {
-            if (arguments.Count == 0) return string.Empty;
+            if (arguments.Count == 0)
+                return string.Empty;
 
             _stringBuilder.Clear();
 

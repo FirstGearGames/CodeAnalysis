@@ -11,7 +11,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class INamedTypeSymbolExtensions
     {
-
         /// <summary>
         /// Returns field members of a named symbol.
         /// </summary>
@@ -76,15 +75,18 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// </summary>
         public static bool HasPartialModifier(this INamedTypeSymbol namedTypeSymbol)
         {
-            if (namedTypeSymbol == null) return false;
+            if (namedTypeSymbol == null)
+                return false;
 
             ImmutableArray<SyntaxReference> syntaxReferences = namedTypeSymbol.DeclaringSyntaxReferences;
 
             //If there's more than one reference then we know it's partial
-            if (syntaxReferences.Length > 1) return true;
+            if (syntaxReferences.Length > 1)
+                return true;
 
             SyntaxReference firstSyntaxReference = syntaxReferences.FirstOrDefault();
-            if (firstSyntaxReference == null) return false;
+            if (firstSyntaxReference == null)
+                return false;
 
             if (firstSyntaxReference.GetSyntax() is ClassDeclarationSyntax classDeclarationSyntax)
                 return classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
@@ -93,18 +95,18 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             return false;
         }
-        
+
         /// <summary>
         /// Returns a types header as a string. (Eg: public partial class MyClass).
         /// </summary>
-        /// <param name="classSymbol"></param>
+        /// <param name = "classSymbol"></param>
         /// <returns></returns>
         public static string GetClassOrStructHeader(this INamedTypeSymbol namedTypeSymbol)
         {
             string keywordText;
             if (!IsAllowedKeyword(out keywordText))
                 return string.Empty;
-            
+
             //Public, internal, etc. 
             string modifiersText = namedTypeSymbol.DeclaredAccessibility.ToString().ToLower();
             //Partial check.
@@ -113,7 +115,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             bool IsAllowedKeyword(out string lKeyword)
             {
                 lKeyword = string.Empty;
-                
+
                 if (namedTypeSymbol.TypeKind == TypeKind.Class)
                     lKeyword = "class";
                 else if (namedTypeSymbol.TypeKind == TypeKind.Struct)
@@ -127,5 +129,5 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             return $"{modifiersText} {partialText}{keywordText} {namedTypeSymbol.Name}";
         }
     }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+    #pragma warning restore CS8602 // Dereference of a possibly null reference.
 }

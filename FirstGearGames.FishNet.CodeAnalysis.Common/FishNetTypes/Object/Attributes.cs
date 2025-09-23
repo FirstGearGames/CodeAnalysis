@@ -4,7 +4,6 @@ using FishNetTypes.Managing.Logging;
 
 namespace FishNetTypes.Object
 {
-    
     public static class DataOrderTypeExtensions
     {
         /// <summary>
@@ -22,7 +21,6 @@ namespace FishNetTypes.Object
         public static string GetEnumName(this DataOrderType orderType) => $"{FishNetConstants.DataOrderType_FullName}.{orderType.ToString()}";
     }
 
-    
     public enum DataOrderType
     {
         /// <summary>
@@ -34,7 +32,7 @@ namespace FishNetTypes.Object
         /// Data will be attached to the end of the packet.
         /// RPCs can be sent after all SyncTypes by using this value. Multiple RPCs with this order type will send last, in the order they were called.
         /// </summary>
-        Last = 1,
+        Last = 1
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
@@ -140,35 +138,32 @@ namespace FishNetTypes.Object
     }
 }
 
-
 namespace FishNetTypes.Object.Synchronizing
 {
-
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public class SyncObjectAttribute : Attribute { }
+
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public class SyncVarAttribute : Attribute { }
-
-
 }
 
 namespace FishNetTypes.CodeGenerating
 {
-
     /// <summary>
     /// Indicates a method is the default writer for a type. The first non-extension parameter indicates the type this writer is for.
     /// This attribute is primarily for internal use and may change at anytime without notice.
     /// </summary>
     public class DefaultWriterAttribute : Attribute { }
+
     /// <summary>
     /// Indicates a method is the default reader for a type. The return type indicates what type the reader is for.
     /// This attribute is primarily for internal use and may change at anytime without notice.
     /// </summary>
     public class DefaultReaderAttribute : Attribute { }
-    
+
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class DefaultDeltaWriterAttribute : Attribute { }
+
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class DefaultDeltaReaderAttribute : Attribute { }
-
 }

@@ -21,12 +21,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// Invoked during analysis when a class is not partial.
         /// </summary>
         public event Action<SyntaxNodeAnalysisContext> OnClassIsNotPartial;
-
         /// <summary>
         /// All RPC methods which need to be generated.
         /// </summary>
         public readonly HashSet<RpcMethodDatas> RpcMethodDatas = new();
-        
         private GeneratorSyntaxReceiver _generatorSyntaxReceiver;
 
         /// <summary>
@@ -36,7 +34,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
-            if (symbol is not IMethodSymbol methodSymbol) return;
+            if (symbol is not IMethodSymbol methodSymbol)
+                return;
 
             CheckRpcMethod(context, methodSymbol);
         }
@@ -48,7 +47,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         {
             ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
-            if (symbol is not IMethodSymbol methodSymbol) return;
+            if (symbol is not IMethodSymbol methodSymbol)
+                return;
 
             CheckRpcMethod(context, methodSymbol);
         }
@@ -58,7 +58,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// </summary>
         private void CheckRpcMethod(object context, IMethodSymbol methodSymbol)
         {
-            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return;
+            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results))
+                return;
 
             //Check scope to ensure class holding method is partial.
             if (!methodSymbol.ContainingType.HasPartialModifier())
@@ -67,7 +68,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
                     OnClassIsNotPartial?.Invoke(analysisContext);
                 else
                     Log($"Class {methodSymbol.ContainingType.GetTypeSymbolFullName(metadataName: false)} must be partial to create RPC serializers.");
-                
+
                 return;
             }
 
@@ -75,11 +76,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             foreach (RpcAttributeData data in results)
             {
                 List<IParameterSymbol> serializables = _generatorSyntaxReceiver.SerializableFinder.GetRpcSerializableParameters(context, methodSymbol, data);
-                
+
                 //Build RpcMethodData here.
                 string defaultChannelValue = RpcHelper.GetDefaultChannelValue(methodSymbol, data.RPCType);
                 RpcMethodDatas rmd = new(methodSymbol, defaultChannelValue, serializables, data);
-             
+
                 RpcMethodDatas.Add(rmd);
             }
         }

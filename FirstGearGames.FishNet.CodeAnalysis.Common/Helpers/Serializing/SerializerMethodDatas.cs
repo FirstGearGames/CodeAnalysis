@@ -12,20 +12,23 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
     {
         public static bool IsValid(this SerializerMethodData? smd)
         {
-            if (smd == null) return false;
+            if (smd == null)
+                return false;
             return !string.IsNullOrWhiteSpace(smd.TypeFullName);
         }
 
         public static bool IsGenericReadOrWriteMethod(this SerializerMethodData? smd)
         {
-            if (!smd.IsValid()) return false;
-            
-            return (smd.MethodName == FishNetConstants.Writer_Write_Name || smd.MethodName == FishNetConstants.Reader_Read_Name) || (smd.MethodName == FishNetConstants.Writer_WriteDelta_Name || smd.MethodName == FishNetConstants.Reader_ReadDelta_Name);
+            if (!smd.IsValid())
+                return false;
+
+            return smd.MethodName == FishNetConstants.Writer_Write_Name || smd.MethodName == FishNetConstants.Reader_Read_Name || smd.MethodName == FishNetConstants.Writer_WriteDelta_Name || smd.MethodName == FishNetConstants.Reader_ReadDelta_Name;
         }
 
         public static string GetReadOrWriteArgumentString(this SerializerMethodData? smd, ITypeSymbol typeSymbol)
         {
-            if (!smd.IsValid()) return string.Empty;
+            if (!smd.IsValid())
+                return string.Empty;
 
             //Uses Read/Write<T>.
             if (smd.IsGenericReadOrWriteMethod())
@@ -33,7 +36,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             //Uses generated or built-in serializer.
             if (smd.HasGenericArguments && !smd.AreGenericsNamed)
                 return ReturnArguments();
-            
+
             return string.Empty;
 
             string ReturnArguments() => typeSymbol.GetTypeSymbolCombinedGenericArgumentsString(argumentType: GenericArgumentType.PreferNamed);
@@ -102,7 +105,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         /// <summary>
         /// True if there are any generic arguments.
         /// </summary>
-        public bool HasGenericArguments => (GenericArguments.Count > 0);
+        public bool HasGenericArguments => GenericArguments.Count > 0;
         /// <summary>
         /// True if generic arguments are named.
         /// </summary>
@@ -111,7 +114,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         /// Content of the method.
         /// </summary>
         public readonly SerializerMethodContent MethodContent;
-
         public SerializerMethodData() { }
 
         public SerializerMethodData(ITypeSymbol typeSymbol, string methodName)

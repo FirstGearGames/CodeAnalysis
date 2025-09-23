@@ -23,7 +23,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         /// <summary>
         /// Calls WriterPool to return a pooled writer.
         /// </summary>
-        /// <param name="writerVariableName">Variable name result of </param>
+        /// <param name = "writerVariableName">Variable name result of </param>
         public static string CallGetPooledWriter(out string writerVariableName, string variablePrefix = "", bool closeCall = true)
         {
             _stringBuilder.Clear();
@@ -91,7 +91,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             sb.AppendLine(indent, $"[{UnityConstants.RuntimeInitializeOnLoadMethod_FullName}]");
             sb.Append(indent, $"public static void {methodName}()");
 
-            return new SerializerMethodContent(sb);
+            return new(sb);
         }
     }
 }

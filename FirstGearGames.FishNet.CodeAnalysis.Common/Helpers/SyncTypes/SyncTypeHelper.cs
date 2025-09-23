@@ -12,7 +12,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers
         SyncHashSet,
         SyncList,
         SyncVar,
-        Custom,
+        Custom
     }
 
     public static class SyncTypeHelper
@@ -22,9 +22,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers
         /// </summary>
         public static bool IsSyncType(this IFieldSymbol symbol)
         {
-            if (symbol.Type is not INamedTypeSymbol namedTypeSymbol) return false;
+            if (symbol.Type is not INamedTypeSymbol namedTypeSymbol)
+                return false;
 
-            return (namedTypeSymbol.GetSyncType() != SyncTypeType.Unset);
+            return namedTypeSymbol.GetSyncType() != SyncTypeType.Unset;
         }
 
         /// <summary>
@@ -51,6 +52,5 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers
             //Fall through or unhandle, such as custom synctypes.
             return SyncTypeType.Unset;
         }
-
     }
 }

@@ -20,14 +20,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
     public class RpcWriter_Builder
     {
         public const string GENERATED_PAREMETER_PREFIX = "p___";
-
         private List<string> _stringList = new();
         private MainGenerator _generator;
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, MainGenerator generator)
         {
@@ -108,7 +106,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                 StringBuilder sb = PerformanceHelper.RetrieveStringBuilder();
 
                 sb.AppendLine(CreateCallerChecks());
-                
+
                 sb.AppendLine(indent + 1, GeneralBuilder.CallGetPooledWriter(out string writerVariableName));
                 sb.AppendLine();
 
@@ -182,7 +180,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                 {
                     StringBuilder fullLSb = PerformanceHelper.RetrieveStringBuilder();
 
-                    bool isServerRpc = (methodData.RpcAttributeData.RPCType == RPCType.Server);
+                    bool isServerRpc = methodData.RpcAttributeData.RPCType == RPCType.Server;
 
                     fullLSb.Append(CreateInitializedCheck());
 
@@ -193,7 +191,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                     string result = fullLSb.ToString();
                     PerformanceHelper.StoreStringBuilder(fullLSb);
                     return result;
-                    
+
                     /* This is a mandatory initialized check. */
                     string CreateInitializedCheck()
                     {
@@ -203,7 +201,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                         LoggingType loggingType = methodData.RpcAttributeData.AttributeData.GetNamedArgument(FishNetConstants.RpcAttribute_Logging_Name, FishNetConstants.Default_LoggingType);
                         if (loggingType != LoggingType.Off)
                         {
-                            string requiredInitializer = (isServerRpc) ? "Client" : "Server";
+                            string requiredInitializer = isServerRpc ? "Client" : "Server";
                             string text = $"Rpc {methodData.MethodName} cannot be run while {requiredInitializer} has not initialized the object. This commonly occurs when the {requiredInitializer} is not started or has not yet spawned the object.";
                             lSb.AppendLine(indent + 2, loggingType.CreateLog(FishNetConstants.Base_NetworkManager_Field_Name, text));
                         }
@@ -211,9 +209,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                         lSb.Append(indent + 2, "return;");
 
                         string conditionalStatement = "!";
-                        conditionalStatement += (isServerRpc) ? FishNetConstants.Base_IsClient_Initialized_Field_Name : FishNetConstants.Base_IsServer_Initialized_Field_Name;
+                        conditionalStatement += isServerRpc ? FishNetConstants.Base_IsClient_Initialized_Field_Name : FishNetConstants.Base_IsServer_Initialized_Field_Name;
 
-                        string ifBlock = (CodeBuilder.CreateMultiLineIf(indent + 1, conditionalStatement, lSb));
+                        string ifBlock = CodeBuilder.CreateMultiLineIf(indent + 1, conditionalStatement, lSb);
 
                         PerformanceHelper.StoreStringBuilder(lSb);
 
@@ -227,8 +225,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
                         return default;
                         //Todo. This needs to have the requireauthority check
                     }
-                    
-                    
                 }
             }
         }

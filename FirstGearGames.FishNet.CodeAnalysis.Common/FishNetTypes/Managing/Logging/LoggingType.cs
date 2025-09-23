@@ -2,7 +2,7 @@
 
 namespace FishNetTypes.Managing.Logging
 {
-    public static class LoggingTypeExtensions 
+    public static class LoggingTypeExtensions
     {
         /// <summary>
         /// Returns a LoggingType enum value while containing the enum name (eg: LoggingType.Common).

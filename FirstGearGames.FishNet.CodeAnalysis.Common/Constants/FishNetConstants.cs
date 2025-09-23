@@ -95,7 +95,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// [TargetRpc] class.
         /// </summary>
         public const string TargetRpcAttribute_FullName = $"{Object_Namespace}.TargetRpcAttribute";
-
         /// <summary>
         /// [ServerRpc] class.
         /// </summary>
@@ -104,7 +103,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// ServerRpcAttribute.RequireOwnership name.
         /// </summary>
         public const string ServerRpc_RequireOwnership_FullName = $"RequireOwnership";
-
         /// <summary>
         /// [ObserversRpc] class.
         /// </summary>
@@ -241,7 +239,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         ///// Writer.WriteBytes method.
         ///// </summary>
         //public const string Writer_WriteUInt8Array_Name = "WriteUInt8Array";
-
         /// <summary>
         /// Writer.GetBuffer() property.
         /// </summary>
@@ -278,32 +275,26 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Constants
         /// PooledWriter.Store method.
         /// </summary>
         public const string PooledWriter_Store_Name = "Store";
-
         /// <summary>
         /// PooledWriter class.
         /// </summary>
         public const string PooledWriter_FullName = $"{Serializing_Namespace}.PooledWriter";
-
         /// <summary>
         /// WriterPool.Retrieve method.
         /// </summary>
         public const string WriterPool_Retrieve_Name = $"{Serializing_Namespace}.WriterPool.Retrieve";
-
         /// <summary>
         /// Writer class.
         /// </summary>
         public const string Writer_FullName = $"{Serializing_Namespace}.Writer";
-
         /// <summary>
         /// Writer.WriteUnsignedPackedWhole method.
         /// </summary>
         public const string Writer_WriteUnsignedPackedWhole_Name = "WriteUnsignedPackedWhole";
-
         /// <summary>
         /// [DefaultWriter] class.
         /// </summary>
         public const string DefaultWriterAttribute_FullName = $"{CodeGenerating_Namespace}.DefaultWriterAttribute";
-
         /// <summary>
         /// [DefaultDeltaWriter] class.
         /// </summary>

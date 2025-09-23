@@ -8,7 +8,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         public static bool GetINamedTypeSymbol(this IAssemblySymbol? assemblySymbol, string fullName, out INamedTypeSymbol? result, bool error = true)
         {
             result = null;
-            if (assemblySymbol == null) return false;
+            if (assemblySymbol == null)
+                return false;
 
             if (assemblySymbol.GetTypeByMetadataName(fullName) is INamedTypeSymbol foundSymbol)
             {
@@ -22,7 +23,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 return false;
             }
         }
-
 
         private static void Log(string txt)
         {

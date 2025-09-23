@@ -1,5 +1,4 @@
 ﻿#pragma warning disable CS8603 // Possible null reference return.
-
 using Microsoft.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis.CSharp;
@@ -52,5 +51,5 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 return null;
         }
     }
-#pragma warning restore CS8603 // Possible null reference return.
+    #pragma warning restore CS8603 // Possible null reference return.
 }

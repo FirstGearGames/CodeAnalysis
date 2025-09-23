@@ -21,17 +21,19 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns the full name of a symbol which includes the namespace.
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         public static string GetSymbolFullName(this ISymbol? symbol, bool metadataName)
         {
-            if (symbol == null) return string.Empty;
-            if (symbol is ITypeSymbol typeSymbol) return typeSymbol.GetTypeSymbolFullName(metadataName);
+            if (symbol == null)
+                return string.Empty;
+            if (symbol is ITypeSymbol typeSymbol)
+                return typeSymbol.GetTypeSymbolFullName(metadataName);
 
             string containingNamespace = symbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
             containingNamespace = containingNamespace.RemoveGlobalAlias();
 
             string fullyQualifiedName = string.Empty;
-            string joiningChar = (metadataName) ? "+" : ".";
+            string joiningChar = metadataName ? "+" : ".";
             for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}{joiningChar}{fullyQualifiedName}";
 
@@ -40,11 +42,10 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             return string.IsNullOrWhiteSpace(containingNamespace) ? fullyQualifiedName : $"{containingNamespace}.{fullyQualifiedName}";
         }
 
-
         /// <summary>
         /// Returns if a symbol has an attribute, and outputs it if so.
         /// </summary>
-        /// <param name="isMetadataName">True if the attributeFullName is a metadataName.</param>
+        /// <param name = "isMetadataName">True if the attributeFullName is a metadataName.</param>
         public static bool HasAttribute(this ISymbol symbol, string attributeFullName, bool isMetadataName, out AttributeData data)
         {
             foreach (AttributeData item in symbol.GetAttributes())
@@ -61,9 +62,9 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             }
 
             //Fall through, not found.
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             data = default;
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+            #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             return false;
         }
 
@@ -72,7 +73,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// </summary>
         public static bool HasAttributes(this ISymbol symbol, string[] attributeFullNames, bool isMetadataName, out List<AttributeData> datas)
         {
-            datas = new List<AttributeData>();
+            datas = new();
 
             foreach (string fullName in attributeFullNames)
             {
@@ -87,10 +88,12 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             foreach (AttributeData attribute in thisSymbol.GetAttributes())
             {
-                if (attribute.AttributeClass is not INamedTypeSymbol namedTypeSymbol) continue;
+                if (attribute.AttributeClass is not INamedTypeSymbol namedTypeSymbol)
+                    continue;
 
                 string symbolFullName = namedTypeSymbol.GetSymbolFullName(isMetadataName);
-                if (symbolFullName == attributeFullName) return true;
+                if (symbolFullName == attributeFullName)
+                    return true;
             }
 
             return false;
@@ -115,7 +118,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             return false;
         }
-
     }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+    #pragma warning restore CS8602 // Dereference of a possibly null reference.
 }

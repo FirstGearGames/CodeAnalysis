@@ -14,14 +14,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
     public sealed class MainGenerator : ISourceGenerator
     {
         public GeneratorSyntaxReceiver GeneratorSyntaxReceiver;
-
         public SerializerMethods SerializerMethods;
-
         public GeneratedDeltaWriter_Builder GeneratedDeltaWriterBuilder;
         public GeneratedDeltaReader_Builder GeneratedDeltaReaderBuilder;
         public GeneratedWriter_Builder GeneratedWriterBuilder;
         public GeneratedReader_Builder GeneratedReaderBuilder;
-
         public RpcWriter_Builder RpcWriterBuilder;
 
         public void Initialize(GeneratorInitializationContext context)
@@ -50,12 +47,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
                 Debugg.Send();
                 return;
             }
-            
-            if (!FindSerializers(context)) return;
-            
-            if (!CreateGeneratedSerializers(context)) return;
 
-            if (!CreateRpcSerializerMethods(context)) return;
+            if (!FindSerializers(context))
+                return;
+
+            if (!CreateGeneratedSerializers(context))
+                return;
+
+            if (!CreateRpcSerializerMethods(context))
+                return;
 
             Log($"Iteration complete for assembly {context.Compilation.AssemblyName}.");
 

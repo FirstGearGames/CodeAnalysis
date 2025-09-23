@@ -18,13 +18,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedReaderPrefix}Read";
         private const string Generated_ReaderParameter_Name = "reader";
         public const string InitializeOnLoad_Method_Name = GeneratedWriter_Builder.InitializeOnLoad_Method_Name;
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private SerializerMethods _serializerMethods => _generator.SerializerMethods;
         private MainGenerator _generator;
         private GeneratorExecutionContext _context;
         private GeneratorSyntaxReceiver _rootSyntaxReceiver;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public void Initialize(GeneratorExecutionContext context, GeneratorSyntaxReceiver rootSyntaxReceiver, MainGenerator generator)
         {
@@ -43,7 +42,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
         public SerializerMethodData CreateSerializerMethod(ITypeSymbol typeSymbol)
         {
-            return new SerializerMethodData(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
+            return new(typeSymbol, $"{FishNetConstants.Reader_Read_Name}<{typeSymbol.GetTypeSymbolFullNameWithNamedArguments(metadataName: false)}>");
         }
 
         /// <summary>
@@ -75,9 +74,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             List<IFieldSymbol> serializableFields = _serializerMethods.GetSerializableFieldSymbols(namedTypeSymbol);
             foreach (IFieldSymbol item in serializableFields)
             {
-                if (item.Type is not INamedTypeSymbol fieldNamedTypeSymbol) continue;
-                
-                CreateEmptySerializerMethod(context, new SerializableType(fieldNamedTypeSymbol));
+                if (item.Type is not INamedTypeSymbol fieldNamedTypeSymbol)
+                    continue;
+
+                CreateEmptySerializerMethod(context, new(fieldNamedTypeSymbol));
             }
 
             string header = CreateSignature(out string methodName);
@@ -107,7 +107,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                 //Skip built in serializers.
                 if (!item.Value.IsValid() || item.Value is not GeneratedSerializerMethod gsm)
                     continue;
-                
+
                 const int bodyIndent = 3;
                 StringBuilder sb = new();
 
@@ -130,7 +130,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
                     //     sb.AppendLine(bodyIndent, GeneralBuilder.GetMissingSerializerComment(deltaSerializer: false, item.Value.TypeSymbol, fieldSymbol));
                     // //Serializer found.
                     // else
-                        sb.AppendLine(bodyIndent, GetReadCall(sm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", closeCall: true));
+                    sb.AppendLine(bodyIndent, GetReadCall(sm, fieldSymbol, Generated_ReaderParameter_Name, $"{resultVariableName}.{fieldSymbol.Name}", closeCall: true));
                 }
 
                 sb.Append(bodyIndent, $"return {resultVariableName};");
@@ -157,11 +157,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 
             foreach (KeyValuePair<string, SerializerMethodData> item in _serializerMethods.GetReadMethods())
             {
-                if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol) continue;
-                if (!namedTypeSymbol.HasPublicAccessibility()) continue;
+                if (item.Value.TypeSymbol is not INamedTypeSymbol namedTypeSymbol)
+                    continue;
+                if (!namedTypeSymbol.HasPublicAccessibility())
+                    continue;
 
-                if (item.Value is not GeneratedSerializerMethod dsm) continue;
-                
+                if (item.Value is not GeneratedSerializerMethod dsm)
+                    continue;
+
                 sb.AppendLine(dsm.MethodContent.ToString(2));
 
                 //Add return if body already contains value. This is just to make neater formatting.

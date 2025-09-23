@@ -22,18 +22,22 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
         public void AddStructSerializables(object context, StructDeclarationSyntax structDeclarationSyntax)
         {
-            if (context.GetSemanticModel() is not SemanticModel sm) return;
-            
-            if (sm.GetDeclaredSymbol(structDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol) return;
+            if (context.GetSemanticModel() is not SemanticModel sm)
+                return;
+
+            if (sm.GetDeclaredSymbol(structDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol)
+                return;
 
             AddNamedTypeSymbolSerializablesWithIdentifier(context, namedTypeSymbol, null);
         }
 
         public void AddClassSerializables(object context, ClassDeclarationSyntax classDeclarationSyntax)
         {
-            if (context.GetSemanticModel() is not SemanticModel sm) return;
+            if (context.GetSemanticModel() is not SemanticModel sm)
+                return;
 
-            if (sm.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol) return;
+            if (sm.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol)
+                return;
 
             //Find syncTypes. This only runs if is a NetworkBehaviour.
             CheckSyncTypeSerializables(context, namedTypeSymbol, sm);
@@ -54,10 +58,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             foreach (IFieldSymbol fieldSymbol in fieldSymbols)
             {
                 //This is returning false (not synctype) on synctypes.
-                if (!fieldSymbol.IsSyncType()) continue;
+                if (!fieldSymbol.IsSyncType())
+                    continue;
 
                 //This should always pass given this is checked within 'IsSyncType'.
-                if (fieldSymbol.Type is not INamedTypeSymbol fieldNamedTypeSymbol) continue;
+                if (fieldSymbol.Type is not INamedTypeSymbol fieldNamedTypeSymbol)
+                    continue;
 
                 //Get SyncType.
                 SyncTypeType stt = fieldNamedTypeSymbol.GetSyncType();
@@ -96,17 +102,21 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             void CheckCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol, IFieldSymbol fieldSymbol)
             {
                 IMethodSymbol methodSymbol = fieldNamedTypeSymbol.GetMethod(FishNetConstants.ICustomSync_GetSerializedType_Name, metadataName: false);
-                if (methodSymbol == null) return;
+                if (methodSymbol == null)
+                    return;
 
                 //Default return type should be System.Object, exit if not the case.
-                if (methodSymbol.ReturnType.GetTypeSymbolFullName(metadataName: false) != NativeConstants.Object_FullName) return;
+                if (methodSymbol.ReturnType.GetTypeSymbolFullName(metadataName: false) != NativeConstants.Object_FullName)
+                    return;
 
                 List<ExpressionSyntax> returnExpressions = methodSymbol.GetReturnedExpressionSyntaxes();
                 //No entries, or first entry is not named.
-                if (returnExpressions.Count == 0 || returnExpressions[0] is not TypeOfExpressionSyntax typeOfExpressionSyntax) return;
+                if (returnExpressions.Count == 0 || returnExpressions[0] is not TypeOfExpressionSyntax typeOfExpressionSyntax)
+                    return;
 
                 ITypeSymbol returnedTypeSymbol = typeOfExpressionSyntax.GetTypeIdentifier(semanticModel);
-                if (returnedTypeSymbol == null || returnedTypeSymbol is not INamedTypeSymbol returnedNamedTypeSymbol) return;
+                if (returnedTypeSymbol == null || returnedTypeSymbol is not INamedTypeSymbol returnedNamedTypeSymbol)
+                    return;
                 /* FullNames added this iteration.
                  * This is used to prevent endless loops. */
                 HashSet<string> addedFullNames = new();
@@ -124,7 +134,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
             ISymbol? symbol = sm?.GetDeclaredSymbol(methodDeclarationSyntax);
 
-            if (symbol is not IMethodSymbol methodSymbol) return;
+            if (symbol is not IMethodSymbol methodSymbol)
+                return;
 
             List<IParameterSymbol> serializables = GetRpcSerializableParameters(context, methodSymbol);
 
@@ -143,7 +154,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         {
             List<IParameterSymbol> serializableResults = new();
 
-            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results)) return serializableResults;
+            if (!methodSymbol.HasRpcAttributes(out List<RpcAttributeData> results))
+                return serializableResults;
 
             List<IParameterSymbol> parameters = methodSymbol.Parameters.ToList();
 
@@ -173,7 +185,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             //Removes networkConnection if the first parameter.
             void RemoveLeadingNetworkConnection()
             {
-                if (parametersCount == 0) return;
+                if (parametersCount == 0)
+                    return;
                 //Remove channel from serializable.
                 if (parameters[0].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
                     parameters.RemoveAt(--parametersCount);
@@ -182,7 +195,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             //Removes networkConnection if the last parameter.
             void RemoveTrailingNetworkConnection()
             {
-                if (parametersCount == 0) return;
+                if (parametersCount == 0)
+                    return;
                 //Remove channel from serializable.
                 if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
                     parameters.RemoveAt(--parametersCount);
@@ -191,7 +205,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             //Removes channel if the last parameter.
             void RemoveTrailingChannel()
             {
-                if (parametersCount == 0) return;
+                if (parametersCount == 0)
+                    return;
                 //Remove channel from serializable.
                 if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
                     parameters.RemoveAt(--parametersCount);
@@ -229,12 +244,15 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             const bool isMetadataName = false;
 
             //Has exclude serialization attribute.
-            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName)) return false;
+            if (namedTypeSymbol.HasAttribute(FishNetConstants.ExcludeSerializationAttribute_FullName, isMetadataName))
+                return false;
 
             string fullName = namedTypeSymbol.GetTypeSymbolFullName(isMetadataName);
             //Few other checks for types we want to ignore.
-            if (fullName == typeof(System.ValueType).FullName) return false;
-            if (fullName == typeof(System.Object).FullName) return false;
+            if (fullName == typeof(ValueType).FullName)
+                return false;
+            if (fullName == typeof(Object).FullName)
+                return false;
 
             //Check if already added.
             foreach (SerializableType st in TypesNeedingSerializers)
@@ -242,8 +260,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                 if (st.NamedTypeSymbol == namedTypeSymbol)
                     return false;
             }
-            
-            if (!namedTypeSymbol.HasPublicAccessibility())// && !namedTypeSymbol.ContainingType.HasPartialModifier())
+
+            if (!namedTypeSymbol.HasPublicAccessibility()) // && !namedTypeSymbol.ContainingType.HasPartialModifier())
             {
                 if (context is SyntaxNodeAnalysisContext analysisContext)
                     OnIsNotSerializableAccessible?.Invoke(analysisContext, source, string.Empty);
@@ -251,7 +269,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                 return false;
             }
 
-            if (TypesNeedingSerializers.Add(new SerializableType(namedTypeSymbol)))
+            if (TypesNeedingSerializers.Add(new(namedTypeSymbol)))
                 Log($"Added {namedTypeSymbol.GetTypeSymbolFullName(isMetadataName)} to types needing serializers.");
 
             return true;
@@ -260,7 +278,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// <summary>
         /// Iterates up the base types of a named symbol and adds them to serializables.
         /// </summary>
-        /// <param name="foundNames">A collection reference to store already found serializables during the iteration.</param>
+        /// <param name = "foundNames">A collection reference to store already found serializables during the iteration.</param>
         private void AddSelfAndBaseTypeSerializables(object context, INamedTypeSymbol namedTypeSymbol, HashSet<string> foundNames, ISymbol source)
         {
             while (true)

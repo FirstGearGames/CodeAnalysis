@@ -14,13 +14,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
     internal sealed class SerializableScopeAnalyzer : DiagnosticAnalyzer
     {
         public static readonly DiagnosticDescriptor Descriptor1 = new(DiagnosticIds.FN0001, "Invalid scope", "{0}", DiagnosticCategories.Scope, DiagnosticSeverity.Error, true, customTags: WellKnownDiagnosticTags.NotConfigurable);
-
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
-
         public SerializableFinder SerializableFinder;
-
         private Dictionary<DiagnosticDescriptor, string> _defaultMessages;
-        
+
         public override void Initialize(AnalysisContext context)
         {
             if (_defaultMessages == null)
@@ -28,7 +25,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
                 _defaultMessages = new();
                 _defaultMessages.Add(Descriptor1, "Network serializable types must be declared public or have their containing type as partial. If you do not wish to serialize the type use the ExcludeSerialization attribute on the member or type.");
             }
-            
+
             if (SerializableFinder == null)
                 SerializableFinder = new();
 

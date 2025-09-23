@@ -64,7 +64,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             MethodDeclarationSyntax? methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
 
-            if (methodSyntax == null) return results;
+            if (methodSyntax == null)
+                return results;
 
             //Uses expression body, such as MethodName() => something;
             if (methodSyntax.ExpressionBody != null)
@@ -77,7 +78,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
              * EG: MethodName() { return something; } */
             else
             {
-                if (methodSyntax.Body == null) return results;
+                if (methodSyntax.Body == null)
+                    return results;
 
                 //Find all return statements.
                 IEnumerable<ReturnStatementSyntax> returnStatements = methodSyntax.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
@@ -91,6 +93,5 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             }
             return results;
         }
-
     }
 }

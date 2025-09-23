@@ -17,7 +17,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Receivers
 
             if (SerializableFinder == null)
                 SerializableFinder = new();
-            
+
             if (RpcFinder == null)
                 RpcFinder = new(this);
 

@@ -12,13 +12,13 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
         {
             // Collect pertinent syntax trees from these attributes
-            HashSet<SyntaxTree> acceptedTrees = new HashSet<SyntaxTree>();
+            HashSet<SyntaxTree> acceptedTrees = new();
             foreach (AttributeSyntax attribute in attributes.Attributes)
                 acceptedTrees.Add(attribute.SyntaxTree);
 
             ISymbol parentSymbol = attributes.Parent!.GetDeclaredSymbol(compilation)!;
             ImmutableArray<AttributeData> parentAttributes = parentSymbol.GetAttributes();
-            List<AttributeData> ret = new List<AttributeData>();
+            List<AttributeData> ret = new();
             foreach (AttributeData? attribute in parentAttributes)
             {
                 if (acceptedTrees.Contains(attribute.ApplicationSyntaxReference!.SyntaxTree))
@@ -33,7 +33,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             ImmutableArray<TypedConstant> constructorArguments = thisAttributeData.ConstructorArguments;
 
-            if (argumentIndex > -1 && argumentIndex < constructorArguments.Length) return (T)constructorArguments[argumentIndex].Value;
+            if (argumentIndex > -1 && argumentIndex < constructorArguments.Length)
+                return (T)constructorArguments[argumentIndex].Value;
 
             return default;
         }
@@ -43,20 +44,23 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments = thisAttributeData.NamedArguments;
 
-            if (argumentIndex > -1 && argumentIndex < namedArguments.Length) return (T)namedArguments[argumentIndex].Value.Value;
+            if (argumentIndex > -1 && argumentIndex < namedArguments.Length)
+                return (T)namedArguments[argumentIndex].Value.Value;
 
             return default;
         }
-        
+
         public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
-        
+
         public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T defaultValue)
         {
             foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
-                if (namedArgument.Key == argumentName) return (T)namedArgument.Value.Value;
+                if (namedArgument.Key == argumentName)
+                    return (T)namedArgument.Value.Value;
 
-            return defaultValue;;
+            return defaultValue;
+            ;
         }
     }
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+    #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 }

@@ -6,8 +6,10 @@
 
         public static string RemoveGlobalAlias(this string value)
         {
-            if (value.StartsWith("global::")) value = value.Substring(8);
-            else if (value.StartsWith("<global namespace>")) value = value.Substring(18);
+            if (value.StartsWith("global::"))
+                value = value.Substring(8);
+            else if (value.StartsWith("<global namespace>"))
+                value = value.Substring(18);
             return value;
         }
     }

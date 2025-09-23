@@ -18,7 +18,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// Full meta name of the type.
         /// </summary>
         public string FullMetadataName;
-        
+
         public SerializableType(INamedTypeSymbol namedTypeSymbol)
         {
             NamedTypeSymbol = namedTypeSymbol;

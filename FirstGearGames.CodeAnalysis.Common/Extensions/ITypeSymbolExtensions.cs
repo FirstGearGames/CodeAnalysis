@@ -18,7 +18,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns arguments as generic (T0, T1).
         /// </summary>
-        ForceGeneric,
+        ForceGeneric
     }
 
     public static class ITypeSymbolExtensions
@@ -26,9 +26,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         private static StringBuilder _stringBuilder = new();
 
         /// <summary>
-        ///
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolFullName(this ITypeSymbol typeSymbol, bool metadataName)
         {
@@ -43,7 +42,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             containingNamespace = containingNamespace.RemoveGlobalAlias();
 
             string fullyQualifiedName = string.Empty;
-            string joiningChar = (metadataName) ? "+" : ".";
+            string joiningChar = metadataName ? "+" : ".";
             for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}{joiningChar}{fullyQualifiedName}";
 
@@ -56,21 +55,21 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns full name with generic arguments as named types (System.Collections.Generic.List<System.String>).
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolFullNameWithNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName, GenericArgumentType.PreferNamed);
 
         /// <summary>
         /// Returns full name with generic arguments as generic types (System.Collections.Generic.List<T0>).
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolFullNameWithGenericArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolFullNameWithArguments(metadataName, GenericArgumentType.ForceGeneric);
 
         /// <summary>
         /// Returns full name with generic arguments as named types (System.Collections.Generic.List<System.String>).
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolFullNameWithArguments(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType argumentType)
         {
@@ -97,18 +96,18 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns arguments as named types (eg: <int, bool>).
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolNamedArguments(this ITypeSymbol typeSymbol, bool metadataName) => typeSymbol.GetTypeSymbolArguments(metadataName, GenericArgumentType.PreferNamed);
 
         /// <summary>
         /// Returns full name with generic arguments as named types (System.Collections.Generic.List<System.String>).
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolArguments(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType argumentType)
         {
-            string genericArguments = (typeSymbol is IArrayTypeSymbol) ? "[]" : typeSymbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments();
+            string genericArguments = typeSymbol is IArrayTypeSymbol ? "[]" : typeSymbol.GetTypeSymbolGenericArgumentsString(argumentType).GetCombinedGenericArguments();
 
             return $"{genericArguments}";
         }
@@ -116,7 +115,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns type as a generic array, if an array (T0[], T0[][]). If not an array empty is returned.
         /// </summary>
-        /// <param name="metadataName">True to return name as metadata.</param>
+        /// <param name = "metadataName">True to return name as metadata.</param>
         /// <returns></returns>
         public static string GetTypeSymbolNameAsArray(this ITypeSymbol typeSymbol, bool metadataName, GenericArgumentType genericArgumentType)
         {
@@ -125,7 +124,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             _stringBuilder.Clear();
 
-            string symbolName = (genericArgumentType == GenericArgumentType.ForceGeneric) ? NativeConstants.FirstGenericParameter_Name : arrayTypeSymbol.ElementType.GetTypeSymbolFullName(metadataName);
+            string symbolName = genericArgumentType == GenericArgumentType.ForceGeneric ? NativeConstants.FirstGenericParameter_Name : arrayTypeSymbol.ElementType.GetTypeSymbolFullName(metadataName);
             _stringBuilder.Append($"{symbolName}[");
 
             AppendMultidimensionalAndJagged(arrayTypeSymbol);
@@ -156,7 +155,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             List<string> results = new();
             int typeParameterCount = 0;
-            bool forceGeneric = (argumentType == GenericArgumentType.ForceGeneric);
+            bool forceGeneric = argumentType == GenericArgumentType.ForceGeneric;
 
             if (symbol is INamedTypeSymbol { IsGenericType: true } namedTypeSymbol)
             {
@@ -182,7 +181,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns true if all generic arguments are named.
         /// </summary>
-        /// <param name="symbol"></param>
+        /// <param name = "symbol"></param>
         /// <returns></returns>
         public static bool AreGenericArgumentsNamed(this ITypeSymbol symbol)
         {
@@ -196,7 +195,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             }
             else if (symbol is IArrayTypeSymbol arrayTypeSymbol)
             {
-                return (arrayTypeSymbol.ElementType.TypeKind is not TypeKind.TypeParameter);
+                return arrayTypeSymbol.ElementType.TypeKind is not TypeKind.TypeParameter;
             }
 
             //No generic arguemnts; return true.
@@ -245,5 +244,5 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 Debugg.Log($"   [ITypeSymbolExtensions] {txt}");
         }
     }
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+    #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 }

@@ -11,7 +11,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
     {
         public static bool IsValid(this RpcMethodDatas? md)
         {
-            if (md == null) return false;
+            if (md == null)
+                return false;
             return !string.IsNullOrWhiteSpace(md.MethodName);
         }
     }
@@ -146,7 +147,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// </summary>
         public RpcMethodContent MethodContent;
 
-        /// <param name="rpcAttributeData">RpcAttributeData to use for this RpcMethod. When a Rpc has multiple attributes a RpcMethodData should be made for each attribute.</param>
+        /// <param name = "rpcAttributeData">RpcAttributeData to use for this RpcMethod. When a Rpc has multiple attributes a RpcMethodData should be made for each attribute.</param>
         public RpcMethodDatas(IMethodSymbol methodSymbol, string defaultChannelValue, List<IParameterSymbol> serializableParameters, RpcAttributeData rpcAttributeData, RpcMethodContent methodContent = null)
         {
             RpcAttributeData = rpcAttributeData;

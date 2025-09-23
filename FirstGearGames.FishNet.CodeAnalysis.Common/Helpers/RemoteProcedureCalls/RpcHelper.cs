@@ -25,12 +25,12 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
         /// Sender connection parameter.
         /// </summary>
         /// <remarks>This is used by ServerRpc.</remarks>
-        SenderConnection = (1 << 0),
+        SenderConnection = 1 << 0,
         /// <summary>
         /// Runtime channel.
         /// </summary>
         /// <remarks>This is used by all RPCs.</remarks>
-        Channel = (1 << 1),
+        Channel = 1 << 1
     }
 
     public enum RPCType
@@ -110,31 +110,33 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
             //Removes networkConnection if the last parameter.
             void RemoveTrailingNetworkConnection()
             {
-                if (parametersCount == 0) return;
+                if (parametersCount == 0)
+                    return;
                 //Remove channel from serializable.
                 if (parameters[parametersCount - 1].Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.NetworkConnection_FullName)
                     parameters.RemoveAt(--parametersCount);
             }
 
-            IParameterSymbol? lastParameter = (parametersCount > 0) ? parameters[parametersCount - 1] : null;
-            if (lastParameter?.Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName) 
+            IParameterSymbol? lastParameter = parametersCount > 0 ? parameters[parametersCount - 1] : null;
+            if (lastParameter?.Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
             {
                 //Not optional, default is reliable.
-                if (!lastParameter.IsOptional) return FishNetConstants.Default_Rpc_Channel.GetEnumName();
-                
+                if (!lastParameter.IsOptional)
+                    return FishNetConstants.Default_Rpc_Channel.GetEnumName();
+
                 //Find optional value.
                 object? value = lastParameter.ExplicitDefaultValue;
                 //Should never be null in this case; check for safety.
-                if (value?.GetType() != Enum.GetUnderlyingType(typeof(Channel))) return FishNetConstants.Default_Rpc_Channel.GetEnumName();
+                if (value?.GetType() != Enum.GetUnderlyingType(typeof(Channel)))
+                    return FishNetConstants.Default_Rpc_Channel.GetEnumName();
 
-                return ChannelExtensions.GetEnumName(((byte)value));
+                return ChannelExtensions.GetEnumName((byte)value);
             }
 
             //Fall through, no parameters or last is not channel.
             return FishNetConstants.Default_Rpc_Channel.GetEnumName();
         }
 
-        
         public static RPCType GetRpcType(this string attributeFullName)
         {
             if (attributeFullName == FishNetConstants.TargetRpcAttribute_FullName)
@@ -153,22 +155,21 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
         public static bool HasRpcAttributes(this IMethodSymbol methodSymbol, out List<RpcAttributeData> results)
         {
             const bool isMetadataName = false;
-            results = new List<RpcAttributeData>();
-            
+            results = new();
+
             /* Do not use else ifs. A method can have multiple RPC attributes
              * so we need to check for them all. */
-            
+
             if (methodSymbol.HasAttribute(FishNetConstants.TargetRpcAttribute_FullName, isMetadataName, out AttributeData a0))
-                results.Add(new RpcAttributeData(a0, RPCType.Target));
-            
+                results.Add(new(a0, RPCType.Target));
+
             if (methodSymbol.HasAttribute(FishNetConstants.ServerRpcAttribute_FullName, isMetadataName, out AttributeData a1))
-                results.Add(new RpcAttributeData(a1, RPCType.Server));
+                results.Add(new(a1, RPCType.Server));
 
             if (methodSymbol.HasAttribute(FishNetConstants.ObserversRpcAttribute_FullName, isMetadataName, out AttributeData a2))
-                results.Add(new RpcAttributeData(a2, RPCType.Observers));
+                results.Add(new(a2, RPCType.Observers));
 
-            return (results.Count > 0);
+            return results.Count > 0;
         }
-
     }
 }

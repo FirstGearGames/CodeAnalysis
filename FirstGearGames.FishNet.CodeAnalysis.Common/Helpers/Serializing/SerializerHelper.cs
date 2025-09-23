@@ -21,7 +21,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         public static bool ImplementsIBroadcastInterface(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
-            if (namedTypeSymbol == null) return false;
+            if (namedTypeSymbol == null)
+                return false;
 
             return namedTypeSymbol.ImplementsInterface(FishNetConstants.IBroadcasts_FullName);
         }
@@ -33,7 +34,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         public static bool ImplementsPredictionInterface(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
-            if (namedTypeSymbol == null) return false;
+            if (namedTypeSymbol == null)
+                return false;
 
             return namedTypeSymbol.ImplementsInterface(FishNetConstants.IReplicateInterface_FullName) || namedTypeSymbol.ImplementsInterface(FishNetConstants.IReconcileInterface_FullName);
         }
@@ -60,7 +62,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// </summary>
         public static bool HasSerializableIdentifier(this ISymbol symbol)
         {
-            if (symbol == null) return false;
+            if (symbol == null)
+                return false;
 
             return symbol switch
             {
@@ -73,7 +76,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 
             bool HasSerializableIdentifierForNamedTypeSymbol(INamedTypeSymbol lNamedTypeSymbol)
             {
-                if (lNamedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName)) return false;
+                if (lNamedTypeSymbol.InheritsClass(FishNetConstants.NetworkBehaviour_FullName))
+                    return false;
 
                 return lNamedTypeSymbol.ImplementsIBroadcastInterface() || lNamedTypeSymbol.ImplementsPredictionInterface() || lNamedTypeSymbol.HasGenerateSerializerAttribute();
             }

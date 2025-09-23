@@ -13,14 +13,13 @@ namespace FishNetTypes.Transporting
             Channel channel = (Channel)channelValue;
             return channel.GetEnumName();
         }
-        
+
         /// <summary>
         /// Returns a Channel enum value while containing the enum name (eg: Channel.Reliable).
         /// </summary>
         public static string GetEnumName(this Channel channel) => $"{FishNetConstants.Channel_FullName}.{channel.ToString()}";
     }
 
-    
     /// <summary>
     /// Channel which data is sent or received.
     /// </summary>
@@ -35,6 +34,4 @@ namespace FishNetTypes.Transporting
         /// </summary>
         Unreliable = 1
     }
-
-
 }
