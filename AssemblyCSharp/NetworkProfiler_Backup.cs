@@ -68,19 +68,19 @@ namespace FishNet.Editing
         /// <summary>
         /// Name of this window.
         /// </summary>
-        private const string WINDOW_NAME = "FishNet Network Profiler";
+        private static readonly string WINDOW_NAME = "FishNet Network Profiler";
         /// <summary>
         /// EditorPrefs key to save last window size.
         /// </summary>
-        private const string WINDOW_SIZE_PREFIX_PREF_NAME = "FishNet_NetworkProfilerWindowSize_";
+        private static readonly string WINDOW_SIZE_PREFIX_PREF_NAME = "FishNet_NetworkProfilerWindowSize_";
         /// <summary>
         /// EditorPrefs float X name.
         /// </summary>
-        private const string FLOAT_X_PREF_NAME = "X";
+        private static readonly string FLOAT_X_PREF_NAME = "X";
         /// <summary>
         /// EditorPrefs float Y name.
         /// </summary>
-        private const string FLOAT_Y_PREF_NAME = "Y";
+        private static readonly string FLOAT_Y_PREF_NAME = "Y";
         /// <summary>
         /// Maximum size the window can be.
         /// </summary>

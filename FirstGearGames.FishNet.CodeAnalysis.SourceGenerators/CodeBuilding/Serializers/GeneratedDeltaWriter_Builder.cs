@@ -14,11 +14,11 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
     public class GeneratedDeltaWriter_Builder
     {
-        public const string InitializeOnLoad_Method_Name = GeneratedWriter_Builder.InitializeOnLoad_Method_Name;
-        public const string Generated_DeltaSerializerOption_Name = "options";
-        private const string Generated_Class_Name = "Generated_DeltaWriters";
-        private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}WriteDelta";
-        private const string Generated_WriterParameter_Name = GeneratedWriter_Builder.Generated_WriterParameter_Name;
+        public static readonly string InitializeOnLoad_Method_Name = GeneratedWriter_Builder.InitializeOnLoad_Method_Name;
+        public static readonly string Generated_DeltaSerializerOption_Name = "options";
+        private static readonly string Generated_Class_Name = "Generated_DeltaWriters";
+        private static readonly string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}WriteDelta";
+        private static readonly string Generated_WriterParameter_Name = GeneratedWriter_Builder.Generated_WriterParameter_Name;
         private static readonly StringBuilder _stringBuilder = new();
         #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private SerializerMethods _serializerMethods => _generator.SerializerMethods;

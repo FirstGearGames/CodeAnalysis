@@ -13,10 +13,10 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
     public class GeneratedWriter_Builder
     {
-        public const string Generated_WriterParameter_Name = "writer";
-        public const string InitializeOnLoad_Method_Name = "InitializeSerializers";
-        private const string Generated_Class_Name = "Generated_Writers";
-        private const string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}Write";
+        public static readonly string Generated_WriterParameter_Name = "writer";
+        public static readonly string InitializeOnLoad_Method_Name = "InitializeSerializers";
+        private static readonly string Generated_Class_Name = "Generated_Writers";
+        private static readonly string Generated_Method_Prefix = $"{FishNetConstants.GeneratedWriterPrefix}Write";
         private static StringBuilder _stringBuilder = new();
         #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private SerializerMethods _serializerMethods => _generator.SerializerMethods;

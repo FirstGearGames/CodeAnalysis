@@ -19,7 +19,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.RemoteProcedureCalls
 {
     public class RpcWriter_Builder
     {
-        public const string GENERATED_PAREMETER_PREFIX = "p___";
+        public static readonly string GENERATED_PAREMETER_PREFIX = "p___";
         private List<string> _stringList = new();
         private MainGenerator _generator;
         #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

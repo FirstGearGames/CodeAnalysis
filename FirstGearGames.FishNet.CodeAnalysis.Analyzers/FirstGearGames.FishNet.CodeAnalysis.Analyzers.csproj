@@ -2,9 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>9</LangVersion>
         <RootNamespace>FirstGearGames.FishNet.CodeAnalysis.Analyzers</RootNamespace>
         <AssemblyName>FirstGearGames.FishNet.CodeAnalysis.Analyzers</AssemblyName>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
 	<ItemGroup>
