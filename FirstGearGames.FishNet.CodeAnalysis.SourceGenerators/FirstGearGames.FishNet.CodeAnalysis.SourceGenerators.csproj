@@ -27,6 +27,7 @@
 		<NoWarn>$(NoWarn);CS8618</NoWarn>
 		<NoWarn>$(NoWarn);CS8625</NoWarn>
 		<NoWarn>$(NoWarn);CS0067</NoWarn>
+		<NoWarn>$(NoWarn);RS0016</NoWarn>
 	</PropertyGroup>
 	
 </Project>

@@ -62,9 +62,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             }
 
             //Fall through, not found.
-            #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            data = default;
-            #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+            data = null;
+
             return false;
         }
 
@@ -78,7 +77,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             foreach (string fullName in attributeFullNames)
             {
                 if (symbol.HasAttribute(fullName, isMetadataName, out AttributeData d))
-                    datas.Add(d!);
+                    datas.Add(d);
             }
 
             return datas.Count > 0;
@@ -88,7 +87,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             foreach (AttributeData attribute in thisSymbol.GetAttributes())
             {
-                if (attribute.AttributeClass is not INamedTypeSymbol namedTypeSymbol)
+                if (attribute.AttributeClass is not { } namedTypeSymbol)
                     continue;
 
                 string symbolFullName = namedTypeSymbol.GetSymbolFullName(isMetadataName);
