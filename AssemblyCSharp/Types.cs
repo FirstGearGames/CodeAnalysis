@@ -46,7 +46,7 @@
 //         /// <returns></returns>
 //         public BidirectionalNetworkTraffic CloneUsingCache()
 //         {
-//             if (InboundTraffic == null) 
+//             if (InboundTraffic is null) 
 //             {
 //                 NetworkManagerExtensions.LogError($"One or more NetworkTraffic values is null. {nameof(BidirectionalNetworkTraffic)} cannot be cloned.");
 //                 return null;
@@ -271,7 +271,7 @@
 //             ServerTraffic = serverTraffic.CloneUsingCache();
 //             ClientTraffic = clientTraffic.CloneUsingCache();
 //             
-//             return ServerTraffic != null && ClientTraffic != null;
+//             return ServerTraffic is not null && ClientTraffic is not null;
 //         }
 //         
 //         /// <summary>

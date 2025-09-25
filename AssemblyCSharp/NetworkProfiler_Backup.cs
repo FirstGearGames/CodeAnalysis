@@ -113,7 +113,7 @@ namespace FishNet.Editing
         /// </summary>
         private void InitializeIfNeeded(NetworkManager manager)
         {
-            if (_networkTrafficStatistics != null)
+            if (_networkTrafficStatistics is not null)
                 return;
 
             if (manager.StatisticsManager.TryGetNetworkTrafficStatistics(out _networkTrafficStatistics))
@@ -133,7 +133,7 @@ namespace FishNet.Editing
 
             SaveWindowSize(force: true);
 
-            if (_networkTrafficStatistics != null)
+            if (_networkTrafficStatistics is not null)
                 _networkTrafficStatistics.OnNetworkTraffic -= NetworkTrafficStatistics_OnNetworkTraffic;
         }
         #endregion
@@ -174,7 +174,7 @@ namespace FishNet.Editing
             {
                 void UpdateAgainstLargest(ref ProfiledTickData lCurrentLargest)
                 {
-                    if (lCurrentLargest == null || tickData.ClientTraffic.
+                    if (lCurrentLargest is null || tickData.ClientTraffic.
                 }
             }
         }
@@ -523,7 +523,7 @@ namespace FishNet.Editing
                                     EditorGUI.indentLevel--;
                                     GUILayout.BeginHorizontal();
                                     bool newExpanded = EditorGUILayout.Foldout(isExpanded, $"{FormatBytes(rpc.data.length)} bytes", true);
-                                    if (rpc.context != null)
+                                    if (rpc.context is not null)
                                         EditorGUILayout.ObjectField(rpc.context, typeof(UnityEngine.Object), true);
                                     GUILayout.EndHorizontal();
                                     EditorGUI.indentLevel++;
@@ -609,7 +609,7 @@ namespace FishNet.Editing
                                     EditorGUI.indentLevel--;
                                     GUILayout.BeginHorizontal();
                                     bool newExpanded = EditorGUILayout.Foldout(isExpanded, $"{FormatBytes(rpc.data.length)} bytes", true);
-                                    if (rpc.context != null)
+                                    if (rpc.context is not null)
                                         EditorGUILayout.ObjectField(rpc.context, typeof(UnityEngine.Object), true);
                                     GUILayout.EndHorizontal();
                                     EditorGUI.indentLevel++;
@@ -913,7 +913,7 @@ namespace FishNet.Editing
         // {
         //     MethodInfo method = type.GetMethod(methodName);
         //
-        //     if (method == null)
+        //     if (method is null)
         //         return $"Failed to find method {methodName} in type {type.Name}";
         //
         //     ParameterInfo[] parameters = method.GetParameters();

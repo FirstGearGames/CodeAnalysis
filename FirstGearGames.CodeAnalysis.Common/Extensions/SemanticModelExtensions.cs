@@ -24,15 +24,15 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns IFieldSymbol from a FieldDelarationSynthax.
         /// </summary>
-        public static IFieldSymbol? GetFieldSymbol(this SemanticModel semanticModel, FieldDeclarationSyntax fieldDeclaration)
+        public static IFieldSymbol GetFieldSymbol(this SemanticModel semanticModel, FieldDeclarationSyntax fieldDeclaration)
         {
             if (fieldDeclaration.Declaration.Variables.Count == 0)
                 return null;
 
             VariableDeclaratorSyntax variableDeclaratorSyntax = fieldDeclaration.Declaration.Variables[0];
-            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(semanticModel, variableDeclaratorSyntax);
+            ISymbol symbol = ModelExtensions.GetDeclaredSymbol(semanticModel, variableDeclaratorSyntax);
 
-            if (symbol != null && symbol is IFieldSymbol fieldSymbol)
+            if (symbol is not null && symbol is IFieldSymbol fieldSymbol)
                 return fieldSymbol;
 
             return null;

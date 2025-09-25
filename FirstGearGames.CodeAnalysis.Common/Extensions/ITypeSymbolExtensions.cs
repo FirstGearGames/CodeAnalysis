@@ -43,7 +43,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             string fullyQualifiedName = string.Empty;
             string joiningChar = metadataName ? "+" : ".";
-            for (INamedTypeSymbol? currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
+            for (INamedTypeSymbol currentType = typeSymbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}{joiningChar}{fullyQualifiedName}";
 
             //fullyQualifiedName = $"{fullyQualifiedName}{typeSymbol.Name}{arraySuffix}";
@@ -225,12 +225,12 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns a string as readable context (UserStruct.SomeField).
         /// </summary>
-        public static string ToReadable(this ITypeSymbol typeSymbol, IFieldSymbol? fieldSymbol)
+        public static string ToReadable(this ITypeSymbol typeSymbol, IFieldSymbol fieldSymbol)
         {
             bool metadataName = false;
             _stringBuilder.Clear();
             _stringBuilder.Append(typeSymbol.GetTypeSymbolFullName(metadataName));
-            if (fieldSymbol != null)
+            if (fieldSymbol is not null)
                 _stringBuilder.Append($".{fieldSymbol.GetSymbolFullName(metadataName)}");
 
             return _stringBuilder.ToString();

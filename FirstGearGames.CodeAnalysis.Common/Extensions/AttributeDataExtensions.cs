@@ -19,7 +19,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             ISymbol parentSymbol = attributes.Parent!.GetDeclaredSymbol(compilation)!;
             ImmutableArray<AttributeData> parentAttributes = parentSymbol.GetAttributes();
             List<AttributeData> ret = new();
-            foreach (AttributeData? attribute in parentAttributes)
+            foreach (AttributeData attribute in parentAttributes)
             {
                 if (acceptedTrees.Contains(attribute.ApplicationSyntaxReference!.SyntaxTree))
                     ret.Add(attribute);
@@ -29,7 +29,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T? GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+        public static T GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<TypedConstant> constructorArguments = thisAttributeData.ConstructorArguments;
 
@@ -40,7 +40,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+        public static T GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments = thisAttributeData.NamedArguments;
 
@@ -50,9 +50,9 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             return default;
         }
 
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
+        public static T GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
 
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T defaultValue)
+        public static T GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T defaultValue)
         {
             foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
                 if (namedArgument.Key == argumentName)

@@ -21,7 +21,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         public static bool ImplementsIBroadcastInterface(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
-            if (namedTypeSymbol == null)
+            if (namedTypeSymbol is null)
                 return false;
 
             return namedTypeSymbol.ImplementsInterface(FishNetConstants.IBroadcasts_FullName);
@@ -34,7 +34,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         public static bool ImplementsPredictionInterface(this INamedTypeSymbol symbol)
         {
             INamedTypeSymbol namedTypeSymbol = symbol.GetUserDefinedNamedTypeSymbol();
-            if (namedTypeSymbol == null)
+            if (namedTypeSymbol is null)
                 return false;
 
             return namedTypeSymbol.ImplementsInterface(FishNetConstants.IReplicateInterface_FullName) || namedTypeSymbol.ImplementsInterface(FishNetConstants.IReconcileInterface_FullName);
@@ -62,7 +62,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// </summary>
         public static bool HasSerializableIdentifier(this ISymbol symbol)
         {
-            if (symbol == null)
+            if (symbol is null)
                 return false;
 
             return symbol switch
@@ -103,7 +103,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         /// <summary>
         /// Returns INamedTypeSymbol if symbol is a user define typed. Otherwise returns null.
         /// </summary>
-        private static INamedTypeSymbol? GetUserDefinedNamedTypeSymbol(this ISymbol symbol)
+        private static INamedTypeSymbol GetUserDefinedNamedTypeSymbol(this ISymbol symbol)
         {
             //If not named it cannot be class or struct.
             if (symbol is not INamedTypeSymbol namedTypeSymbol)

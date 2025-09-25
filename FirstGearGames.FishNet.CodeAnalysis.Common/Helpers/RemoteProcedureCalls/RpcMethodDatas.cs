@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+using System.Collections.Generic;
 using System.Text;
 using FirstGearGames.CodeAnalysis.Extensions;
 using FirstGearGames.FishNet.CodeAnalysis.Constants;
@@ -9,9 +10,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
 {
     public static class RpcMethodDataExtensions
     {
-        public static bool IsValid(this RpcMethodDatas? md)
+        public static bool IsValid(this RpcMethodDatas md)
         {
-            if (md == null)
+            if (md is null)
                 return false;
             return !string.IsNullOrWhiteSpace(md.MethodName);
         }
@@ -101,7 +102,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
             Header = new(header);
             Body = new(body);
         }
-
+        
         public string ToString(int bracketIndent)
         {
             StringBuilder sb = new();

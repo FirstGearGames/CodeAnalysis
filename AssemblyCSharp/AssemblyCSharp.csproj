@@ -1,29 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	
+
 	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<EnablePreviewFeatures>false</EnablePreviewFeatures>		
-		<LangVersion>9</LangVersion>
-		<ImplicitUsings>disable</ImplicitUsings>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9.0</LangVersion>
+		<RootNamespace>FirstGearGames.FishNet.CodeAnalysis.Analyzers</RootNamespace>
+		<AssemblyName>FirstGearGames.FishNet.CodeAnalysis.Analyzers</AssemblyName>
 		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
 	</PropertyGroup>
+
 	<ItemGroup>
-		<ProjectReference Include="..\FirstGearGames.FishNet.CodeAnalysis.Analyzers\FirstGearGames.FishNet.CodeAnalysis.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\FirstGearGames.FishNet.CodeAnalysis.SourceGenerators\FirstGearGames.FishNet.CodeAnalysis.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+		<PackageReference Include="Roslyn.Diagnostics.Analyzers" Version="3.3.4">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<PropertyGroup>
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 	</PropertyGroup>
-
-	<Target Name="CleanSourceGeneratedFiles" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
-		<RemoveDir Directories="Generated" />
-	</Target>
-
-	<ItemGroup>
-		<Compile Remove="Generated\**" />
-		<Content Include="Generated\**" />
-	</ItemGroup>
+	
 </Project>

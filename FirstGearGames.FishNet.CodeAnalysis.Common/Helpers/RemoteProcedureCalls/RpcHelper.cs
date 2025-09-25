@@ -117,17 +117,17 @@ namespace FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls
                     parameters.RemoveAt(--parametersCount);
             }
 
-            IParameterSymbol? lastParameter = parametersCount > 0 ? parameters[parametersCount - 1] : null;
-            if (lastParameter?.Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
+            IParameterSymbol lastParameter = parametersCount > 0 ? parameters[parametersCount - 1] : null;
+            if (lastParameter is not null && lastParameter.Type.GetTypeSymbolFullName(metadataName) == FishNetConstants.Channel_FullName)
             {
                 //Not optional, default is reliable.
                 if (!lastParameter.IsOptional)
                     return FishNetConstants.Default_Rpc_Channel.GetEnumName();
 
                 //Find optional value.
-                object? value = lastParameter.ExplicitDefaultValue;
+                object value = lastParameter.ExplicitDefaultValue;
                 //Should never be null in this case; check for safety.
-                if (value?.GetType() != Enum.GetUnderlyingType(typeof(Channel)))
+                if (value is not null && value.GetType() != Enum.GetUnderlyingType(typeof(Channel)))
                     return FishNetConstants.Default_Rpc_Channel.GetEnumName();
 
                 return ChannelExtensions.GetEnumName((byte)value);

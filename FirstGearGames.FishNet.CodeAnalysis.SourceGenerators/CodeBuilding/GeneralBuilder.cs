@@ -12,7 +12,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         // /// <summary>
         // /// Appends a line to stringBuilder indicating a serializer could not be found.
         // /// </summary>
-        // public static string GetMissingSerializerComment(bool deltaSerializer, ITypeSymbol typeSymbol, IFieldSymbol? fieldSymbol = null)
+        // public static string GetMissingSerializerComment(bool deltaSerializer, ITypeSymbol typeSymbol, IFieldSymbol fieldSymbol = null)
         // {
         //     if (deltaSerializer)
         //         return $"//Delta serializer not found for {typeSymbol.ToReadable(fieldSymbol)}; full serializer will be used.";

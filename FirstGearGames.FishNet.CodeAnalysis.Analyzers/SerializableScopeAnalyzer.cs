@@ -20,13 +20,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            if (_defaultMessages == null)
+            if (_defaultMessages is null)
             {
                 _defaultMessages = new();
                 _defaultMessages.Add(Descriptor1, "Network serializable types must be declared public or have their containing type as partial. If you do not wish to serialize the type use the ExcludeSerialization attribute on the member or type.");
             }
 
-            if (SerializableFinder == null)
+            if (SerializableFinder is null)
                 SerializableFinder = new();
 
             context.EnableConcurrentExecution();
@@ -67,7 +67,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
             else if (syntaxNode is FieldDeclarationSyntax fieldDeclarationSyntax)
                 location = fieldDeclarationSyntax.GetLocation();
 
-            if (location != null)
+            if (location is not null)
             {
                 string msg = String.IsNullOrEmpty(messageOverride) ? _defaultMessages[Descriptor1] : messageOverride;
                 Diagnostic diagnostic = Diagnostic.Create(Descriptor1, location, msg);

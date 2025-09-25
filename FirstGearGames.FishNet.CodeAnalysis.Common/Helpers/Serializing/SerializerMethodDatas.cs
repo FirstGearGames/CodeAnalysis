@@ -1,32 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿#pragma warning disable CS8618, CS9264
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Text;
 using FirstGearGames.CodeAnalysis.Extensions;
-using FirstGearGames.CodeAnalysis.Helpers;
 using FirstGearGames.FishNet.CodeAnalysis.Constants;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
     public static class SerializerMethodDataExtensions
     {
-        public static bool IsValid(this SerializerMethodData? smd)
+        public static bool IsValid(this SerializerMethodData smd)
         {
-            if (smd == null)
+            if (smd is null)
                 return false;
+            
             return !string.IsNullOrWhiteSpace(smd.TypeFullName);
         }
 
-        public static bool IsGenericReadOrWriteMethod(this SerializerMethodData? smd)
+        public static bool IsGenericReadOrWriteMethod(this SerializerMethodData smd)
         {
+            #pragma warning disable CS8602 // Dereference of a possibly null reference.
             if (!smd.IsValid())
                 return false;
 
             return smd.MethodName == FishNetConstants.Writer_Write_Name || smd.MethodName == FishNetConstants.Reader_Read_Name || smd.MethodName == FishNetConstants.Writer_WriteDelta_Name || smd.MethodName == FishNetConstants.Reader_ReadDelta_Name;
+            #pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
 
-        public static string GetReadOrWriteArgumentString(this SerializerMethodData? smd, ITypeSymbol typeSymbol)
+        public static string GetReadOrWriteArgumentString(this SerializerMethodData smd, ITypeSymbol typeSymbol)
         {
+            #pragma warning disable CS8602 // Dereference of a possibly null reference.
             if (!smd.IsValid())
                 return string.Empty;
 
@@ -40,6 +43,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             return string.Empty;
 
             string ReturnArguments() => typeSymbol.GetTypeSymbolCombinedGenericArgumentsString(argumentType: GenericArgumentType.PreferNamed);
+            #pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
     }
 
@@ -114,6 +118,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
         /// Content of the method.
         /// </summary>
         public readonly SerializerMethodContent MethodContent;
+        
         public SerializerMethodData() { }
 
         public SerializerMethodData(ITypeSymbol typeSymbol, string methodName)

@@ -18,10 +18,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirstGearGames.FishNet.Code
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirstGearGames.CodeAnalysis.Common", "FirstGearGames.CodeAnalysis.Common\FirstGearGames.CodeAnalysis.Common.shproj", "{9B8C3F11-7D5A-4A9F-886B-446B9D651817}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeBoost", "..\CodeBoost\CodeBoost\CodeBoost.csproj", "{146C3F9E-2EC1-4CC5-8909-07C829D7282B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LV", "..\CodenameLV\LV\LV.csproj", "{39F6E2F3-301D-4421-B8A3-DA5EC05D5ED4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,14 +36,6 @@ Global
 		{19F1247D-584A-4604-9354-16B97751D71E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19F1247D-584A-4604-9354-16B97751D71E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19F1247D-584A-4604-9354-16B97751D71E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{146C3F9E-2EC1-4CC5-8909-07C829D7282B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{146C3F9E-2EC1-4CC5-8909-07C829D7282B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{146C3F9E-2EC1-4CC5-8909-07C829D7282B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{146C3F9E-2EC1-4CC5-8909-07C829D7282B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{39F6E2F3-301D-4421-B8A3-DA5EC05D5ED4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{39F6E2F3-301D-4421-B8A3-DA5EC05D5ED4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39F6E2F3-301D-4421-B8A3-DA5EC05D5ED4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{39F6E2F3-301D-4421-B8A3-DA5EC05D5ED4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -32,7 +32,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// </summary>
         public void CheckRpcMethod(GeneratorSyntaxContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
-            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
+            ISymbol symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol)
                 return;
@@ -45,7 +45,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls
         /// </summary>
         public void CheckRpcMethod(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDeclarationSyntax)
         {
-            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
+            ISymbol symbol = ModelExtensions.GetDeclaredSymbol(context.SemanticModel, methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol)
                 return;

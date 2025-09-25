@@ -8,7 +8,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class SyntaxNodeExtensions
     {
-        public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
+        public static ISymbol GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
         {
             SemanticModel model = compilation.GetSemanticModel(node.SyntaxTree);
             return model.GetDeclaredSymbol(node);
@@ -21,7 +21,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             result = null;
             #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
-            if (syntaxNode == null)
+            if (syntaxNode is null)
             {
                 return false;
             }
@@ -30,7 +30,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             {
                 syntaxNode = syntaxNode.Parent;
 
-                if (syntaxNode == null)
+                if (syntaxNode is null)
                 {
                     return false;
                 }

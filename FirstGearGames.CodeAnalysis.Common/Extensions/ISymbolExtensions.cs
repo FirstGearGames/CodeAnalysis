@@ -22,9 +22,9 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// Returns the full name of a symbol which includes the namespace.
         /// </summary>
         /// <param name = "metadataName">True to return name as metadata.</param>
-        public static string GetSymbolFullName(this ISymbol? symbol, bool metadataName)
+        public static string GetSymbolFullName(this ISymbol symbol, bool metadataName)
         {
-            if (symbol == null)
+            if (symbol is null)
                 return string.Empty;
             if (symbol is ITypeSymbol typeSymbol)
                 return typeSymbol.GetTypeSymbolFullName(metadataName);
@@ -34,7 +34,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             string fullyQualifiedName = string.Empty;
             string joiningChar = metadataName ? "+" : ".";
-            for (INamedTypeSymbol? currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
+            for (INamedTypeSymbol currentType = symbol.ContainingType; currentType is not null; currentType = currentType.ContainingType)
                 fullyQualifiedName = $"{currentType.Name}{joiningChar}{fullyQualifiedName}";
 
             fullyQualifiedName = $"{fullyQualifiedName}{symbol.Name}";
@@ -50,8 +50,8 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             foreach (AttributeData item in symbol.GetAttributes())
             {
-                INamedTypeSymbol? typeSymbol = item.AttributeClass;
-                if (typeSymbol == null)
+                INamedTypeSymbol typeSymbol = item.AttributeClass;
+                if (typeSymbol is null)
                     continue;
 
                 if (typeSymbol.GetSymbolFullName(isMetadataName) == attributeFullName)
@@ -77,7 +77,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 
             foreach (string fullName in attributeFullNames)
             {
-                if (symbol.HasAttribute(fullName, isMetadataName, out AttributeData? d))
+                if (symbol.HasAttribute(fullName, isMetadataName, out AttributeData d))
                     datas.Add(d!);
             }
 

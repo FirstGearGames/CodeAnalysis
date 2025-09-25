@@ -10,4 +10,16 @@
   <PropertyGroup />
   <Import Project="FirstGearGames.CodeAnalysis.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
+
+  <ItemGroup>
+    <Compile Include="..\..\CodeBoost\CodeBoost\**\*.cs" Link="CodeBoost\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+
 </Project>
+
+

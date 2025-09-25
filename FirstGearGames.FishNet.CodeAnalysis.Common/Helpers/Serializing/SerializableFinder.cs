@@ -102,7 +102,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             void CheckCustomSyncTypeSerializable(INamedTypeSymbol fieldNamedTypeSymbol, IFieldSymbol fieldSymbol)
             {
                 IMethodSymbol methodSymbol = fieldNamedTypeSymbol.GetMethod(FishNetConstants.ICustomSync_GetSerializedType_Name, metadataName: false);
-                if (methodSymbol == null)
+                if (methodSymbol is null)
                     return;
 
                 //Default return type should be System.Object, exit if not the case.
@@ -115,7 +115,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
                     return;
 
                 ITypeSymbol returnedTypeSymbol = typeOfExpressionSyntax.GetTypeIdentifier(semanticModel);
-                if (returnedTypeSymbol == null || returnedTypeSymbol is not INamedTypeSymbol returnedNamedTypeSymbol)
+                if (returnedTypeSymbol is null || returnedTypeSymbol is not INamedTypeSymbol returnedNamedTypeSymbol)
                     return;
                 /* FullNames added this iteration.
                  * This is used to prevent endless loops. */
@@ -132,7 +132,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
         {
             SemanticModel sm = context.GetSemanticModel();
 
-            ISymbol? symbol = sm?.GetDeclaredSymbol(methodDeclarationSyntax);
+            ISymbol symbol = sm?.GetDeclaredSymbol(methodDeclarationSyntax);
 
             if (symbol is not IMethodSymbol methodSymbol)
                 return;

@@ -8,17 +8,17 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Receivers
 {
     public class GeneratorSyntaxReceiver : ISyntaxContextReceiver
     {
-        public SerializableFinder? SerializableFinder;
-        public RpcFinder? RpcFinder;
+        public SerializableFinder SerializableFinder;
+        public RpcFinder RpcFinder;
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
             SyntaxNode syntaxNode = context.Node;
 
-            if (SerializableFinder == null)
+            if (SerializableFinder is null)
                 SerializableFinder = new();
 
-            if (RpcFinder == null)
+            if (RpcFinder is null)
                 RpcFinder = new(this);
 
             if (syntaxNode is ClassDeclarationSyntax classDeclaration)

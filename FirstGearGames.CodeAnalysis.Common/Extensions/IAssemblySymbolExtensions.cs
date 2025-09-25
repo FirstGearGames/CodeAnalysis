@@ -5,10 +5,10 @@ namespace FirstGearGames.CodeAnalysis.Extensions
 {
     public static class IAssemblySymbolExtensions
     {
-        public static bool GetINamedTypeSymbol(this IAssemblySymbol? assemblySymbol, string fullName, out INamedTypeSymbol? result, bool error = true)
+        public static bool GetINamedTypeSymbol(this IAssemblySymbol assemblySymbol, string fullName, out INamedTypeSymbol result, bool error = true)
         {
             result = null;
-            if (assemblySymbol == null)
+            if (assemblySymbol is null)
                 return false;
 
             if (assemblySymbol.GetTypeByMetadataName(fullName) is INamedTypeSymbol foundSymbol)

@@ -8,11 +8,11 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns ITypeSymbol for a TypeOfExpressionSyntax.
         /// </summary>
-        public static ITypeSymbol? GetTypeIdentifier(this TypeOfExpressionSyntax syntax, SemanticModel semanticModel) => semanticModel.GetSymbolInfo(syntax.Type).Symbol as ITypeSymbol;
+        public static ITypeSymbol GetTypeIdentifier(this TypeOfExpressionSyntax syntax, SemanticModel semanticModel) => semanticModel.GetSymbolInfo(syntax.Type).Symbol as ITypeSymbol;
 
         /// <summary>
         /// Returns ITypeSymbol for an expression syntax using GetTypeInfo.
         /// </summary>
-        public static ITypeSymbol? GeTypeInfoTypeSymbol(this ExpressionSyntax syntax, SemanticModel semanticModel) => semanticModel.GetTypeInfo(syntax).Type;
+        public static ITypeSymbol GeTypeInfoTypeSymbol(this ExpressionSyntax syntax, SemanticModel semanticModel) => semanticModel.GetTypeInfo(syntax).Type;
     }
 }

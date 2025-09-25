@@ -62,13 +62,13 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         {
             List<ExpressionSyntax> results = new();
 
-            MethodDeclarationSyntax? methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
+            MethodDeclarationSyntax methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
 
-            if (methodSyntax == null)
+            if (methodSyntax is null)
                 return results;
 
             //Uses expression body, such as MethodName() => something;
-            if (methodSyntax.ExpressionBody != null)
+            if (methodSyntax.ExpressionBody is not null)
             {
                 //Get the return of the arrowExpression, which is seen as => in code.
                 ExpressionSyntax expressionSyntax = methodSyntax.ExpressionBody.Expression;
@@ -78,16 +78,16 @@ namespace FirstGearGames.CodeAnalysis.Extensions
              * EG: MethodName() { return something; } */
             else
             {
-                if (methodSyntax.Body == null)
+                if (methodSyntax.Body is null)
                     return results;
 
                 //Find all return statements.
                 IEnumerable<ReturnStatementSyntax> returnStatements = methodSyntax.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
 
-                foreach (ReturnStatementSyntax? returnStatement in returnStatements)
+                foreach (ReturnStatementSyntax returnStatement in returnStatements)
                 {
-                    ExpressionSyntax? expression = returnStatement.Expression;
-                    if (expression != null)
+                    ExpressionSyntax expression = returnStatement.Expression;
+                    if (expression is not null)
                         results.Add(expression);
                 }
             }

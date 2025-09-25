@@ -13,7 +13,20 @@
 
 	<Import Project="..\FirstGearGames.CodeAnalysis.Common\FirstGearGames.CodeAnalysis.Common.projitems" Label="Shared" />
 	<Import Project="..\FirstGearGames.FishNet.CodeAnalysis.Common\FirstGearGames.FishNet.CodeAnalysis.Common.projitems" Label="Shared" />
+	
+	<PropertyGroup>
+		<ImplicitUsings>disable</ImplicitUsings>
+	</PropertyGroup>
 
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+	</PropertyGroup>
 
-
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CS8618</NoWarn>
+		<NoWarn>$(NoWarn);CS8625</NoWarn>
+		<NoWarn>$(NoWarn);CS0067</NoWarn>
+	</PropertyGroup>
+	
 </Project>

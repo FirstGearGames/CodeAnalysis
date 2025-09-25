@@ -30,8 +30,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
         {
             Log("");
             string assemblyName = context.Compilation.AssemblyName;
+            
             //Ignore unity assemblies.
-            if (assemblyName.StartsWith("Unity.", StringComparison.OrdinalIgnoreCase))
+            if (assemblyName is null || assemblyName.StartsWith("Unity.", StringComparison.OrdinalIgnoreCase))
                 return;
 
             Debugg.SetAssemblyName(assemblyName);
@@ -64,8 +65,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
 
         private bool FindSerializers(GeneratorExecutionContext context)
         {
-            IAssemblySymbol? fishnetRuntimeAssemblySymbol = GetFishNetRuntimeAssemblySymbol(context);
-            if (fishnetRuntimeAssemblySymbol == null)
+            IAssemblySymbol fishnetRuntimeAssemblySymbol = GetFrameworkAssemblySymbol(context);
+            if (fishnetRuntimeAssemblySymbol is null)
             {
                 Log($"FishNet assembly {FishNetConstants.Runtime_Assembly_Name} could not be found.");
                 Debugg.Send();
@@ -132,9 +133,9 @@ namespace FirstGearGames.FishNet.CodeAnalysis.SourceGenerators
             return true;
         }
 
-        private IAssemblySymbol? GetFishNetRuntimeAssemblySymbol(in GeneratorExecutionContext context)
+        private IAssemblySymbol GetFrameworkAssemblySymbol(in GeneratorExecutionContext context)
         {
-            IAssemblySymbol? fishNetSymbol = null;
+            IAssemblySymbol fishNetSymbol = null;
 
             if (context.Compilation.SourceModule.ContainingAssembly.Name == FishNetConstants.Runtime_Assembly_Name)
             {

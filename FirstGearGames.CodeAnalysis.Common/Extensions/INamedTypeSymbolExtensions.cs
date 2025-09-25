@@ -38,7 +38,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// </summary>
         public static bool InheritsClass(this INamedTypeSymbol symbol, string classFullName)
         {
-            while (symbol.BaseType != null && symbol.BaseType is INamedTypeSymbol baseSymbol)
+            while (symbol.BaseType is not null && symbol.BaseType is INamedTypeSymbol baseSymbol)
             {
                 if (baseSymbol.GetTypeSymbolFullName(metadataName: false) == classFullName)
                     return true;
@@ -52,7 +52,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// <summary>
         /// Returns a method containing matching parameter names.
         /// </summary>
-        public static IMethodSymbol? GetMethod(this INamedTypeSymbol symbol, string methodName, bool metadataName, params string[] parameterNames)
+        public static IMethodSymbol GetMethod(this INamedTypeSymbol symbol, string methodName, bool metadataName, params string[] parameterNames)
         {
             IEnumerable<IMethodSymbol> methodSymbols = symbol.GetMembers(methodName).OfType<IMethodSymbol>();
 
@@ -75,7 +75,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
         /// </summary>
         public static bool HasPartialModifier(this INamedTypeSymbol namedTypeSymbol)
         {
-            if (namedTypeSymbol == null)
+            if (namedTypeSymbol is null)
                 return false;
 
             ImmutableArray<SyntaxReference> syntaxReferences = namedTypeSymbol.DeclaringSyntaxReferences;
@@ -85,7 +85,7 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 return true;
 
             SyntaxReference firstSyntaxReference = syntaxReferences.FirstOrDefault();
-            if (firstSyntaxReference == null)
+            if (firstSyntaxReference is null)
                 return false;
 
             if (firstSyntaxReference.GetSyntax() is ClassDeclarationSyntax classDeclarationSyntax)

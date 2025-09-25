@@ -65,8 +65,8 @@ namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
             if (_serializerMethods.GetReadMethod(serializableType.NamedTypeSymbol, GetSerializerType.Full, metadataName: false, out _).IsValid())
                 return;
 
-            INamedTypeSymbol? namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
-            if (namedTypeSymbol == null)
+            INamedTypeSymbol namedTypeSymbol = context.Compilation.GetTypeByMetadataName(serializableType.FullMetadataName);
+            if (namedTypeSymbol is null)
                 return;
             if (!_serializerMethods.CanCreateSerializer(namedTypeSymbol))
                 return;
