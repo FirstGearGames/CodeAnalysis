@@ -1,25 +1,77 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using FirstGearGames.CodeAnalysis.Constants;
 using FirstGearGames.CodeAnalysis.Extensions;
 using FirstGearGames.CodeAnalysis.Helpers;
-using FirstGearGames.FishNet.CodeAnalysis.RemoteProcedureCalls;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 {
-    public class SerializableFinder
+    public class APIFinder: ISyntaxContextReceiver
     {
-        public event IsNotSerializableAccessibleDel OnIsNotSerializableAccessible;
+        public const string GENERATE_SHELL_ATTRIBUTE = "GenerateShellAttribute";
 
-        public delegate void IsNotSerializableAccessibleDel(SyntaxNodeAnalysisContext context, ISymbol source, string message = "");
+        private List<MethodDeclarationSyntax> _methods;
+        private List<StructDeclarationSyntax> _structs;
+        private List<EnumDeclarationSyntax> _enums;
+        private List<ClassDeclarationSyntax> _classes;
 
-        public readonly HashSet<SerializableType> TypesNeedingSerializers = new();
+        private bool _collectionsInstantiated;
+        
+        /// <summary>
+        /// Instantiates collections if they have not already been created.
+        /// </summary>
+        private void InstantiateCollectionsIfNeeded()
+        {
+            if (_collectionsInstantiated)
+                return;
 
+            _methods = new();
+            _structs = new();
+            _enums = new();
+            _classes = new();
+            
+            _collectionsInstantiated = true;
+        }
+
+        public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
+        {
+            InstantiateCollectionsIfNeeded();
+            
+            SyntaxNode syntaxNode = context.Node;
+
+            if (SerializableFinder is null)
+                SerializableFinder = new();
+
+            if (RpcFinder is null)
+                RpcFinder = new(this);
+
+            if (syntaxNode is ClassDeclarationSyntax classDeclaration)
+            {
+                LogVisit();
+                SerializableFinder.AddClassSerializables(context, classDeclaration);
+            }
+            else if (syntaxNode is StructDeclarationSyntax structDeclaration)
+            {
+                LogVisit();
+                SerializableFinder.AddStructSerializables(context, structDeclaration);
+            }
+            else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
+            {
+                LogVisit();
+                SerializableFinder.AddRpcSerializables(context, methodDeclaration);
+                RpcFinder.CheckRpcMethod(context, methodDeclaration);
+            }
+
+            void LogVisit()
+            {
+                //Log($"OnVisitSyntaxNode type {syntaxNode.GetType().Name}");
+            }
+        }
+        
         public void AddStructSerializables(object context, StructDeclarationSyntax structDeclarationSyntax)
         {
             if (context.GetSemanticModel() is not SemanticModel sm)
@@ -319,5 +371,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
             else
                 Debugg.Log($"   [SerializerReceiver] {txt}");
         }
+        
     }
 }

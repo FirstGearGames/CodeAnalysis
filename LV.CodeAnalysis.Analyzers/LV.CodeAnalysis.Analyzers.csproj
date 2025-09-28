@@ -3,10 +3,9 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>9.0</LangVersion>
-		<RootNamespace>FirstGearGames.LV.CodeAnalysis.Analyzers</RootNamespace>
-		<AssemblyName>FirstGearGames.LV.CodeAnalysis.Analyzers</AssemblyName>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
+		<PackageId>LV.CodeAnalysis.Analyzers</PackageId>
 	</PropertyGroup>
 
 	<ItemGroup>

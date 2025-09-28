@@ -1,6 +1,4 @@
-﻿using FirstGearGames.CodeAnalysis.Helpers;
-using FirstGearGames.FishNet.CodeAnalysis.Helpers.RemoteProcedureCalls;
-using FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing;
+﻿﻿using FirstGearGames.CodeAnalysis.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -8,9 +6,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Receivers
 {
     public class GeneratorSyntaxReceiver : ISyntaxContextReceiver
     {
-        public SerializableFinder SerializableFinder;
-        public RpcFinder RpcFinder;
-
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
             SyntaxNode syntaxNode = context.Node;

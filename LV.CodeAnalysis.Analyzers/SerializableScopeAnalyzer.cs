@@ -15,7 +15,7 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
     {
         public static readonly DiagnosticDescriptor Descriptor1 = new(DiagnosticIds.FN0001, "Invalid scope", "{0}", DiagnosticCategories.Scope, DiagnosticSeverity.Error, true, customTags: WellKnownDiagnosticTags.NotConfigurable);
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
-        public SerializableFinder SerializableFinder;
+        public APIFinder ApiFinder;
         private Dictionary<DiagnosticDescriptor, string> _defaultMessages;
 
         public override void Initialize(AnalysisContext context)
@@ -26,13 +26,13 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
                 _defaultMessages.Add(Descriptor1, "Network serializable types must be declared public or have their containing type as partial. If you do not wish to serialize the type use the ExcludeSerialization attribute on the member or type.");
             }
 
-            if (SerializableFinder is null)
-                SerializableFinder = new();
+            if (ApiFinder is null)
+                ApiFinder = new();
 
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            SerializableFinder.OnIsNotSerializableAccessible += SerializableReceiver_OnIsNotSerializableAccessible;
+            ApiFinder.OnIsNotSerializableAccessible += ApiReceiverOnIsNotApiAccessible;
 
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.StructDeclaration);
@@ -44,14 +44,14 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
             SyntaxNode syntaxNode = context.Node;
 
             if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
-                SerializableFinder.AddClassSerializables(context, classDeclarationSyntax);
+                ApiFinder.AddClassSerializables(context, classDeclarationSyntax);
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
-                SerializableFinder.AddStructSerializables(context, structDeclaration);
+                ApiFinder.AddStructSerializables(context, structDeclaration);
             else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
-                SerializableFinder.AddRpcSerializables(context, methodDeclaration);
+                ApiFinder.AddRpcSerializables(context, methodDeclaration);
         }
 
-        private void SerializableReceiver_OnIsNotSerializableAccessible(SyntaxNodeAnalysisContext context, ISymbol source, string messageOverride)
+        private void ApiReceiverOnIsNotApiAccessible(SyntaxNodeAnalysisContext context, ISymbol source, string messageOverride)
         {
             SyntaxNode syntaxNode = context.Node;
 
