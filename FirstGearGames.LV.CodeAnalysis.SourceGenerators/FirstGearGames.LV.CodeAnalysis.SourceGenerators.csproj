@@ -1,26 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>9.0</LangVersion>
-		<RootNamespace>FirstGearGames.FishNet.CodeAnalysis.Analyzers</RootNamespace>
-		<AssemblyName>FirstGearGames.FishNet.CodeAnalysis.Analyzers</AssemblyName>
+		<LangVersion>9</LangVersion>
+		<AnalysisLevel>latest</AnalysisLevel>
 		<Nullable>disable</Nullable>
-		<ImplicitUsings>disable</ImplicitUsings>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<AssemblyName>FirstGearGames.LV.CodeAnalysis.SourceGenerators</AssemblyName>
+		<RootNamespace>FirstGearGames.LV.CodeAnalysis.SourceGenerators</RootNamespace>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-		<PackageReference Include="Roslyn.Diagnostics.Analyzers" Version="3.3.4">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 	</ItemGroup>
 
-	<!-- Only include Shared Projects that do NOT contain CodeBoost -->
 	<Import Project="..\FirstGearGames.CodeAnalysis.Common\FirstGearGames.CodeAnalysis.Common.projitems" Label="Shared" />
-	<Import Project="..\FirstGearGames.FishNet.CodeAnalysis.Common\FirstGearGames.FishNet.CodeAnalysis.Common.projitems" Label="Shared" />
+	
+	<PropertyGroup>
+		<ImplicitUsings>disable</ImplicitUsings>
+	</PropertyGroup>
 
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -28,6 +25,9 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
+		<NoWarn>$(NoWarn);CS8618</NoWarn>
+		<NoWarn>$(NoWarn);CS8625</NoWarn>
+		<NoWarn>$(NoWarn);CS0067</NoWarn>
 		<NoWarn>$(NoWarn);RS0016</NoWarn>
 	</PropertyGroup>
 	
