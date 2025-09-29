@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using CodeAnalysis.Common.Constants;
 using CodeAnalysis.Common.Helpers;
-using CodeAnalysis.SourceGenerators.CodeBuilding;
 
 namespace CodeAnalysis.Common.Extensions
 {
