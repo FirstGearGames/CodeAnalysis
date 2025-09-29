@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using FirstGearGames.CodeAnalysis.Helpers;
+using CodeAnalysis.Common.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public static class INamedTypeSymbolExtensions
     {

@@ -14,9 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LV.CodeAnalysis.Analyzers", "LV.CodeAnalysis.Analyzers\LV.CodeAnalysis.Analyzers.csproj", "{19F1247D-584A-4604-9354-16B97751D71E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeAnalysis.Analyzers", "CodeAnalysis.Analyzers\CodeAnalysis.Analyzers.csproj", "{BE156435-266F-40B3-BC52-E4DD8BFA2A1E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeAnalysis.SourceGenerators", "CodeAnalysis.SourceGenerators\CodeAnalysis.SourceGenerators.csproj", "{3F3AD1EF-B7DC-4D91-98B4-64CEC151E7B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeAnalysis", "CodeAnalysis\CodeAnalysis.csproj", "{BE156435-266F-40B3-BC52-E4DD8BFA2A1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +38,6 @@ Global
 		{BE156435-266F-40B3-BC52-E4DD8BFA2A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE156435-266F-40B3-BC52-E4DD8BFA2A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE156435-266F-40B3-BC52-E4DD8BFA2A1E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3F3AD1EF-B7DC-4D91-98B4-64CEC151E7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3F3AD1EF-B7DC-4D91-98B4-64CEC151E7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3F3AD1EF-B7DC-4D91-98B4-64CEC151E7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3F3AD1EF-B7DC-4D91-98B4-64CEC151E7B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

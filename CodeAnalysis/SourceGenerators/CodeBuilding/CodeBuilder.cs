@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Text;
-using FirstGearGames.CodeAnalysis.Constants;
+using CodeAnalysis.Common.Constants;
 using Microsoft.CodeAnalysis;
-using FirstGearGames.CodeAnalysis.Extensions;
+using CodeAnalysis.Common.Extensions;
 
-namespace FirstGearGames.CodeAnalysis.CodeBuilding
+namespace CodeAnalysis.SourceGenerators.CodeBuilding
 {
     public static class CodeBuilder
     {

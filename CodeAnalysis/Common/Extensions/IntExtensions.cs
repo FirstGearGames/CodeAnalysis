@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public static class IntExtensions
     {

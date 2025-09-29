@@ -4,7 +4,7 @@
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public static class SyntaxNodeExtensions
     {

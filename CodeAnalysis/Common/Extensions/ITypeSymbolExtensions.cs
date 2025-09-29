@@ -1,13 +1,12 @@
 ﻿#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text;
-using FirstGearGames.CodeAnalysis.CodeBuilding;
-using FirstGearGames.CodeAnalysis.Constants;
-using FirstGearGames.CodeAnalysis.Helpers;
+using CodeAnalysis.Common.Constants;
+using CodeAnalysis.Common.Helpers;
+using CodeAnalysis.SourceGenerators.CodeBuilding;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public enum GenericArgumentType
     {

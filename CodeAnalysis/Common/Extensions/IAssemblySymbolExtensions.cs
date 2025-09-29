@@ -1,5 +1,4 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Helpers;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace FirstGearGames.CodeAnalysis.Extensions
 {

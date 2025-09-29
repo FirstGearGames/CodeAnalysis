@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-namespace FirstGearGames.CodeAnalysis.Helpers
+namespace CodeAnalysis.Common.Helpers
 {
     public static class Debugg
     {

@@ -1,10 +1,6 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using FirstGearGames.FishNet.CodeAnalysis.CodeBuilding;
-using FirstGearGames.FishNet.CodeAnalysis.Helpers;
 
 namespace FirstGearGames.CodeAnalysis.Extensions
 {

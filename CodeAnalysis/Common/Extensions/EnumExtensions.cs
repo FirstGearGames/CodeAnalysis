@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public static class EnumExtensions
     {
