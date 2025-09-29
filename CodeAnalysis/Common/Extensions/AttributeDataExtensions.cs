@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public static class AttributeDataExtensions
     {
@@ -26,6 +26,37 @@ namespace FirstGearGames.CodeAnalysis.Extensions
             }
 
             return ret;
+        }
+
+        public static bool HasAttribute(this List<AttributeListSyntax> attributeListSyntaxs,  GeneratorSyntaxContext context, string attributeFullName, bool isMetadataName)
+        {
+            if (attributeListSyntaxs == null)
+                return false;
+
+            // check for a specific attribute by name
+            foreach (AttributeListSyntax atrList in attributeListSyntaxs)
+            {
+                if (atrList.HasAttribute(context, attributeFullName, isMetadataName))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool HasAttribute(this AttributeListSyntax attributeListSyntax, GeneratorSyntaxContext context, string attributeFullName, bool isMetadataName)
+        {
+            if (attributeListSyntax == null)
+                return false;
+
+            foreach (AttributeSyntax atr in attributeListSyntax.Attributes)
+            {
+                ISymbol symbol = context.SemanticModel.GetSymbolInfo(atr).Symbol;
+
+                if (symbol.HasAttribute(attributeFullName, isMetadataName))
+                    return true;
+            }
+
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

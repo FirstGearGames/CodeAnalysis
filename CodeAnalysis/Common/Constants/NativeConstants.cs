@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FirstGearGames.CodeAnalysis.Constants
+namespace CodeAnalysis.Common.Constants
 {
     public static class NativeConstants
     {

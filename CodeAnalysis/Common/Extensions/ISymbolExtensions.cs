@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 
-namespace FirstGearGames.CodeAnalysis.Extensions
+namespace CodeAnalysis.Common.Extensions
 {
     public static class ISymbolExtensions
     {
@@ -90,15 +90,6 @@ namespace FirstGearGames.CodeAnalysis.Extensions
                 if (symbolFullName == attributeFullName)
                     return true;
             }
-
-            return false;
-        }
-
-        public static bool HasAttributes(this ISymbol thisSymbol, bool isMetadataNames, params string[] attributeFullNames)
-        {
-            foreach (string fullyQualifiedAttributeName in attributeFullNames)
-                if (thisSymbol.HasAttribute(fullyQualifiedAttributeName, isMetadataNames))
-                    return true;
 
             return false;
         }
