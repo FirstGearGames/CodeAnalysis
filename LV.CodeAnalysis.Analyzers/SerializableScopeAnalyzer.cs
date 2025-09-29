@@ -15,7 +15,6 @@ namespace FirstGearGames.FishNet.CodeAnalysis.Analyzers
     {
         public static readonly DiagnosticDescriptor Descriptor1 = new(DiagnosticIds.FN0001, "Invalid scope", "{0}", DiagnosticCategories.Scope, DiagnosticSeverity.Error, true, customTags: WellKnownDiagnosticTags.NotConfigurable);
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor1);
-        public APIFinder ApiFinder;
         private Dictionary<DiagnosticDescriptor, string> _defaultMessages;
 
         public override void Initialize(AnalysisContext context)

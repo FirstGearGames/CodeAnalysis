@@ -28,13 +28,10 @@ namespace CodeAnalysis.Common.Extensions
             return ret;
         }
 
-        public static bool HasAttribute(this List<AttributeListSyntax> attributeListSyntaxs,  GeneratorSyntaxContext context, string attributeFullName, bool isMetadataName)
+        public static bool HasAttribute(this SyntaxList<AttributeListSyntax> synxtaxList,  GeneratorSyntaxContext context, string attributeFullName, bool isMetadataName)
         {
-            if (attributeListSyntaxs == null)
-                return false;
-
             // check for a specific attribute by name
-            foreach (AttributeListSyntax atrList in attributeListSyntaxs)
+            foreach (AttributeListSyntax atrList in synxtaxList)
             {
                 if (atrList.HasAttribute(context, attributeFullName, isMetadataName))
                     return true;

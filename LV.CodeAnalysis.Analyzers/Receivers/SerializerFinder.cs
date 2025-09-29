@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.Helpers.Serializing
 {
-    public class APIFinder: ISyntaxContextReceiver
+    public class SerializerFinder: ISyntaxContextReceiver
     {
         public const string GENERATE_SHELL_ATTRIBUTE = "GenerateShellAttribute";
 
