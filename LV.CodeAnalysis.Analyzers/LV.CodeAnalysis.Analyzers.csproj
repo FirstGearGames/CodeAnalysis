@@ -6,6 +6,7 @@
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<PackageId>LV.CodeAnalysis.Analyzers</PackageId>
+		<RootNamespace>LV.CodeAnalysis.Analyzers</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,7 +19,6 @@
 	</ItemGroup>
 
 	<!-- Only include Shared Projects that do NOT contain CodeBoost -->
-	<Import Project="..\FirstGearGames.CodeAnalysis.Common\FirstGearGames.CodeAnalysis.Common.projitems" Label="Shared" />
 
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>

@@ -11,8 +11,6 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
 	</ItemGroup>
-
-	<Import Project="..\FirstGearGames.CodeAnalysis.Common\FirstGearGames.CodeAnalysis.Common.projitems" Label="Shared" />
 	
 	<PropertyGroup>
 		<ImplicitUsings>disable</ImplicitUsings>

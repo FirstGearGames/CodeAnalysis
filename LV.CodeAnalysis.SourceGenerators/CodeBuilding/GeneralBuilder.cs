@@ -1,7 +1,4 @@
-﻿using FirstGearGames.FishNet.CodeAnalysis.Constants;
-using System.Text;
-using FirstGearGames.CodeAnalysis.Extensions;
-using Microsoft.CodeAnalysis;
+﻿using System.Text;
 
 namespace FirstGearGames.FishNet.CodeAnalysis.CodeBuilding.Serializers
 {
