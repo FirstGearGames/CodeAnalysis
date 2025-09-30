@@ -9,6 +9,22 @@ namespace CodeAnalysis.Common.Extensions
 {
     public static class AttributeDataExtensions
     {
+        public static bool IsCool(this bool member) => true;
+        public static IReadOnlyList<AttributeData> GetAttributes(this SyntaxList<AttributeListSyntax> syntaxList, Compilation compilation)
+        {
+            return null;
+            // List<AttributeData> attributes = new();
+            //
+            // foreach (AttributeListSyntax atrList in syntaxList)
+            // {
+            //     if (atrList is null)
+            //         continue;
+            //     
+            //     attributes.AddRange(atrList.GetAttributes(compilation));
+            // }
+            //
+            // return attributes;
+        }
         public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
         {
             // Collect pertinent syntax trees from these attributes
@@ -16,7 +32,7 @@ namespace CodeAnalysis.Common.Extensions
             foreach (AttributeSyntax attribute in attributes.Attributes)
                 acceptedTrees.Add(attribute.SyntaxTree);
 
-            ISymbol parentSymbol = attributes.Parent!.GetDeclaredSymbol(compilation)!;
+            ISymbol parentSymbol = attributes.Parent.GetDeclaredSymbol(compilation);
             ImmutableArray<AttributeData> parentAttributes = parentSymbol.GetAttributes();
             List<AttributeData> ret = new();
             foreach (AttributeData attribute in parentAttributes)
@@ -28,31 +44,28 @@ namespace CodeAnalysis.Common.Extensions
             return ret;
         }
 
-        public static bool HasAttribute(this SyntaxList<AttributeListSyntax> synxtaxList,  GeneratorSyntaxContext context, string attributeFullName, bool isMetadataName)
+        public static bool HasAttribute(this SyntaxList<AttributeListSyntax> syntaxList, string attributeFullName)
         {
-            // check for a specific attribute by name
-            foreach (AttributeListSyntax atrList in synxtaxList)
+            foreach (AttributeListSyntax atrList in syntaxList)
             {
-                if (atrList.HasAttribute(context, attributeFullName, isMetadataName))
+                if (atrList.HasAttribute(attributeFullName))
                     return true;
             }
 
             return false;
         }
 
-        public static bool HasAttribute(this AttributeListSyntax attributeListSyntax, GeneratorSyntaxContext context, string attributeFullName, bool isMetadataName)
+        public static bool HasAttribute(this AttributeListSyntax attributeListSyntax,string attributeFullName)
         {
             if (attributeListSyntax == null)
                 return false;
-
+            
             foreach (AttributeSyntax atr in attributeListSyntax.Attributes)
             {
-                ISymbol symbol = context.SemanticModel.GetSymbolInfo(atr).Symbol;
-
-                if (symbol.HasAttribute(attributeFullName, isMetadataName))
+                if (atr.Name.ToString() == attributeFullName)
                     return true;
             }
-
+            
             return false;
         }
 

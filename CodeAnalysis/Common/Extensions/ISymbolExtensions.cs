@@ -22,6 +22,7 @@ namespace CodeAnalysis.Common.Extensions
         {
             if (symbol is null)
                 return string.Empty;
+            
             if (symbol is ITypeSymbol typeSymbol)
                 return typeSymbol.GetTypeSymbolFullName(metadataName);
 
@@ -44,6 +45,11 @@ namespace CodeAnalysis.Common.Extensions
         /// <param name = "isMetadataName">True if the attributeFullName is a metadataName.</param>
         public static bool HasAttribute(this ISymbol symbol, string attributeFullName, bool isMetadataName, out AttributeData data)
         {
+            data = null;
+            
+            if (symbol is null)
+                return false;
+            
             foreach (AttributeData item in symbol.GetAttributes())
             {
                 INamedTypeSymbol typeSymbol = item.AttributeClass;
@@ -56,10 +62,7 @@ namespace CodeAnalysis.Common.Extensions
                     return true;
                 }
             }
-
-            //Fall through, not found.
-            data = null;
-
+            
             return false;
         }
 
@@ -70,6 +73,9 @@ namespace CodeAnalysis.Common.Extensions
         {
             datas = new();
 
+            if (symbol is null)
+                return false;
+
             foreach (string fullName in attributeFullNames)
             {
                 if (symbol.HasAttribute(fullName, isMetadataName, out AttributeData d))
@@ -79,9 +85,12 @@ namespace CodeAnalysis.Common.Extensions
             return datas.Count > 0;
         }
 
-        public static bool HasAttribute(this ISymbol thisSymbol, string attributeFullName, bool isMetadataName)
+        public static bool HasAttribute(this ISymbol symbol, string attributeFullName, bool isMetadataName)
         {
-            foreach (AttributeData attribute in thisSymbol.GetAttributes())
+            if (symbol is null)
+                return false;
+            
+            foreach (AttributeData attribute in symbol.GetAttributes())
             {
                 if (attribute.AttributeClass is not { } namedTypeSymbol)
                     continue;
