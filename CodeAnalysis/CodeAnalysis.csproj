@@ -1,22 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>9</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\..\CodeBoost\CodeBoost\**\*.cs" Link="CodeBoost\%(RecursiveDir)%(Filename)%(Extension)" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
     </ItemGroup>
-
+    
     <ItemGroup>
       <Folder Include="Common\" />
       <Folder Include="SourceGenerators\" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+    
 </Project>
 
