@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using CodeAnalysis.Common.Constants;
@@ -95,7 +96,7 @@ namespace CodeAnalysis.SourceGenerators.CodeBuilding
         /// <summary>
         /// Calls a method taking optional arguments.
         /// </summary>
-        public static string CallMethod(string methodName, string callingVariable = "", bool closeCall = true, params string[] variableNames)
+        public static string CallMethodZ(string methodName, string callingVariable = "", List<string>? variableNames = null)
         {
             if (callingVariable.Length > 0)
                 callingVariable += ".";
@@ -104,19 +105,11 @@ namespace CodeAnalysis.SourceGenerators.CodeBuilding
             _stringBuilder.Append($"{callingVariable}{methodName}(");
 
             //Add arguments.
-            for (int i = 0; i < variableNames.Length; i++)
-            {
-                //Add comma to take another variable.
-                if (i > 0)
-                    _stringBuilder.Append(", ");
-
-                _stringBuilder.Append(variableNames[i]);
-            }
+            if (variableNames is not null)
+                _stringBuilder.Append(string.Join(", ", variableNames));
 
             //End call.
             _stringBuilder.Append(')');
-            if (closeCall)
-                _stringBuilder.Append(';');
 
             return _stringBuilder.ToString();
         }

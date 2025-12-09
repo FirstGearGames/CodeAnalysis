@@ -9,11 +9,9 @@ namespace CodeAnalysis.Common.Extensions
         private static StringBuilder _stringBuilder = new();
         
         /// <summary>
-        /// Combines generic argument strings into <str0, str1, str2 ...>
+        /// Combines into a natural string: <str0, str1, str2 ...>
         /// </summary>
-        /// <param name = "arguments"></param>
-        /// <returns></returns>
-        public static string GetCombinedGenericArguments(this List<string> arguments)
+        public static string GetCombinedArguments(this List<string> arguments)
         {
             if (arguments.Count == 0)
                 return string.Empty;
@@ -29,7 +27,7 @@ namespace CodeAnalysis.Common.Extensions
                 _stringBuilder.Append(s);
             }
 
-            return $"<{_stringBuilder.ToString()}>";
+            return $"<{_stringBuilder}>";
         }
     }
 }

@@ -14,13 +14,13 @@ namespace CodeAnalysis.Common.Extensions
         /// Returns true if method parameters match expected parameters.
         /// </summary>
         /// <returns></returns>
-        public static bool AreParametersMatching(this IMethodSymbol methodSymbol, bool metadataName, params string[] expectedParameterNames)
+        public static bool AreParametersMatching(this IMethodSymbol methodSymbol, params string[] expectedParameterNames)
         {
             _strings.Clear();
 
             foreach (IParameterSymbol parameterSymbol in methodSymbol.Parameters)
             {
-                string parameterName = parameterSymbol.GetSymbolFullName(metadataName);
+                string parameterName = parameterSymbol.GetSymbolFullName();
                 _strings.Add(parameterName);
             }
 

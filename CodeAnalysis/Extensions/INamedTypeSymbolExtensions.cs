@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using CodeAnalysis.Common.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,11 +11,41 @@ namespace CodeAnalysis.Common.Extensions
     public static class INamedTypeSymbolExtensions
     {
         /// <summary>
-        /// Returns field members of a named symbol.
+        /// Gets IFieldSymbols within a symbol.
         /// </summary>
-        public static List<IFieldSymbol> GetFieldMembers(this INamedTypeSymbol symbol)
+        public static List<IFieldSymbol> GetFieldSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility = null)
         {
-            return symbol.GetMembers().OfType<IFieldSymbol>().ToList();
+            List<IFieldSymbol> validSymbols = new();
+            
+            foreach (ISymbol symbol in namedTypeSymbol.GetMembers())
+            {
+                if (symbol is IFieldSymbol methodSymbol) 
+                {
+                    if (requiredAccessibility is null || methodSymbol.DeclaredAccessibility == requiredAccessibility.Value)
+                        validSymbols.Add(methodSymbol);
+                }
+            }
+
+            return validSymbols;
+        }
+
+        /// <summary>
+        /// Gets IMethodSymbols within an INamedTypeSymbols.
+        /// </summary>
+        public static List<IMethodSymbol> GetMethodSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility = null)
+        {
+            List<IMethodSymbol> validSymbols = new();
+            
+            foreach (ISymbol symbol in namedTypeSymbol.GetMembers())
+            {
+                if (symbol is IMethodSymbol methodSymbol) 
+                {
+                    if (requiredAccessibility is null || methodSymbol.DeclaredAccessibility == requiredAccessibility.Value)
+                        validSymbols.Add(methodSymbol);
+                }
+            }
+
+            return validSymbols;
         }
 
         /// <summary>
@@ -26,7 +55,7 @@ namespace CodeAnalysis.Common.Extensions
         {
             foreach (INamedTypeSymbol interfaceNamed in symbol.Interfaces)
             {
-                if (interfaceNamed.GetTypeSymbolFullName(metadataName: false) == interfaceFullName)
+                if (interfaceNamed.GetTypeSymbolFullName() == interfaceFullName)
                     return true;
             }
 
@@ -38,9 +67,9 @@ namespace CodeAnalysis.Common.Extensions
         /// </summary>
         public static bool InheritsClass(this INamedTypeSymbol symbol, string classFullName)
         {
-            while (symbol.BaseType is not null && symbol.BaseType is INamedTypeSymbol baseSymbol)
+            while (symbol.BaseType is { } baseSymbol)
             {
-                if (baseSymbol.GetTypeSymbolFullName(metadataName: false) == classFullName)
+                if (baseSymbol.GetTypeSymbolFullName() == classFullName)
                     return true;
 
                 symbol = symbol.BaseType;
@@ -52,13 +81,13 @@ namespace CodeAnalysis.Common.Extensions
         /// <summary>
         /// Returns a method containing matching parameter names.
         /// </summary>
-        public static IMethodSymbol GetMethod(this INamedTypeSymbol symbol, string methodName, bool metadataName, params string[] parameterNames)
+        public static IMethodSymbol? GetMethod(this INamedTypeSymbol symbol, string methodName, params string[] parameterNames)
         {
             IEnumerable<IMethodSymbol> methodSymbols = symbol.GetMembers(methodName).OfType<IMethodSymbol>();
 
             foreach (IMethodSymbol methodSymbol in methodSymbols)
             {
-                if (methodSymbol.AreParametersMatching(metadataName, parameterNames))
+                if (methodSymbol.AreParametersMatching(parameterNames))
                     return methodSymbol;
             }
 
@@ -80,11 +109,11 @@ namespace CodeAnalysis.Common.Extensions
 
             ImmutableArray<SyntaxReference> syntaxReferences = namedTypeSymbol.DeclaringSyntaxReferences;
 
-            //If there's more than one reference then we know it's partial
+            // If there's more than one reference then we know it's partial
             if (syntaxReferences.Length > 1)
                 return true;
 
-            SyntaxReference firstSyntaxReference = syntaxReferences.FirstOrDefault();
+            SyntaxReference? firstSyntaxReference = syntaxReferences.FirstOrDefault();
             if (firstSyntaxReference is null)
                 return false;
 
@@ -107,9 +136,9 @@ namespace CodeAnalysis.Common.Extensions
             if (!IsAllowedKeyword(out keywordText))
                 return string.Empty;
 
-            //Public, internal, etc. 
+            // Public, internal, etc. 
             string modifiersText = namedTypeSymbol.DeclaredAccessibility.ToString().ToLower();
-            //Partial check.
+            // Partial check.
             string partialText = HasPartialModifier(namedTypeSymbol) ? "partial " : string.Empty;
 
             bool IsAllowedKeyword(out string lKeyword)

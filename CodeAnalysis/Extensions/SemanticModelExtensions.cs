@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS8603 // Possible null reference return.
+#nullable enable
 using Microsoft.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis.CSharp;
@@ -30,26 +31,14 @@ namespace CodeAnalysis.Common.Extensions
                 return null;
 
             VariableDeclaratorSyntax variableDeclaratorSyntax = fieldDeclaration.Declaration.Variables[0];
-            ISymbol symbol = ModelExtensions.GetDeclaredSymbol(semanticModel, variableDeclaratorSyntax);
+            ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(semanticModel, variableDeclaratorSyntax);
 
-            if (symbol is not null && symbol is IFieldSymbol fieldSymbol)
+            if (symbol is IFieldSymbol fieldSymbol)
                 return fieldSymbol;
 
             return null;
         }
-
-        /// <summary>
-        /// Returns the SemanticModel for context if context is a supported type.
-        /// </summary>
-        public static SemanticModel GetSemanticModel(this object context)
-        {
-            if (context is GeneratorSyntaxContext gsc)
-                return gsc.SemanticModel;
-            else if (context is SyntaxNodeAnalysisContext snac)
-                return snac.SemanticModel;
-            else
-                return null;
-        }
+        
     }
     #pragma warning restore CS8603 // Possible null reference return.
 }

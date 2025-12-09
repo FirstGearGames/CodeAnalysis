@@ -9,22 +9,22 @@ namespace CodeAnalysis.Common.Extensions
 {
     public static class AttributeDataExtensions
     {
-        public static bool IsCool(this bool member) => true;
-        public static IReadOnlyList<AttributeData> GetAttributes(this SyntaxList<AttributeListSyntax> syntaxList, Compilation compilation)
-        {
-            return null;
-            // List<AttributeData> attributes = new();
-            //
-            // foreach (AttributeListSyntax atrList in syntaxList)
-            // {
-            //     if (atrList is null)
-            //         continue;
-            //     
-            //     attributes.AddRange(atrList.GetAttributes(compilation));
-            // }
-            //
-            // return attributes;
-        }
+        // public static IReadOnlyList<AttributeData> GetAttributes(this SyntaxList<AttributeListSyntax> syntaxList, Compilation compilation)
+        // {
+        //     return null;
+        //     // List<AttributeData> attributes = new();
+        //     //
+        //     // foreach (AttributeListSyntax atrList in syntaxList)
+        //     // {
+        //     //     if (atrList is null)
+        //     //         continue;
+        //     //     
+        //     //     attributes.AddRange(atrList.GetAttributes(compilation));
+        //     // }
+        //     //
+        //     // return attributes;
+        // }
+        
         public static IReadOnlyList<AttributeData> GetAttributes(this AttributeListSyntax attributes, Compilation compilation)
         {
             // Collect pertinent syntax trees from these attributes
@@ -32,13 +32,17 @@ namespace CodeAnalysis.Common.Extensions
             foreach (AttributeSyntax attribute in attributes.Attributes)
                 acceptedTrees.Add(attribute.SyntaxTree);
 
-            ISymbol parentSymbol = attributes.Parent.GetDeclaredSymbol(compilation);
-            ImmutableArray<AttributeData> parentAttributes = parentSymbol.GetAttributes();
             List<AttributeData> ret = new();
-            foreach (AttributeData attribute in parentAttributes)
+
+            ISymbol parentSymbol = attributes.Parent?.GetDeclaredSymbol(compilation);
+            if (parentSymbol is not null)
             {
-                if (acceptedTrees.Contains(attribute.ApplicationSyntaxReference!.SyntaxTree))
-                    ret.Add(attribute);
+                ImmutableArray<AttributeData> parentAttributes = parentSymbol.GetAttributes();
+                foreach (AttributeData attribute in parentAttributes)
+                {
+                    if (acceptedTrees.Contains(attribute.ApplicationSyntaxReference!.SyntaxTree))
+                        ret.Add(attribute);
+                }
             }
 
             return ret;
@@ -80,7 +84,7 @@ namespace CodeAnalysis.Common.Extensions
             return default;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static T GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments = thisAttributeData.NamedArguments;
@@ -100,7 +104,6 @@ namespace CodeAnalysis.Common.Extensions
                     return (T)namedArgument.Value.Value;
 
             return defaultValue;
-            ;
         }
     }
     #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
