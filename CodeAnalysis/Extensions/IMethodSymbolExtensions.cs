@@ -8,30 +8,28 @@ namespace CodeAnalysis.Common.Extensions
 {
     public static class IMethodSymbolExtensions
     {
-        private static List<string> _strings = new();
-
         /// <summary>
         /// Returns true if method parameters match expected parameters.
         /// </summary>
         /// <returns></returns>
         public static bool AreParametersMatching(this IMethodSymbol methodSymbol, params string[] expectedParameterNames)
         {
-            _strings.Clear();
+            List<string> parameters = new();
 
             foreach (IParameterSymbol parameterSymbol in methodSymbol.Parameters)
             {
                 string parameterName = parameterSymbol.GetSymbolFullName();
-                _strings.Add(parameterName);
+                parameters.Add(parameterName);
             }
 
             //Lengths do not match.
-            if (expectedParameterNames.Length != _strings.Count)
+            if (expectedParameterNames.Length != parameters.Count)
                 return false;
 
             //Compare each entry.
-            for (int i = 0; i < _strings.Count; i++)
+            for (int i = 0; i < parameters.Count; i++)
             {
-                if (!string.Equals(_strings[i], expectedParameterNames[i], StringComparison.Ordinal))
+                if (!string.Equals(parameters[i], expectedParameterNames[i], StringComparison.Ordinal))
                     return false;
             }
 
@@ -55,6 +53,64 @@ namespace CodeAnalysis.Common.Extensions
             return results;
         }
 
+        public static List<string> GetMethodSymbolArguments(this IMethodSymbol thisValue, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
+        {
+            List<string> arguments = [];
+
+            if (thisValue is null)
+            {
+                argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
+                return arguments;
+            }
+
+            if (argumentSearchType.IsExplicitlyNamed() && !thisValue.ArePresentArgumentsNamed())
+            {
+                argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
+                return arguments;
+            }
+
+            if (thisValue.TypeArguments.Length == 0)
+            {
+                argumentSearchResult = ArgumentSearchResult.NoArguments;
+                return arguments;
+            }
+
+            argumentSearchResult = ArgumentSearchResult.HasArguments;
+
+            bool useNamed = argumentSearchType.IsExplicitlyNamed() || argumentSearchType.IsPreferNamed();
+            int iteration = 0;
+
+            foreach (ITypeSymbol typeSymbol in thisValue.TypeArguments)
+            {
+                if (useNamed && typeSymbol is INamedTypeSymbol namedTypeSymbol)
+                    arguments.Add(namedTypeSymbol.GetTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
+                else
+                    arguments.Add($"T{iteration}");
+
+                iteration++;
+
+                if (argumentSearchResult.HasError())
+                    return arguments;
+            }
+
+            argumentSearchResult = ArgumentSearchResult.HasArguments;
+            return arguments;
+        }
+
+        /// <summary>
+        /// Returns true if any present arguments are named.
+        /// </summary>
+        public static bool ArePresentArgumentsNamed(this IMethodSymbol thisValue)
+        {
+            foreach (ITypeSymbol typeSymbol in thisValue.TypeArguments)
+            {
+                if (typeSymbol.TypeKind is TypeKind.TypeParameter)
+                    return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Gets all ExpressionSyntax returned within the body of a method.
         /// </summary>
@@ -62,7 +118,7 @@ namespace CodeAnalysis.Common.Extensions
         {
             List<ExpressionSyntax> results = new();
 
-            MethodDeclarationSyntax methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
+            MethodDeclarationSyntax? methodSyntax = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
 
             if (methodSyntax is null)
                 return results;
@@ -86,7 +142,7 @@ namespace CodeAnalysis.Common.Extensions
 
                 foreach (ReturnStatementSyntax returnStatement in returnStatements)
                 {
-                    ExpressionSyntax expression = returnStatement.Expression;
+                    ExpressionSyntax? expression = returnStatement.Expression;
                     if (expression is not null)
                         results.Add(expression);
                 }

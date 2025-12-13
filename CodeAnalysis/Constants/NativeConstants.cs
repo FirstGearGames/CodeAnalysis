@@ -4,6 +4,9 @@ namespace CodeAnalysis.Common.Constants
 {
     public static class NativeConstants
     {
+        /// <summary>
+        /// void when being used as a return type.
+        /// </summary>
         public const string Func_FullName = "System.Func";
         public const string Action_FullName = "System.Action";
         public const string Boolean_FullName = "System.Boolean";

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CodeAnalysis.Common.Extensions;
+using CodeAnalysis.Common.Finding;
 using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis
@@ -11,7 +12,7 @@ namespace CodeAnalysis
         public readonly string ParameterName;
         public readonly int Index;
 
-        public MethodParameter(IParameterSymbol parameterSymbol) : this(parameterSymbol.Type.GetSymbolFullName(), parameterSymbol.Name, parameterSymbol.Ordinal) 
+        public MethodParameter(IParameterSymbol parameterSymbol) : this(parameterSymbol.Type.GetTypeSymbolFullNameWithArguments(ArgumentSearchType.PreferNamed, out _), parameterSymbol.Name, parameterSymbol.Ordinal) 
         {
         }
 
@@ -38,21 +39,17 @@ namespace CodeAnalysis
         /// Returns all entries as they would appear in a method signature.
         /// </summary>
         /// <example>bool isSafe, int healthRemaining</example>
-        public static string GetAsMethodSignature(this List<MethodParameter> methodParameters)
+        public static string GetAsMethodSignature(this List<MethodParameter> thisValue)
         {
-            if (methodParameters is null || methodParameters.Count == 0)
+            if (thisValue is null || thisValue.Count == 0)
                 return string.Empty;
+
+            List<string> parametersAsSignatures = [];
+
+            foreach (MethodParameter methodParameter in thisValue) 
+                parametersAsSignatures.Add($"{methodParameter.TypeFullName} {methodParameter.ParameterName}");
             
-            StringBuilder stringBuilder = new();
-            
-            for (int i = 0; i < methodParameters.Count; i++)
-            {
-                stringBuilder.Append(methodParameters[i].GetParameterAsMethodSignature());
-                if (i < methodParameters.Count - 1)
-                    stringBuilder.Append(", ");
-            }
-            
-            return stringBuilder.ToString();
+            return string.Join(", ", parametersAsSignatures);
         }
         
         /// <summary>

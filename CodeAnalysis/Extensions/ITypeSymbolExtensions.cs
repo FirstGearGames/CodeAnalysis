@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CodeAnalysis.Common.Constants;
+using CodeAnalysis.Logging;
 
 namespace CodeAnalysis.Common.Extensions
 {
@@ -57,8 +58,6 @@ namespace CodeAnalysis.Common.Extensions
 
     public static class ITypeSymbolExtensions
     {
-        private static readonly StringBuilder _stringBuilder = new();
-
         /// <summary>
         /// Gets the full name of a TypeSymbol.
         /// </summary>
@@ -93,37 +92,36 @@ namespace CodeAnalysis.Common.Extensions
         /// </summary>
         public static string GetTypeSymbolFullNameWithArguments(this ITypeSymbol typeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
-            argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
-        
             /* If is an array then just use the extension method
              * to return the type named as an array. */
             if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
-                return arrayTypeSymbol.GetArrayTypeSymbolFullNameWithArgumentsZ(argumentSearchType, out argumentSearchResult);
-        
+                return arrayTypeSymbol.GetArrayTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult);
+
             if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
-                return namedTypeSymbol.GetNamedTypeSymbolFullNameWithArgumentsZ(argumentSearchType, out argumentSearchResult);
-        
+                return namedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult);
+
+            argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
             return string.Empty;
         }
 
         /// <summary>
         /// Returns type as a generic array, if an array (T0[], T0[][]). If not an array empty is returned.
         /// </summary>
-        public static string GetArrayTypeSymbolFullNameWithArgumentsZ(this IArrayTypeSymbol arrayTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
+        public static string GetArrayTypeSymbolFullNameWithArguments(this IArrayTypeSymbol arrayTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
-            _stringBuilder.Clear();
-
-            //Default value until changed.
-            argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
-
+            StringBuilder stringBuilder = new();
+            
             bool isSearchTypeExplicitlyNamed = argumentSearchType.IsExplicitlyNamed();
 
             //Expecting named arguments, but they are not named.
-            if (isSearchTypeExplicitlyNamed && !arrayTypeSymbol.AreArgumentsPresentAndNamed())
+            if (isSearchTypeExplicitlyNamed && !arrayTypeSymbol.ArePresentArgumentsNamed())
+            {
+                argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
                 return string.Empty;
+            }
 
             string symbolName = argumentSearchType == ArgumentSearchType.Generic ? NativeConstants.FirstGenericParameter_Name : arrayTypeSymbol.ElementType.GetTypeSymbolFullName();
-            _stringBuilder.Append($"{symbolName}[");
+            stringBuilder.Append($"{symbolName}[");
 
             //Add any additional sub-arrays.
             TryAppendMultidimensionalAndJagged(arrayTypeSymbol);
@@ -134,14 +132,14 @@ namespace CodeAnalysis.Common.Extensions
             bool TryAppendMultidimensionalAndJagged(IArrayTypeSymbol arrSym)
             {
                 for (int i = 1; i < arrSym.Rank; i++)
-                    _stringBuilder.Append(",");
+                    stringBuilder.Append(",");
 
                 if (arrSym.ElementType is IArrayTypeSymbol jaggedElement)
                 {
-                    if (isSearchTypeExplicitlyNamed && !jaggedElement.AreArgumentsPresentAndNamed())
+                    if (isSearchTypeExplicitlyNamed && !jaggedElement.ArePresentArgumentsNamed())
                         return false;
 
-                    _stringBuilder.Append("][");
+                    stringBuilder.Append("][");
                     if (!TryAppendMultidimensionalAndJagged(jaggedElement))
                         return false;
                 }
@@ -149,22 +147,21 @@ namespace CodeAnalysis.Common.Extensions
                 return true;
             }
 
-            _stringBuilder.Append("]");
+            stringBuilder.Append("]");
 
             /* If here then success. Arrays themselves are arguments, so has arguments
              * is always set as the result on success. */
             argumentSearchResult = ArgumentSearchResult.HasArguments;
 
-            return _stringBuilder.ToString();
+            return stringBuilder.ToString();
         }
 
         /// <summary>
         /// Returns arguments as a list.
         /// </summary>
-        public static string GetNamedTypeSymbolFullNameWithArgumentsZ(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
+        public static string GetNamedTypeSymbolFullNameWithArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
             //Default value until changed.
-            argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
             string typeFullName = namedTypeSymbol.GetTypeSymbolFullName();
 
             List<string> results = new();
@@ -178,17 +175,22 @@ namespace CodeAnalysis.Common.Extensions
 
             int typeParameterCount = 0;
 
-            if (argumentSearchType.IsExplicitlyNamed() && !namedTypeSymbol.AreArgumentsPresentAndNamed())
+            if (argumentSearchType.IsExplicitlyNamed() && !namedTypeSymbol.ArePresentArgumentsNamed())
+            {
+                argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
                 return string.Empty;
+            }
 
+            argumentSearchResult = ArgumentSearchResult.HasArguments;
+            
             foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
             {
                 if (argumentSearchType.IsGeneric() || typeArgument.TypeKind is TypeKind.TypeParameter)
                     results.Add($"T{typeParameterCount++}");
                 else if (typeArgument is INamedTypeSymbol argumentNamedTypeSymbol)
-                    results.Add(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArgumentsZ(argumentSearchType, out argumentSearchResult));
+                    results.Add(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
                 else if (typeArgument is IArrayTypeSymbol argumentArrayTypeSymbol)
-                    results.Add(argumentArrayTypeSymbol.GetArrayTypeSymbolFullNameWithArgumentsZ(argumentSearchType, out argumentSearchResult));
+                    results.Add(argumentArrayTypeSymbol.GetArrayTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
                 else
                     argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
                 
@@ -206,11 +208,8 @@ namespace CodeAnalysis.Common.Extensions
         /// <summary>
         /// Returns arguments as a list.
         /// </summary>
-        public static List<string> GetTypeSymbolArgumentsZ(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
+        public static List<string> GetTypeSymbolArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
-            //Default value until changed.
-            argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
-
             List<string> results = new();
 
             //Type does not have arguments.
@@ -222,15 +221,20 @@ namespace CodeAnalysis.Common.Extensions
 
             int typeParameterCount = 0;
 
-            if (argumentSearchType.IsExplicitlyNamed() && !namedTypeSymbol.AreArgumentsPresentAndNamed())
+            if (argumentSearchType.IsExplicitlyNamed() && !namedTypeSymbol.ArePresentArgumentsNamed())
+            {
+                argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
                 return results;
+            }
+            
+            argumentSearchResult = ArgumentSearchResult.HasArguments;
 
             foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
             {
                 if (argumentSearchType.IsGeneric() || typeArgument.TypeKind is TypeKind.TypeParameter)
                     results.Add($"T{typeParameterCount++}");
                 else if (typeArgument is INamedTypeSymbol argumentNamedTypeSymbol)
-                    results.Add(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArgumentsZ(argumentSearchType, out argumentSearchResult));
+                    results.Add(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
                 else
                     argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
 
@@ -244,7 +248,7 @@ namespace CodeAnalysis.Common.Extensions
 
             return results;
         }
-        
+
         /// <summary>
         /// Returns true if a TypeSymbol has arguments.
         /// </summary>
@@ -260,9 +264,9 @@ namespace CodeAnalysis.Common.Extensions
         }
 
         /// <summary>
-        /// Returns true if arguments are present and all are named.
+        /// Returns true if any present arguments are named.
         /// </summary>
-        public static bool AreArgumentsPresentAndNamed(this ITypeSymbol symbol)
+        public static bool ArePresentArgumentsNamed(this ITypeSymbol symbol)
         {
             if (symbol is IArrayTypeSymbol arrayTypeSymbol)
                 return arrayTypeSymbol.ElementType.TypeKind is not TypeKind.TypeParameter;
@@ -305,12 +309,13 @@ namespace CodeAnalysis.Common.Extensions
         /// </summary>
         public static string ToReadable(this ITypeSymbol typeSymbol, IFieldSymbol fieldSymbol)
         {
-            _stringBuilder.Clear();
-            _stringBuilder.Append(typeSymbol.GetTypeSymbolFullName());
-            if (fieldSymbol is not null)
-                _stringBuilder.Append($".{fieldSymbol.GetSymbolFullName()}");
+            StringBuilder stringBuilder = new();
 
-            return _stringBuilder.ToString();
+            stringBuilder.Append(typeSymbol.GetTypeSymbolFullName());
+            if (fieldSymbol is not null)
+                stringBuilder.Append($".{fieldSymbol.GetSymbolFullName()}");
+
+            return stringBuilder.ToString();
         }
     }
 }

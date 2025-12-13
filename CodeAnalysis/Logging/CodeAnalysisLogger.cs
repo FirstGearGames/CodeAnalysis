@@ -2,20 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using CodeBoost.Logging;
 
 namespace CodeAnalysis.Logging
 {
-
-    public class CodeAnalysisLogger: ILogger
+    public static class CodeAnalysisLogger
     {
-        private readonly LoggerSetting _loggerSettings = new();
-        private readonly List<string> _messages = new();
-        private string _outputFilePath;
-        
-        public void SetOutputPath(string outputFilePath) => _outputFilePath = outputFilePath;
-        public LoggerSetting GetLoggerSetting() => _loggerSettings;
-        public bool DisableUnconditionalDevelopmentStacktrace() => true;
+        private static readonly List<string> _messages = new();
+        private static string _outputFilePath;
+
+        public static void SetOutputPath(string outputFilePath) => _outputFilePath = outputFilePath;
         // private string GetTypePrefix<T0>() => $"[{typeof(T0).FullName}]";
         // public void LogInformation<T0>(string message) => LogInformation($"{GetTypePrefix<T0>()}{message}");
         // public void LogWarning<T0>(string message) => LogWarning($"{GetTypePrefix<T0>()}{message}");
@@ -26,19 +21,18 @@ namespace CodeAnalysis.Logging
         //     message = Environment.NewLine + GetTypePrefix<T0>() + Environment.NewLine + message;
         //     LogCode(message);
         // }
+        public static void LogInformation(string message) => _messages.Add($"Information: {message}");
+        public static void LogWarning(string message) => _messages.Add($"Warning: {message}");
+        public static void LogError(string message) => _messages.Add($"Error: {message}");
 
-        public void LogInformation(string message) => _messages.Add($"Information: {message}");
-        public void LogWarning(string message) => _messages.Add($"Warning: {message}");
-        public void LogError(string message) => _messages.Add($"Error: {message}");
-
-        public void LogCode(string message)
+        public static void LogCode(string message)
         {
             _messages.Add($"");
             _messages.Add(message);
             _messages.Add($"");
         }
 
-        public void WriteToFile() 
+        public static void WriteToFile()
         {
             #pragma warning disable RS1035
 
@@ -63,9 +57,9 @@ namespace CodeAnalysis.Logging
 
                 File.WriteAllLines(_outputFilePath, _messages);
             }
-            
+
             _messages.Clear();
-            
+
             #pragma warning restore RS1035
         }
     }

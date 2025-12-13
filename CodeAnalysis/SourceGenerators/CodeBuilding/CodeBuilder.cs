@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using CodeAnalysis.Common.Constants;
 using Microsoft.CodeAnalysis;
@@ -96,7 +94,7 @@ namespace CodeAnalysis.SourceGenerators.CodeBuilding
         /// <summary>
         /// Calls a method taking optional arguments.
         /// </summary>
-        public static string CallMethodZ(string methodName, string callingVariable = "", List<string>? variableNames = null)
+        public static string CallMethod(string methodName, string callingVariable = "", List<string>? variableNames = null)
         {
             if (callingVariable.Length > 0)
                 callingVariable += ".";
