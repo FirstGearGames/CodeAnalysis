@@ -208,9 +208,9 @@ namespace CodeAnalysis.Common.Extensions
         /// <summary>
         /// Returns arguments as a list.
         /// </summary>
-        public static List<string> GetTypeSymbolArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
+        public static List<Argument> GetTypeSymbolArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
-            List<string> results = new();
+            List<Argument> results = [];
 
             //Type does not have arguments.
             if (!namedTypeSymbol.IsGenericType)
@@ -232,9 +232,9 @@ namespace CodeAnalysis.Common.Extensions
             foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
             {
                 if (argumentSearchType.IsGeneric() || typeArgument.TypeKind is TypeKind.TypeParameter)
-                    results.Add($"T{typeParameterCount++}");
+                    results.Add(new($"T{typeParameterCount++}", isNamed: false));
                 else if (typeArgument is INamedTypeSymbol argumentNamedTypeSymbol)
-                    results.Add(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
+                    results.Add(new (argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
                 else
                     argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
 

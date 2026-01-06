@@ -52,10 +52,10 @@ namespace CodeAnalysis.Common.Extensions
 
             return results;
         }
-
-        public static List<string> GetMethodSymbolArguments(this IMethodSymbol thisValue, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
+        
+        public static List<Argument> GetMethodSymbolArguments(this IMethodSymbol thisValue, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
-            List<string> arguments = [];
+            List<Argument> arguments = [];
 
             if (thisValue is null)
             {
@@ -83,9 +83,9 @@ namespace CodeAnalysis.Common.Extensions
             foreach (ITypeSymbol typeSymbol in thisValue.TypeArguments)
             {
                 if (useNamed && typeSymbol is INamedTypeSymbol namedTypeSymbol)
-                    arguments.Add(namedTypeSymbol.GetTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
+                    arguments.Add(new(namedTypeSymbol.GetTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
                 else
-                    arguments.Add($"T{iteration}");
+                    arguments.Add(new($"T{iteration}", isNamed: false));
 
                 iteration++;
 
@@ -96,7 +96,6 @@ namespace CodeAnalysis.Common.Extensions
             argumentSearchResult = ArgumentSearchResult.HasArguments;
             return arguments;
         }
-
         /// <summary>
         /// Returns true if any present arguments are named.
         /// </summary>

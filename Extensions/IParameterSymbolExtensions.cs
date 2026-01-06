@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,6 +21,26 @@ namespace CodeAnalysis.Common.Extensions
                 methodParameters.Add(new(parameterSymbol));
 
             return methodParameters;
+        }
+        
+        public static string OptionalValueToString(this IParameterSymbol thisValue)
+        {
+            if (!thisValue.HasExplicitDefaultValue)
+                return string.Empty;
+
+            object? v = thisValue.ExplicitDefaultValue;
+
+            return v switch
+            {
+                null => string.Empty,
+                string s => s,
+                char c => $"'{c}'",
+                bool b => b ? "true" : "false",
+                Enum e => $"{e.GetType().Name}.{e}",
+                _ => Convert.ToString(v, CultureInfo.InvariantCulture)
+                     ?? v.ToString()
+                     ?? "Unprintable"
+            };
         }
 
         public static bool TypeFullNameEquals(this IParameterSymbol parameterSymbol, IParameterSymbol otherParameterSymbol) => parameterSymbol.TypeFullNameEquals(otherParameterSymbol.Type.GetTypeSymbolFullName());
