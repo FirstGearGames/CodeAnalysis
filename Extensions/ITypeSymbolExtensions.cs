@@ -294,9 +294,14 @@ namespace CodeAnalysis.Common.Extensions
             return typeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
         }
 
-        public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
+        public static bool IsUserDefinedEnum(this ITypeSymbol typeSymbol)
         {
-            return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
+            return typeSymbol is { TypeKind: TypeKind.Enum, SpecialType: SpecialType.None };
+        }
+        
+        public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
         }
 
         /// <summary>
