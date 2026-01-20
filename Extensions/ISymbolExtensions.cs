@@ -53,7 +53,7 @@ namespace CodeAnalysis.Common.Extensions
             foreach (Type type in attributeTypes)
             {
                 if (type is not null)
-                    fullNames.Add(type.GetTypeFullName());
+                    fullNames.Add(type.GetFullName());
             }
 
             return symbol.HasAnyAttribute(searchScope, fullNames, out data);
@@ -70,7 +70,7 @@ namespace CodeAnalysis.Common.Extensions
                 return false;
             }
 
-            return symbol.HasAttribute(searchScope, attributeType.GetTypeFullName(), out data);
+            return symbol.HasAttribute(searchScope, attributeType.GetFullName(), out data);
         }
 
         /// <summary>

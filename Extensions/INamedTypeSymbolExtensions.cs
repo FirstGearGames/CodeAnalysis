@@ -51,8 +51,11 @@ namespace CodeAnalysis.Common.Extensions
         /// <summary>
         /// Returns the short name of a symbol which includes the namespace.
         /// </summary>
-        public static bool ImplementsInterface(this INamedTypeSymbol symbol, string interfaceFullName)
+        public static bool NamedTypeSymbolImplementsInterface(this INamedTypeSymbol symbol, string? interfaceFullName)
         {
+            if (interfaceFullName is null)
+                return false;
+
             foreach (INamedTypeSymbol interfaceNamed in symbol.Interfaces)
             {
                 if (interfaceNamed.GetTypeSymbolFullName() == interfaceFullName)

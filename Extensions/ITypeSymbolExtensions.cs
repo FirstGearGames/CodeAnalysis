@@ -283,11 +283,35 @@ namespace CodeAnalysis.Common.Extensions
             //No arguments, return true.
             return true;
         }
+        
+        /// <summary>
+        /// Returns the short name of a symbol which includes the namespace.
+        /// </summary>
+        public static bool TypeSymbolImplementsInterface(this ITypeSymbol symbol, string? interfaceFullName)
+        {
+            if (interfaceFullName is null)
+                return false;
+            
+            foreach (INamedTypeSymbol interfaceNamed in symbol.Interfaces)
+            {
+                if (interfaceNamed.GetTypeSymbolFullName() == interfaceFullName)
+                    return true;
+            }
 
+            return false;
+        }
+
+        
+        public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
+        }
+        
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
         }
+        
 
         public static bool IsUserDefinedClass(this ITypeSymbol typeSymbol)
         {
@@ -299,9 +323,14 @@ namespace CodeAnalysis.Common.Extensions
             return typeSymbol is { TypeKind: TypeKind.Enum, SpecialType: SpecialType.None };
         }
         
-        public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol)
+        public static bool IsClass(this ITypeSymbol typeSymbol)
         {
-            return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
+            return typeSymbol is { TypeKind: TypeKind.Class };
+        }
+
+        public static bool IsStruct(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol is { TypeKind: TypeKind.Struct };
         }
 
         /// <summary>
