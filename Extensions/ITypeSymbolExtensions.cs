@@ -331,6 +331,11 @@ namespace CodeAnalysis.Common.Extensions
             return typeSymbol is { TypeKind: TypeKind.Struct };
         }
 
+        public static bool IsClassOrStruct(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsStruct() || typeSymbol.IsClass();
+        }
+
         /// <summary>
         /// Returns if a TypeSymbol is a reference type or is declared as nullable.
         /// </summary>
@@ -349,6 +354,33 @@ namespace CodeAnalysis.Common.Extensions
             return typeSymbol is ITypeParameterSymbol { IsReferenceType: true };
         }
 
+        /// <summary>
+        /// Returns if a TypeSymbol is encapsulated in Nullable<> is encapsulated in Nullable<> and the encapsulated type is an INamedTypeSymbol.
+        /// </summary>
+        /// <returns></returns>
+        public static bool TryGetNullableEncapsulatedNamedTypeSymbol(this ITypeSymbol typeSymbol, out INamedTypeSymbol nullableEncapsulatedNamedTypeSybol)
+        {
+            nullableEncapsulatedNamedTypeSybol = null;
+            
+            if (!typeSymbol.IsNullable())
+                return false;
+
+            if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+                return false;
+
+            if (namedTypeSymbol.TypeArguments.Length == 0)
+                return false;
+            
+            ITypeSymbol encapsulatedType = namedTypeSymbol.TypeArguments[0];
+            if (encapsulatedType is not INamedTypeSymbol encapsulatedNamedTypeSymbol)
+                return false;
+
+            nullableEncapsulatedNamedTypeSybol = encapsulatedNamedTypeSymbol;
+
+            return true;
+        }
+
+        
         /// <summary>
         /// Returns if a TypeSymbol is encapsulated in Nullable<>. 
         /// </summary>

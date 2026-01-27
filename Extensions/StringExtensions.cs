@@ -19,6 +19,9 @@ namespace CodeAnalysis.Common.Extensions
         /// <returns></returns>
         public static string IndentByBrace(this string thisValue)
         {
+            if (thisValue is null)
+                return string.Empty;
+            
             StringBuilder result = new();
             StringReader reader = new(thisValue);
             
