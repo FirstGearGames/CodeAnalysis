@@ -110,7 +110,7 @@ namespace CodeAnalysis.Common.Extensions
         public static string GetArrayTypeSymbolFullNameWithArguments(this IArrayTypeSymbol arrayTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
             StringBuilder stringBuilder = new();
-            
+
             bool isSearchTypeExplicitlyNamed = argumentSearchType.IsExplicitlyNamed();
 
             //Expecting named arguments, but they are not named.
@@ -182,7 +182,7 @@ namespace CodeAnalysis.Common.Extensions
             }
 
             argumentSearchResult = ArgumentSearchResult.HasArguments;
-            
+
             foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
             {
                 if (argumentSearchType.IsGeneric() || typeArgument.TypeKind is TypeKind.TypeParameter)
@@ -193,7 +193,7 @@ namespace CodeAnalysis.Common.Extensions
                     results.Add(argumentArrayTypeSymbol.GetArrayTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult));
                 else
                     argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
-                
+
                 //If search result has switched to error.
                 if (argumentSearchResult.HasError())
                     return string.Empty;
@@ -226,7 +226,7 @@ namespace CodeAnalysis.Common.Extensions
                 argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
                 return results;
             }
-            
+
             argumentSearchResult = ArgumentSearchResult.HasArguments;
 
             foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
@@ -234,7 +234,7 @@ namespace CodeAnalysis.Common.Extensions
                 if (argumentSearchType.IsGeneric() || typeArgument.TypeKind is TypeKind.TypeParameter)
                     results.Add(new($"T{typeParameterCount++}", isNamed: false));
                 else if (typeArgument is INamedTypeSymbol argumentNamedTypeSymbol)
-                    results.Add(new (argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
+                    results.Add(new(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
                 else
                     argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
 
@@ -283,7 +283,7 @@ namespace CodeAnalysis.Common.Extensions
             //No arguments, return true.
             return true;
         }
-        
+
         /// <summary>
         /// Returns the short name of a symbol which includes the namespace.
         /// </summary>
@@ -291,7 +291,7 @@ namespace CodeAnalysis.Common.Extensions
         {
             if (interfaceFullName is null)
                 return false;
-            
+
             foreach (INamedTypeSymbol interfaceNamed in symbol.Interfaces)
             {
                 if (interfaceNamed.GetTypeSymbolFullName() == interfaceFullName)
@@ -301,17 +301,15 @@ namespace CodeAnalysis.Common.Extensions
             return false;
         }
 
-        
         public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
         }
-        
+
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
         }
-        
 
         public static bool IsUserDefinedClass(this ITypeSymbol typeSymbol)
         {
@@ -322,7 +320,7 @@ namespace CodeAnalysis.Common.Extensions
         {
             return typeSymbol is { TypeKind: TypeKind.Enum, SpecialType: SpecialType.None };
         }
-        
+
         public static bool IsClass(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Class };
@@ -332,6 +330,30 @@ namespace CodeAnalysis.Common.Extensions
         {
             return typeSymbol is { TypeKind: TypeKind.Struct };
         }
+
+        /// <summary>
+        /// Returns if a TypeSymbol is a reference type or is declared as nullable.
+        /// </summary>
+        /// <returns></returns>
+        public static bool CanBeNull(this ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol.IsReferenceType)
+                return true;
+
+            if (typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+                return true;
+
+            if (typeSymbol.TypeKind is TypeKind.Pointer)
+                return true;
+
+            return typeSymbol is ITypeParameterSymbol { IsReferenceType: true };
+        }
+
+        /// <summary>
+        /// Returns if a TypeSymbol is encapsulated in Nullable<>. 
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsNullable(this ITypeSymbol typeSymbol) => typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
 
         /// <summary>
         /// Returns a string as readable context (UserStruct.SomeField).
