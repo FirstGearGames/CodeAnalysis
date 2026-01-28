@@ -306,6 +306,10 @@ namespace CodeAnalysis.Common.Extensions
             return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
         }
 
+        public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
+        }
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
