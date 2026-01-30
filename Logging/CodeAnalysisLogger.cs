@@ -7,58 +7,83 @@ namespace CodeAnalysis.Logging
 {
     public static class CodeAnalysisLogger
     {
-        private static readonly List<string> _messages = new();
-        private static string _outputFilePath;
+        /// <summary>
+        /// Messages by output path suffixes.
+        /// </summary>
+        private static readonly Dictionary<string, List<string>> _messages = [];
+        private static string _outputPathPrefix;
+        private const string FileExtension = ".txt";
 
-        public static void SetOutputPath(string outputFilePath) => _outputFilePath = outputFilePath;
-        // private string GetTypePrefix<T0>() => $"[{typeof(T0).FullName}]";
-        // public void LogInformation<T0>(string message) => LogInformation($"{GetTypePrefix<T0>()}{message}");
-        // public void LogWarning<T0>(string message) => LogWarning($"{GetTypePrefix<T0>()}{message}");
-        // public void LogError<T0>(string message) => LogError($"{GetTypePrefix<T0>()}{message}");
+        private static void AddMessage(string fileSuffix, string message)
+        {
+            if (string.IsNullOrEmpty(fileSuffix))
+                fileSuffix = "_";
 
-        // public void LogCode<T0>(string message)
-        // {
-        //     message = Environment.NewLine + GetTypePrefix<T0>() + Environment.NewLine + message;
-        //     LogCode(message);
-        // }
-        public static void LogInformation(string message) => _messages.Add($"Information: {message}");
-        public static void LogWarning(string message) => _messages.Add($"Warning: {message}");
-        public static void LogError(string message) => _messages.Add($"Error: {message}");
+            if (!_messages.TryGetValue(fileSuffix, out List<string> messages))
+            {
+                messages = [];
+                _messages.Add(fileSuffix, messages);
+            }
+
+            messages.Add(message);
+        }
+
+        /// <summary>
+        /// Sets the output path. The .txt should be removed.
+        /// </summary>
+        public static void SetOutputPath(string outputFilePath) => _outputPathPrefix = outputFilePath;
+
+        public static void LogInformation(string message) => AddMessage("", $"Information: {message}");
+        public static void LogWarning(string message) => AddMessage("", $"Warning: {message}");
+        public static void LogError(string message) => AddMessage("", $"Error: {message}");
 
         public static void LogCode(string message)
         {
-            _messages.Add($"");
-            _messages.Add(message);
-            _messages.Add($"");
+            AddMessage("", "");
+            AddMessage("", message);
+            AddMessage("", "");
+        }
+
+        public static void LogCode(string fileSuffix, string message)
+        {
+            AddMessage(fileSuffix, "");
+            AddMessage(fileSuffix, message);
+            AddMessage(fileSuffix, "");
         }
 
         public static void WriteToFile()
         {
             #pragma warning disable RS1035
 
-            if (!string.IsNullOrWhiteSpace(_outputFilePath))
+            foreach (KeyValuePair<string, List<string>> kvp in _messages)
             {
-                try
+                string fullPath = $"{_outputPathPrefix}{kvp.Key}{FileExtension}";
+                
+                if (!string.IsNullOrWhiteSpace(fullPath))
                 {
-                    DateTime startTime = DateTime.Now;
-                    File.Delete(_outputFilePath);
-
-                    while (File.Exists(_outputFilePath))
+                    try
                     {
-                        Thread.Sleep(100);
-                        if ((DateTime.Now - startTime).TotalSeconds > 3)
-                            break;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
+                        DateTime startTime = DateTime.Now;
+                        File.Delete(fullPath);
 
-                File.WriteAllLines(_outputFilePath, _messages);
+                        while (File.Exists(fullPath))
+                        {
+                            Thread.Sleep(100);
+                            if ((DateTime.Now - startTime).TotalSeconds > 3)
+                                break;
+                        }
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+
+                    File.WriteAllLines(fullPath, kvp.Value);
+                }
+                
+                kvp.Value.Clear();
             }
 
-            _messages.Clear();
 
             #pragma warning restore RS1035
         }
