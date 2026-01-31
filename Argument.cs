@@ -17,13 +17,13 @@ namespace CodeAnalysis
     public static class ArgumentExtensions 
     {
         /// <summary>
-        /// Returns if all arguments are named. 
+        /// Returns if provided arguments are named. 
         /// </summary>
-        /// <returns>True if there are arguments and all are named.</returns>
-        public static bool AreArgumentsNamed(this List<Argument> methodArguments) 
+        /// <returns>True if there are no arguments present, or if all arguments are named.</returns>
+        public static bool AreArgumentsEmptyOrNamed(this List<Argument> methodArguments)
         {
-            if (methodArguments.Count == 0)
-                return false;
+            if (methodArguments is null || methodArguments.Count == 0)
+                return true;
 
             foreach (Argument argument in methodArguments)
             {
