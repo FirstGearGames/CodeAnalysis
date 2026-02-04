@@ -46,7 +46,7 @@ namespace CodeAnalysis.Common.Extensions
             List<ExpressionSyntax> expressionSyntaxes = GetReturnedExpressionSyntaxes(methodSymbol);
             foreach (ExpressionSyntax expressionSyntax in expressionSyntaxes)
             {
-                if (expressionSyntax.GeTypeInfoTypeSymbol(semanticModel) is { } typeSymbol)
+                if (expressionSyntax.GetTypeInfoTypeSymbol(semanticModel) is { } typeSymbol)
                     results.Add(typeSymbol);
             }
 

@@ -1,6 +1,6 @@
-﻿#pragma warning disable CS8601 // Possible null reference assignment.
+﻿
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8601 // Possible null reference assignment.
+
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 using Microsoft.CodeAnalysis;
 
@@ -8,13 +8,13 @@ namespace CodeAnalysis.Common.Extensions
 {
     public static class SyntaxNodeExtensions
     {
-        public static ISymbol GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
+        public static ISymbol? GetDeclaredSymbol(this SyntaxNode node, Compilation compilation)
         {
             SemanticModel model = compilation.GetSemanticModel(node.SyntaxTree);
-            return model.GetDeclaredSymbol(node);
+            return model?.GetDeclaredSymbol(node);
         }
 
-        public static bool TryGetParentSyntax<T>(this SyntaxNode syntaxNode, out T result) where T : SyntaxNode
+        public static bool TryGetParentSyntax<T>(this SyntaxNode syntaxNode, out T? result) where T : SyntaxNode
         {
             // set defaults
             #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.

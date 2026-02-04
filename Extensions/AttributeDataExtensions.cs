@@ -74,7 +74,7 @@ namespace CodeAnalysis.Common.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+        public static T? GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<TypedConstant> constructorArguments = thisAttributeData.ConstructorArguments;
 
@@ -85,7 +85,7 @@ namespace CodeAnalysis.Common.Extensions
         }
 
 
-        public static T GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments = thisAttributeData.NamedArguments;
 
@@ -95,9 +95,9 @@ namespace CodeAnalysis.Common.Extensions
             return default;
         }
 
-        public static T GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
+        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
 
-        public static T GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T defaultValue)
+        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T? defaultValue)
         {
             foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
                 if (namedArgument.Key == argumentName)
