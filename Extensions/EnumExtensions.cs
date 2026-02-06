@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis.Common.Extensions
