@@ -14,7 +14,7 @@ namespace CodeAnalysis.Common.Extensions
             return model?.GetDeclaredSymbol(node);
         }
 
-        public static bool TryGetParentSyntax<T>(this SyntaxNode syntaxNode, out T? result) where T : SyntaxNode
+        public static bool TryGetParentSyntax<T0>(this SyntaxNode syntaxNode, out T0? result) where T0 : SyntaxNode
         {
             // set defaults
             #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -35,9 +35,9 @@ namespace CodeAnalysis.Common.Extensions
                     return false;
                 }
 
-                if (syntaxNode.GetType() == typeof(T))
+                if (syntaxNode.GetType() == typeof(T0))
                 {
-                    result = syntaxNode as T;
+                    result = syntaxNode as T0;
                     return true;
                 }
 

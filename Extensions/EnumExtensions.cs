@@ -53,21 +53,21 @@ namespace CodeAnalysis.Common.Extensions
         /// <summary>
         /// Returns the highest numeric value for T.
         /// </summary>
-        public static int GetHighestValue<T>() where T : Enum
+        public static int GetMaximumValue<T0>() where T0 : Enum
         {
-            Type enumType = typeof(T);
+            Type enumType = typeof(T0);
             /* Brute force enum values.
              * Linq Last/Max lookup throws for IL2CPP. */
-            int highestValue = 0;
+            int maximumValue = 0;
             Array pidValues = Enum.GetValues(enumType);
-            foreach (T pid in pidValues)
+            foreach (T0 pid in pidValues)
             {
                 object obj = Enum.Parse(enumType, pid.ToString());
                 int value = Convert.ToInt32(obj);
-                highestValue = Math.Max(highestValue, value);
+                maximumValue = Math.Max(maximumValue, value);
             }
 
-            return highestValue;
+            return maximumValue;
         }
     }
 }

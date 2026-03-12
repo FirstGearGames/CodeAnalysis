@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using CodeAnalysis.Common.Finding;
 
 namespace CodeAnalysis.Common.Extensions
 {
@@ -130,6 +129,31 @@ namespace CodeAnalysis.Common.Extensions
                 return namedTypeSymbol.InheritsClass(classFullName);
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the INamedTypeSymbol for the Type member of an IFieldSymbol or IPropertySymbol. 
+        /// </summary>
+        public static bool TryGetMemberTypeINamedTypeSymbol(this ISymbol symbol, out INamedTypeSymbol? namedTypeSymbol)
+        {
+            namedTypeSymbol = null;
+
+            if (symbol is IFieldSymbol fieldSymbol)
+            {
+                if (fieldSymbol.Type is not INamedTypeSymbol lNamedTypeSymbol)
+                    return false;
+
+                namedTypeSymbol = lNamedTypeSymbol;
+            }
+            else if (symbol is IPropertySymbol propertySymbol)
+            {
+                if (propertySymbol.Type is not INamedTypeSymbol lNamedTypeSymbol)
+                    return false;
+
+                namedTypeSymbol = lNamedTypeSymbol;
+            }
+
+            return namedTypeSymbol is not null;
         }
     }
 }

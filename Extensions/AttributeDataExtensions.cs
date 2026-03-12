@@ -74,34 +74,34 @@ namespace CodeAnalysis.Common.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T? GetConstructorArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+        public static T0? GetConstructorArgument<T0>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<TypedConstant> constructorArguments = thisAttributeData.ConstructorArguments;
 
             if (argumentIndex > -1 && argumentIndex < constructorArguments.Length)
-                return (T)constructorArguments[argumentIndex].Value;
+                return (T0)constructorArguments[argumentIndex].Value;
 
             return default;
         }
 
 
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, int argumentIndex)
+        public static T0? GetNamedArgument<T0>(this AttributeData thisAttributeData, int argumentIndex)
         {
             ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments = thisAttributeData.NamedArguments;
 
             if (argumentIndex > -1 && argumentIndex < namedArguments.Length)
-                return (T)namedArguments[argumentIndex].Value.Value;
+                return (T0)namedArguments[argumentIndex].Value.Value;
 
             return default;
         }
 
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T>(argumentName, default);
+        public static T0? GetNamedArgument<T0>(this AttributeData thisAttributeData, string argumentName) => thisAttributeData.GetNamedArgument<T0>(argumentName, default);
 
-        public static T? GetNamedArgument<T>(this AttributeData thisAttributeData, string argumentName, T? defaultValue)
+        public static T0? GetNamedArgument<T0>(this AttributeData thisAttributeData, string argumentName, T0? defaultValue)
         {
             foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
                 if (namedArgument.Key == argumentName)
-                    return (T)namedArgument.Value.Value;
+                    return (T0)namedArgument.Value.Value;
 
             return defaultValue;
         }

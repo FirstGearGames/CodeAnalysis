@@ -30,16 +30,24 @@ namespace CodeAnalysis.Common.Extensions
 
             object? v = thisValue.ExplicitDefaultValue;
 
+            if (v is null)
+                return string.Empty;
+
+            if (thisValue.Type.TypeKind == TypeKind.Enum)
+            {
+                INamedTypeSymbol enumType = (INamedTypeSymbol)thisValue.Type;
+                IFieldSymbol? match = enumType.GetMembers().OfType<IFieldSymbol>().FirstOrDefault(f => f.HasConstantValue && Equals(f.ConstantValue, v));
+
+                if (match is not null)
+                    return $"{enumType.Name}.{match.Name}";
+            }
+
             return v switch
             {
-                null => string.Empty,
                 string s => s,
                 char c => $"'{c}'",
                 bool b => b ? "true" : "false",
-                Enum e => $"{e.GetType().Name}.{e}",
-                _ => Convert.ToString(v, CultureInfo.InvariantCulture)
-                     ?? v.ToString()
-                     ?? "Unprintable"
+                _ => Convert.ToString(v, CultureInfo.InvariantCulture) ?? v.ToString() ?? "Unprintable"
             };
         }
 
