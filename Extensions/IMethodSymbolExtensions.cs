@@ -83,9 +83,9 @@ namespace CodeAnalysis.Common.Extensions
             foreach (ITypeSymbol typeSymbol in thisValue.TypeArguments)
             {
                 if (useNamed && typeSymbol is INamedTypeSymbol namedTypeSymbol)
-                    arguments.Add(new(namedTypeSymbol.GetTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
+                    arguments.Add(new(namedTypeSymbol, namedTypeSymbol.GetTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
                 else
-                    arguments.Add(new($"T{iteration}", isNamed: false));
+                    arguments.Add(new(typeSymbol, $"T{iteration}", isNamed: false));
 
                 iteration++;
 

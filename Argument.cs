@@ -1,14 +1,17 @@
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis
 {
     public readonly struct Argument
     {
+        public readonly ITypeSymbol TypeSymbol;
         public readonly string Name;
         public readonly bool IsNamed;
 
-        public Argument(string name, bool isNamed)
+        public Argument(ITypeSymbol typeSymbol, string name, bool isNamed)
         {
+            TypeSymbol = typeSymbol;
             Name = name;
             IsNamed = isNamed;
         }
