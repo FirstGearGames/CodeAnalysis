@@ -232,9 +232,9 @@ namespace CodeAnalysis.Common.Extensions
             foreach (ITypeSymbol typeArgument in namedTypeSymbol.TypeArguments)
             {
                 if (argumentSearchType.IsGeneric() || typeArgument.TypeKind is TypeKind.TypeParameter)
-                    results.Add(new($"T{typeParameterCount++}", isNamed: false));
+                    results.Add(new(typeArgument, $"T{typeParameterCount++}", isNamed: false));
                 else if (typeArgument is INamedTypeSymbol argumentNamedTypeSymbol)
-                    results.Add(new(argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
+                    results.Add(new(typeArgument, argumentNamedTypeSymbol.GetNamedTypeSymbolFullNameWithArguments(argumentSearchType, out argumentSearchResult), isNamed: true));
                 else
                     argumentSearchResult = ArgumentSearchResult.ErrorForSearchType;
 
@@ -310,6 +310,7 @@ namespace CodeAnalysis.Common.Extensions
         {
             return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
         }
+
         public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
         {
             return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
@@ -365,7 +366,7 @@ namespace CodeAnalysis.Common.Extensions
         public static bool TryGetNullableEncapsulatedNamedTypeSymbol(this ITypeSymbol typeSymbol, out INamedTypeSymbol nullableEncapsulatedNamedTypeSybol)
         {
             nullableEncapsulatedNamedTypeSybol = null;
-            
+
             if (!typeSymbol.IsNullable())
                 return false;
 
@@ -374,7 +375,7 @@ namespace CodeAnalysis.Common.Extensions
 
             if (namedTypeSymbol.TypeArguments.Length == 0)
                 return false;
-            
+
             ITypeSymbol encapsulatedType = namedTypeSymbol.TypeArguments[0];
             if (encapsulatedType is not INamedTypeSymbol encapsulatedNamedTypeSymbol)
                 return false;
@@ -384,7 +385,6 @@ namespace CodeAnalysis.Common.Extensions
             return true;
         }
 
-        
         /// <summary>
         /// Returns if a TypeSymbol is encapsulated in Nullable<>. 
         /// </summary>
