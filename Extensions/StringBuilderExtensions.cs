@@ -24,13 +24,13 @@ namespace CodeAnalysis.Common.Extensions
             stringBuilder.AppendLine();
         }
 
-        public static void AppendLineAsOpeningCondition(this StringBuilder stringBuilder, string text) 
+        public static void AppendLineWithOpeningBracket(this StringBuilder stringBuilder, string text) 
         {
             stringBuilder.AppendLine(text);
             stringBuilder.AppendLine("{");
         }
 
-        public static void AppendLineAsClosingCondition(this StringBuilder stringBuilder, string text, bool doubleReturn) 
+        public static void AppendLineWithClosingBracket(this StringBuilder stringBuilder, string text, bool doubleReturn) 
         {
             stringBuilder.AppendLine(text);
             stringBuilder.AppendLine("}");
@@ -38,7 +38,7 @@ namespace CodeAnalysis.Common.Extensions
                 stringBuilder.AppendLine(string.Empty);
         }
 
-        public static void AppendLineAsClosingCondition(this StringBuilder stringBuilder, bool doubleReturn) 
+        public static void AppendLineWithClosingBracket(this StringBuilder stringBuilder, bool doubleReturn) 
         {
             stringBuilder.AppendLine("}");
             if (doubleReturn)
