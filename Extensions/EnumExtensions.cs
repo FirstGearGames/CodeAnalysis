@@ -69,5 +69,18 @@ namespace CodeAnalysis.Common.Extensions
 
             return maximumValue;
         }
+        
+                
+        /// <summary>
+        /// Gets all values for an enum.
+        /// </summary>
+        public static T0[] GetValuesAllocated<T0>() where T0 : Enum
+        {
+            /* Optimized over LINQ, and compatible
+             * with lower .NET 2+. */
+            return (T0[])Enum.GetValues(typeof(T0));
+        }
+
+
     }
 }
