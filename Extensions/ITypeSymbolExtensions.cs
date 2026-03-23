@@ -157,14 +157,15 @@ namespace CodeAnalysis.Common.Extensions
         }
 
         /// <summary>
-        /// Returns arguments as a list.
+        /// Returns the NamedTypeSymbol full name with arguments.
         /// </summary>
+        /// <example>RootNamespace.Strings.StringBuffer<int></example>
         public static string GetNamedTypeSymbolFullNameWithArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
         {
             //Default value until changed.
             string typeFullName = namedTypeSymbol.GetTypeSymbolFullName();
 
-            List<string> results = new();
+            List<string> results = [];
 
             //Type does not have arguments.
             if (!namedTypeSymbol.IsGenericType)
