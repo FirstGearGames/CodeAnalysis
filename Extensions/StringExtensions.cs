@@ -102,7 +102,7 @@ namespace CodeAnalysis.Common.Extensions
         /// </summary>
         /// <example>With a prefix of '_' value 'HelloWorld' is returned as '_helloWorld'.</example>
         /// <remarks>Prefix is only added if missing.</remarks>
-        public static string PascalCaseToCamelCase(this string value, string prefix = "_")
+        public static string PascalCaseToCamelCase(this string value, string prefix)
         {
             int index = value.GetFirstLetterOrDigitIndex();
 
@@ -168,20 +168,5 @@ namespace CodeAnalysis.Common.Extensions
             return UnsetIndex;
         }
         
-        /// <summary>
-        /// Replaces an artifact with a replacement.
-        /// </summary>
-        public static string Replace(this string value, string artifact, string replacement) => value.Replace(artifact, replacement);
-
-        /// <summary>
-        /// Replaces artifacts with replacements.
-        /// </summary>
-        public static string Replace(this string value, List<(string Artifact, string Replacement)> replacements)
-        {
-            foreach ((string Artifact, string Replacement) replacement in replacements)
-                value = value.Replace(replacement.Artifact, replacement.Replacement);
-
-            return value;
-        }
     }
 }
