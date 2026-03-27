@@ -314,10 +314,10 @@ public static class TypeSymbolExtensions
     /// Returns if a TypeSymbol is encapsulated in Nullable<> is encapsulated in Nullable<> and the encapsulated type is an INamedTypeSymbol.
     /// </summary>
     /// <returns></returns>
-    public static bool TryGetNullableEncapsulatedNamedTypeSymbol(this ITypeSymbol typeSymbol, out INamedTypeSymbol nullableEncapsulatedNamedTypeSybol)
+    public static bool TryGetNullableEncapsulatedNamedTypeSymbol(this ITypeSymbol typeSymbol, out ITypeSymbol encapsulatedTypeSymbol)
     {
-        nullableEncapsulatedNamedTypeSybol = null;
-
+        encapsulatedTypeSymbol = null;
+        
         if (!typeSymbol.IsNullable())
             return false;
 
@@ -327,11 +327,9 @@ public static class TypeSymbolExtensions
         if (namedTypeSymbol.TypeArguments.Length == 0)
             return false;
 
-        ITypeSymbol encapsulatedType = namedTypeSymbol.TypeArguments[0];
-        if (encapsulatedType is not INamedTypeSymbol encapsulatedNamedTypeSymbol)
+        encapsulatedTypeSymbol = namedTypeSymbol.TypeArguments[0];
+        if (encapsulatedTypeSymbol is not INamedTypeSymbol)
             return false;
-
-        nullableEncapsulatedNamedTypeSybol = encapsulatedNamedTypeSymbol;
 
         return true;
     }
