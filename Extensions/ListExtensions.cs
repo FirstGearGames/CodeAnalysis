@@ -5,50 +5,47 @@ namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
 
 public static class ListExtensions
 {
-
-    private static StringBuilder _stringBuilder = new();
-        
     /// <summary>
     /// Combines into a natural string: <str0, str1, str2 ...>
     /// </summary>
-    public static string GetCombinedArguments(this List<Argument> arguments)
+    public static string GetCombinedArguments(this List<Argument> argumentList)
     {
-        if (arguments.Count == 0)
+        if (argumentList is null || argumentList.Count == 0)
             return string.Empty;
 
-        _stringBuilder.Clear();
+        StringBuilder stringBuilder = new();
 
-        foreach (Argument methodArgument in arguments)
+        foreach (Argument methodArgument in argumentList)
         {
-            //Add separate if argument already exists.
-            if (_stringBuilder.Length != 0)
-                _stringBuilder.Append(", ");
+            // Add separate if argument already exists.
+            if (stringBuilder.Length != 0)
+                stringBuilder.Append(", ");
 
-            _stringBuilder.Append(methodArgument.Name);
+            stringBuilder.Append(methodArgument.Name);
         }
 
-        return $"<{_stringBuilder}>";
+        return $"<{stringBuilder}>";
     }
-        
+
     /// <summary>
     /// Combines into a natural string: <str0, str1, str2 ...>
     /// </summary>
-    public static string GetCombinedArguments(this List<string> thisValue)
+    public static string GetCombinedArguments(this List<string> stringList)
     {
-        if (thisValue.Count == 0)
+        if (stringList is null || stringList.Count == 0)
             return string.Empty;
 
-        _stringBuilder.Clear();
+        StringBuilder stringBuilder = new();
 
-        foreach (string argumentName in thisValue)
+        foreach (string argumentName in stringList)
         {
-            //Add separate if argument already exists.
-            if (_stringBuilder.Length != 0)
-                _stringBuilder.Append(", ");
+            // Add separate if argument already exists.
+            if (stringBuilder.Length != 0)
+                stringBuilder.Append(", ");
 
-            _stringBuilder.Append(argumentName);
+            stringBuilder.Append(argumentName);
         }
 
-        return $"<{_stringBuilder}>";
+        return $"<{stringBuilder}>";
     }
 }
