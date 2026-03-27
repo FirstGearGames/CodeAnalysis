@@ -1,6 +1,5 @@
-﻿namespace CodeAnalysis.Common.Extensions
+﻿namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+
+public static class NamespaceSymbolExtensions
 {
-    public static class NamespaceSymbolExtensions
-    {
-    }
 }

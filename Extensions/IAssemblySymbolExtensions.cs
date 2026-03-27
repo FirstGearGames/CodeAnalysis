@@ -1,66 +1,64 @@
 ﻿#nullable enable
 using System.Collections.Generic;
-using CodeAnalysis.Common.Finding;
 using Microsoft.CodeAnalysis;
 
-namespace CodeAnalysis.Common.Extensions
+namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+
+public static class AssemblySymbolExtensions
 {
-    public static class IAssemblySymbolExtensions
+    /// <summary>
+    /// Recursively gets INamespaceSymbols within an assembly.
+    /// </summary>
+    public static List<INamespaceSymbol> RecursivelyGetNamespaceSymbols(this IAssemblySymbol assemblySymbol)
     {
-        /// <summary>
-        /// Recursively gets INamespaceSymbols within an assembly.
-        /// </summary>
-        public static List<INamespaceSymbol> RecursivelyGetNamespaceSymbols(this IAssemblySymbol assemblySymbol)
+        if (assemblySymbol is null)
+            return new();
+
+        List<INamespaceSymbol> allNamespaces = new();
+
+        // Get the global namespace and add it to begin iteration.
+        INamespaceSymbol globalNamespace = assemblySymbol.GlobalNamespace;
+        allNamespaces.Add(globalNamespace);
+
+        for (int i = 0; i < allNamespaces.Count; i++)
         {
-            if (assemblySymbol is null)
-                return new();
-
-            List<INamespaceSymbol> allNamespaces = new();
-
-            // Get the global namespace and add it to begin iteration.
-            INamespaceSymbol globalNamespace = assemblySymbol.GlobalNamespace;
-            allNamespaces.Add(globalNamespace);
-
-            for (int i = 0; i < allNamespaces.Count; i++)
-            {
-                INamespaceSymbol current = allNamespaces[i];
-                allNamespaces.AddRange(current.GetNamespaceMembers());
-            }
-
-            return allNamespaces;
+            INamespaceSymbol current = allNamespaces[i];
+            allNamespaces.AddRange(current.GetNamespaceMembers());
         }
 
-        /// <summary>
-        /// Recursively gets INamedTypeSymbols within an assembly.
-        /// </summary>
-        public static List<INamedTypeSymbol> RecursivelyGetNamedTypeSymbols(this IAssemblySymbol assemblySymbol)
-        {
-            List<INamespaceSymbol> allNamespaces = assemblySymbol.RecursivelyGetNamespaceSymbols();
+        return allNamespaces;
+    }
 
-            List<INamedTypeSymbol> namedTypeSymbols = new();
-            foreach (INamespaceSymbol namespaceSymbol in allNamespaces)
-                namedTypeSymbols.AddRange(namespaceSymbol.GetTypeMembers());
+    /// <summary>
+    /// Recursively gets INamedTypeSymbols within an assembly.
+    /// </summary>
+    public static List<INamedTypeSymbol> RecursivelyGetNamedTypeSymbols(this IAssemblySymbol assemblySymbol)
+    {
+        List<INamespaceSymbol> allNamespaces = assemblySymbol.RecursivelyGetNamespaceSymbols();
 
-            // Now recursively iterate namedTypeSymbols.
-            for (int i = 0; i < namedTypeSymbols.Count; i++)
-                namedTypeSymbols.AddRange(namedTypeSymbols[i].GetTypeMembers());
+        List<INamedTypeSymbol> namedTypeSymbols = new();
+        foreach (INamespaceSymbol namespaceSymbol in allNamespaces)
+            namedTypeSymbols.AddRange(namespaceSymbol.GetTypeMembers());
 
-            return namedTypeSymbols;
-        }
+        // Now recursively iterate namedTypeSymbols.
+        for (int i = 0; i < namedTypeSymbols.Count; i++)
+            namedTypeSymbols.AddRange(namedTypeSymbols[i].GetTypeMembers());
 
-        /// <summary>
-        /// Recursively gets IMethodSymbols within an assembly.
-        /// </summary>
-        public static List<IMethodSymbol> RecursivelyGetMethodSymbols(this IAssemblySymbol assemblySymbol, Accessibility? requiredAccessibility = null)
-        {
-            List<INamedTypeSymbol> namedTypeSymbols = assemblySymbol.RecursivelyGetNamedTypeSymbols();
+        return namedTypeSymbols;
+    }
 
-            List<IMethodSymbol> methodSymbols = new();
+    /// <summary>
+    /// Recursively gets IMethodSymbols within an assembly.
+    /// </summary>
+    public static List<IMethodSymbol> RecursivelyGetMethodSymbols(this IAssemblySymbol assemblySymbol, Accessibility? requiredAccessibility = null)
+    {
+        List<INamedTypeSymbol> namedTypeSymbols = assemblySymbol.RecursivelyGetNamedTypeSymbols();
 
-            foreach (INamedTypeSymbol namedTypeSymbol in namedTypeSymbols)
-                methodSymbols.AddRange(namedTypeSymbol.GetMethodSymbols(requiredAccessibility));
+        List<IMethodSymbol> methodSymbols = new();
 
-            return methodSymbols;
-        }
+        foreach (INamedTypeSymbol namedTypeSymbol in namedTypeSymbols)
+            methodSymbols.AddRange(namedTypeSymbol.GetMethodSymbols(requiredAccessibility));
+
+        return methodSymbols;
     }
 }

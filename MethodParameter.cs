@@ -1,104 +1,104 @@
 using System.Collections.Generic;
 using System.Text;
-using CodeAnalysis.Common.Extensions;
 using Microsoft.CodeAnalysis;
+using Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+using Nucleus.CodeAnalysis.SourceGenerators.Finding;
 
-namespace CodeAnalysis
+namespace Nucleus.CodeAnalysis.SourceGenerators;
+
+public readonly struct MethodParameter
 {
-    public readonly struct MethodParameter
+    public readonly string TypeFullName;
+    public readonly string ParameterName;
+    public readonly string OptionalValue;
+    public readonly int Index;
+    public MethodParameter(IParameterSymbol parameterSymbol) : this(parameterSymbol.Type.GetTypeSymbolFullNameWithArguments(ArgumentSearchType.PreferNamed, out _), parameterSymbol.Name, parameterSymbol.Ordinal, parameterSymbol.OptionalValueToString()) { }
+        
+    public MethodParameter(string? typeFullName, string parameterName,int index, string optionalValue)
     {
-        public readonly string TypeFullName;
-        public readonly string ParameterName;
-        public readonly string OptionalValue;
-        public readonly int Index;
-        public MethodParameter(IParameterSymbol parameterSymbol) : this(parameterSymbol.Type.GetTypeSymbolFullNameWithArguments(ArgumentSearchType.PreferNamed, out _), parameterSymbol.Name, parameterSymbol.Ordinal, parameterSymbol.OptionalValueToString()) { }
-        
-        public MethodParameter(string? typeFullName, string parameterName,int index, string optionalValue)
-        {
-            if (typeFullName is null)
-                typeFullName = string.Empty;
+        if (typeFullName is null)
+            typeFullName = string.Empty;
             
-            TypeFullName = typeFullName;
-            ParameterName = parameterName;
-            Index = index;
-            OptionalValue = optionalValue;
-        }
-
-        /// <summary>
-        /// Returns the parameter type and name as it would be seen in a method signature.
-        /// </summary>
-        /// <returns></returns>
-        public string GetParameterAsMethodSignature() => $"{TypeFullName} {ParameterName}";
-        
+        TypeFullName = typeFullName;
+        ParameterName = parameterName;
+        Index = index;
+        OptionalValue = optionalValue;
     }
 
-    public static class MethodParameterExtensions
+    /// <summary>
+    /// Returns the parameter type and name as it would be seen in a method signature.
+    /// </summary>
+    /// <returns></returns>
+    public string GetParameterAsMethodSignature() => $"{TypeFullName} {ParameterName}";
+        
+}
+
+public static class MethodParameterExtensions
+{
+    /// <summary>
+    /// Returns all entries as they would appear in a method signature.
+    /// </summary>
+    /// <example>bool isSafe, int healthRemaining</example>
+    public static string GetAsMethodSignature(this List<MethodParameter> thisValue)
     {
-        /// <summary>
-        /// Returns all entries as they would appear in a method signature.
-        /// </summary>
-        /// <example>bool isSafe, int healthRemaining</example>
-        public static string GetAsMethodSignature(this List<MethodParameter> thisValue)
+        if (thisValue is null || thisValue.Count == 0)
+            return string.Empty;
+
+        StringBuilder stringBuilder = new();
+        List<string> parametersAsSignatures = [];
+
+        foreach (MethodParameter methodParameter in thisValue)
         {
-            if (thisValue is null || thisValue.Count == 0)
-                return string.Empty;
+            stringBuilder.Clear();
 
-            StringBuilder stringBuilder = new();
-            List<string> parametersAsSignatures = [];
+            stringBuilder.Append($"{methodParameter.TypeFullName} {methodParameter.ParameterName}");
 
-            foreach (MethodParameter methodParameter in thisValue)
+            if (!string.IsNullOrWhiteSpace(methodParameter.OptionalValue))
             {
-                stringBuilder.Clear();
-
-                stringBuilder.Append($"{methodParameter.TypeFullName} {methodParameter.ParameterName}");
-
-                if (!string.IsNullOrWhiteSpace(methodParameter.OptionalValue))
-                {
-                    stringBuilder.Append($" = {methodParameter.OptionalValue}");
+                stringBuilder.Append($" = {methodParameter.OptionalValue}");
                     
-                    /* If the type is a Single then the f to indicate
-                     * float has to manually be added for compilation to complete. */
-                    bool typeIsSingle = methodParameter.TypeFullName.Equals(typeof(System.Single).FullName);
-                    if (typeIsSingle)
-                        stringBuilder.Append("f");
-                }
-
-                parametersAsSignatures.Add(stringBuilder.ToString());
+                /* If the type is a Single then the f to indicate
+                 * float has to manually be added for compilation to complete. */
+                bool typeIsSingle = methodParameter.TypeFullName.Equals(typeof(System.Single).FullName);
+                if (typeIsSingle)
+                    stringBuilder.Append("f");
             }
 
-            return string.Join(", ", parametersAsSignatures);
+            parametersAsSignatures.Add(stringBuilder.ToString());
         }
 
-        /// <summary>
-        /// Returns the name only of each parameter.
-        /// </summary>
-        public static List<string> GetParameterNames(this List<MethodParameter> methodParameters)
-        {
-            if (methodParameters is null || methodParameters.Count == 0)
-                return [];
+        return string.Join(", ", parametersAsSignatures);
+    }
 
-            List<string> names = [];
+    /// <summary>
+    /// Returns the name only of each parameter.
+    /// </summary>
+    public static List<string> GetParameterNames(this List<MethodParameter> methodParameters)
+    {
+        if (methodParameters is null || methodParameters.Count == 0)
+            return [];
 
-            for (int i = 0; i < methodParameters.Count; i++)
-                names.Add(methodParameters[i].ParameterName);
+        List<string> names = [];
 
-            return names;
-        }
+        for (int i = 0; i < methodParameters.Count; i++)
+            names.Add(methodParameters[i].ParameterName);
 
-        /// <summary>
-        /// Returns the type full name of each parameter.
-        /// </summary>
-        public static List<string> GetParameterTypeFullNames(this List<MethodParameter> methodParameters)
-        {
-            if (methodParameters is null || methodParameters.Count == 0)
-                return [];
+        return names;
+    }
 
-            List<string> names = [];
+    /// <summary>
+    /// Returns the type full name of each parameter.
+    /// </summary>
+    public static List<string> GetParameterTypeFullNames(this List<MethodParameter> methodParameters)
+    {
+        if (methodParameters is null || methodParameters.Count == 0)
+            return [];
 
-            for (int i = 0; i < methodParameters.Count; i++)
-                names.Add(methodParameters[i].TypeFullName);
+        List<string> names = [];
 
-            return names;
-        }
+        for (int i = 0; i < methodParameters.Count; i++)
+            names.Add(methodParameters[i].TypeFullName);
+
+        return names;
     }
 }

@@ -1,52 +1,51 @@
 ﻿using System;
 
-namespace CodeAnalysis.Common.Extensions
+namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+
+public static class TypeExtensions
 {
-    public static class TypeExtensions
+    /// <summary>
+    /// Gets the full name of a Type.
+    /// </summary>
+    /// <remarks>The returned string does not include the global alias.</remarks>
+    public static string GetFullName(this Type type)
     {
-        /// <summary>
-        /// Gets the full name of a Type.
-        /// </summary>
-        /// <remarks>The returned string does not include the global alias.</remarks>
-        public static string GetFullName(this Type type)
-        {
-            string? fullName = type?.FullName;
+        string? fullName = type?.FullName;
             
-            if (fullName is null)
-                return string.Empty;
+        if (fullName is null)
+            return string.Empty;
 
-            return fullName;
-        }
+        return fullName;
+    }
         
-        /// <summary>
-        /// Gets the full name of a Type while removing generic arguments and brackets.
-        /// </summary>
-        /// <remarks>The returned string does not include the global alias.</remarks>
-        public static string GetFullNameWithoutGenerics(this Type type)
-        {
-            string fullName = type.GetFullName();
+    /// <summary>
+    /// Gets the full name of a Type while removing generic arguments and brackets.
+    /// </summary>
+    /// <remarks>The returned string does not include the global alias.</remarks>
+    public static string GetFullNameWithoutGenerics(this Type type)
+    {
+        string fullName = type.GetFullName();
 
-            int genericMarkerIndex = fullName.IndexOf("`", StringComparison.InvariantCultureIgnoreCase);
-            if (genericMarkerIndex >= 0)
-                return fullName.Substring(0, genericMarkerIndex);
+        int genericMarkerIndex = fullName.IndexOf("`", StringComparison.InvariantCultureIgnoreCase);
+        if (genericMarkerIndex >= 0)
+            return fullName.Substring(0, genericMarkerIndex);
             
-            return fullName;
-        }
+        return fullName;
+    }
         
         
-        /// <summary>
-        /// Gets the name of a Type while removing generic arguments and brackets.
-        /// </summary>
-        /// <remarks>The returned string does not include the global alias.</remarks>
-        public static string GetNameWithoutGenerics(this Type type)
-        {
-            string name = type.Name;
+    /// <summary>
+    /// Gets the name of a Type while removing generic arguments and brackets.
+    /// </summary>
+    /// <remarks>The returned string does not include the global alias.</remarks>
+    public static string GetNameWithoutGenerics(this Type type)
+    {
+        string name = type.Name;
 
-            int genericMarkerIndex = name.IndexOf("`", StringComparison.InvariantCultureIgnoreCase);
-            if (genericMarkerIndex >= 0)
-                return name.Substring(0, genericMarkerIndex);
+        int genericMarkerIndex = name.IndexOf("`", StringComparison.InvariantCultureIgnoreCase);
+        if (genericMarkerIndex >= 0)
+            return name.Substring(0, genericMarkerIndex);
             
-            return name;
-        }
+        return name;
     }
 }
