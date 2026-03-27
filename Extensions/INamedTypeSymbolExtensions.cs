@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,15 +12,73 @@ namespace CodeAnalysis.Common.Extensions
     public static class INamedTypeSymbolExtensions
     {
         /// <summary>
+        /// Sets the namespace and class signature.
+        /// </summary>
+        /// <returns>True if information was set successfully.</returns>
+        /// <example>Generated class signature example: public partial MyClass<Type> : BaseClass, Interface</example>
+        public static bool TryGenerateClassSignature(this INamedTypeSymbol classSymbol, out string? fullNamespace, out string? classDeclaration)
+        {
+            fullNamespace = null;
+            classDeclaration = null;
+
+            if (!classSymbol.IsReferenceType)
+                return false;
+
+            fullNamespace = classSymbol.GetNamespace();
+            
+            StringBuilder stringBuilder = new();
+            
+            /* Get modifiers. */
+            SyntaxReference? classSyntaxReference = classSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+            if (classSyntaxReference is null)
+                return false;
+            
+            TypeDeclarationSyntax typeDeclarationSyntax = (TypeDeclarationSyntax)classSyntaxReference.GetSyntax();
+            string generatedModifiers = string.Join(" ", typeDeclarationSyntax.Modifiers.Select(x => x.Text));
+            
+            // public partial 
+            stringBuilder.Append($"{generatedModifiers} class ");
+            
+            // Formatting for ToDisplayString.
+            SymbolDisplayFormat thisStringFormat = new(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters, kindOptions: SymbolDisplayKindOptions.IncludeMemberKeyword, memberOptions: SymbolDisplayMemberOptions.IncludeModifiers, miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+            // public partial class Name<Parameters>
+            stringBuilder.Append(classSymbol.ToDisplayString(thisStringFormat));
+
+            bool hasBaseClass = classSymbol.BaseType is not null && classSymbol.BaseType.SpecialType is not SpecialType.System_Object;
+
+            SymbolDisplayFormat fullNameWithParameterFormat = new(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters, kindOptions: SymbolDisplayKindOptions.None, memberOptions: SymbolDisplayMemberOptions.IncludeModifiers, miscellaneousOptions: SymbolDisplayMiscellaneousOptions.None);
+
+            // public partial class Name<Parameters> : Namespace.BaseClass<Parameters>
+            if (hasBaseClass)
+                stringBuilder.Append($" : {classSymbol.BaseType.ToDisplayString(fullNameWithParameterFormat)}");
+
+            for (int i = 0; i < classSymbol.Interfaces.Length; i++)
+            {
+                INamedTypeSymbol interfaceSymbol = classSymbol.Interfaces[i];
+
+                /* If there is a base class or if this is the second interface
+                 * prefix with a comma, otherwise use a colon. */
+                string prefix = hasBaseClass || i > 0 ? ", " : " : ";
+                stringBuilder.Append(prefix);
+                
+                stringBuilder.Append(interfaceSymbol.ToDisplayString(fullNameWithParameterFormat));
+            }
+            
+            classDeclaration = stringBuilder.ToString();
+            
+            return true;
+        }
+
+        /// <summary>
         /// Gets IFieldSymbols within a symbol.
         /// </summary>
-        public static List<IFieldSymbol> GetFieldSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility = null)
+        public static List<IFieldSymbol> GetFieldSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility)
         {
             List<IFieldSymbol> validSymbols = new();
-            
+
             foreach (ISymbol symbol in namedTypeSymbol.GetMembers())
             {
-                if (symbol is IFieldSymbol methodSymbol) 
+                if (symbol is IFieldSymbol methodSymbol)
                 {
                     if (requiredAccessibility is null || methodSymbol.DeclaredAccessibility == requiredAccessibility.Value)
                         validSymbols.Add(methodSymbol);
@@ -32,13 +91,13 @@ namespace CodeAnalysis.Common.Extensions
         /// <summary>
         /// Gets IMethodSymbols within an INamedTypeSymbols.
         /// </summary>
-        public static List<IMethodSymbol> GetMethodSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility = null)
+        public static List<IMethodSymbol> GetMethodSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility)
         {
             List<IMethodSymbol> validSymbols = new();
-            
+
             foreach (ISymbol symbol in namedTypeSymbol.GetMembers())
             {
-                if (symbol is IMethodSymbol methodSymbol) 
+                if (symbol is IMethodSymbol methodSymbol)
                 {
                     if (requiredAccessibility is null || methodSymbol.DeclaredAccessibility == requiredAccessibility.Value)
                         validSymbols.Add(methodSymbol);

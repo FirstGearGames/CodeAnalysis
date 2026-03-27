@@ -168,5 +168,26 @@ namespace CodeAnalysis.Common.Extensions
             return UnsetIndex;
         }
         
+        /// <summary>
+        /// Makes names of various types safe for use as file names.
+        /// </summary>
+        /// <param name="value">Value to make safe.</param>
+        /// <returns>Value with non-alphaNumeric characters replaced with '_'.</returns>
+        public static string MakeFileSafeName(this string value)
+        {
+            StringBuilder stringBuilder = new();
+            
+            foreach (char c in value)
+            {
+                if (char.IsLetterOrDigit(c))
+                    stringBuilder.Append(c);
+                else
+                    stringBuilder.Append('_');
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        
     }
 }

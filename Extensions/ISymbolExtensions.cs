@@ -1,11 +1,43 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeAnalysis.Common.Extensions
 {
     public static class ISymbolExtensions
     {
+        /// <summary>
+        /// Gets the specific location of the identifier (the name) of a method or class.
+        /// This makes diagnostics look much cleaner in the IDE.
+        /// </summary>
+        public static Location GetIdentifierLocation(this ISymbol symbol)
+        {
+            if (!symbol.TryGetRecordDeclaration(out SyntaxNode? syntaxNode))
+                return Location.None;
+
+            // Use pattern matching or simple casting for older Roslyn
+            if (syntaxNode is MethodDeclarationSyntax method)
+                return method.Identifier.GetLocation();
+            
+            if (syntaxNode is ClassDeclarationSyntax cls)
+                return cls.Identifier.GetLocation();
+
+            return syntaxNode!.GetLocation();
+        }
+        
+        /// <summary>
+        /// Gets the SyntaxNode for a symbol if it exists in source.
+        /// </summary>
+        public static bool TryGetRecordDeclaration(this ISymbol symbol, out SyntaxNode? syntaxNode)
+        {
+            SyntaxReference? reference = symbol.DeclaringSyntaxReferences.FirstOrDefault();
+            syntaxNode = reference?.GetSyntax();
+
+            return syntaxNode is not null;
+        }
+        
         /// <summary>
         /// Returns the full name of a symbol which includes the namespace.
         /// </summary>
