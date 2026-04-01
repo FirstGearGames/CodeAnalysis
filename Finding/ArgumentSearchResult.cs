@@ -1,4 +1,4 @@
-﻿namespace Nucleus.CodeAnalysis.SourceGenerators.Finding;
+﻿namespace CodeAnalysis.Finding;
 
 
 [System.Flags]

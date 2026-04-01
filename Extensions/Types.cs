@@ -1,5 +1,5 @@
 ﻿
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public enum SearchScope 
 {

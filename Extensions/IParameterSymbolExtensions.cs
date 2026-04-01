@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public static class ParameterSymbolExtensions
 {

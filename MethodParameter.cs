@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
+using CodeAnalysis.Extensions;
+using CodeAnalysis.Finding;
 using Microsoft.CodeAnalysis;
-using Nucleus.CodeAnalysis.SourceGenerators.Extensions;
-using Nucleus.CodeAnalysis.SourceGenerators.Finding;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators;
+namespace CodeAnalysis;
 
 public readonly struct MethodParameter
 {

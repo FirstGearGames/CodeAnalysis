@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators;
+namespace CodeAnalysis;
 
 public readonly struct Argument
 {

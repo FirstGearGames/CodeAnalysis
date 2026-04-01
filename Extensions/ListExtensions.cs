@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public static class ListExtensions
 {

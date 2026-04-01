@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public static class AssemblySymbolExtensions
 {
@@ -53,12 +53,12 @@ public static class AssemblySymbolExtensions
     public static List<IMethodSymbol> RecursivelyGetMethodSymbols(this IAssemblySymbol assemblySymbol, Accessibility? requiredAccessibility = null)
     {
         List<INamedTypeSymbol> namedTypeSymbols = assemblySymbol.RecursivelyGetNamedTypeSymbols();
-
-        List<IMethodSymbol> methodSymbols = new();
-
+        
+        List<IMethodSymbol> methodSymbols = [];
+        
         foreach (INamedTypeSymbol namedTypeSymbol in namedTypeSymbols)
             methodSymbols.AddRange(namedTypeSymbol.GetMethodSymbols(requiredAccessibility));
-
+        
         return methodSymbols;
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public static class NamedTypeSymbolExtensions
 {

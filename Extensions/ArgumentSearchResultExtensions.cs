@@ -1,6 +1,6 @@
-﻿using Nucleus.CodeAnalysis.SourceGenerators.Finding;
+﻿using CodeAnalysis.Finding;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 
 public static class ArgumentSearchResultExtensions

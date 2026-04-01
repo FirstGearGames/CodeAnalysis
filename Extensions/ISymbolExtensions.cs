@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public static class SymbolExtensions
 {
@@ -20,13 +20,13 @@ public static class SymbolExtensions
         // Use pattern matching or simple casting for older Roslyn
         if (syntaxNode is MethodDeclarationSyntax method)
             return method.Identifier.GetLocation();
-            
+
         if (syntaxNode is ClassDeclarationSyntax cls)
             return cls.Identifier.GetLocation();
 
         return syntaxNode!.GetLocation();
     }
-        
+
     /// <summary>
     /// Gets the SyntaxNode for a symbol if it exists in source.
     /// </summary>
@@ -37,7 +37,7 @@ public static class SymbolExtensions
 
         return syntaxNode is not null;
     }
-        
+
     /// <summary>
     /// Returns the full name of a symbol which includes the namespace.
     /// </summary>
@@ -80,11 +80,12 @@ public static class SymbolExtensions
             data = null;
             return false;
         }
-        List<string> fullNames = new();
+        List<string> fullNames = [];
         foreach (Type type in attributeTypes)
         {
-            if (type is not null)
-                fullNames.Add(type.GetFullName());
+            string? typeFullName = type?.FullName;
+            if (typeFullName is not null)
+                fullNames.Add(typeFullName);
         }
 
         return symbol.HasAnyAttribute(searchScope, fullNames, out data);
@@ -101,14 +102,22 @@ public static class SymbolExtensions
             return false;
         }
 
-        return symbol.HasAttribute(searchScope, attributeType.GetFullName(), out data);
+        string? typeFullName = attributeType.FullName;
+            
+        return symbol.HasAttribute(searchScope, typeFullName, out data);
     }
 
     /// <summary>
     /// Returns if a symbol has an attribute, and outputs it if so.
     /// </summary>
-    public static bool HasAttribute(this ISymbol symbol, SearchScope searchScope, string attributeFullName, out AttributeData data)
+    public static bool HasAttribute(this ISymbol symbol, SearchScope searchScope, string? attributeFullName, out AttributeData data)
     {
+        if (attributeFullName is null)
+        {
+            data = null;
+            return false;
+        }
+
         if (symbol is not null)
         {
             foreach (AttributeData item in symbol.GetAttributes())

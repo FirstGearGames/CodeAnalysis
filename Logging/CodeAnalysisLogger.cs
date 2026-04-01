@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Logging;
+namespace CodeAnalysis.Logging;
 
 public static class CodeAnalysisLogger
 {

@@ -2,9 +2,9 @@
 using System.Text;
 using CodeAnalysis.Constants;
 using Microsoft.CodeAnalysis;
-using Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+using CodeAnalysis.Extensions;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.SourceGenerators.CodeBuilding;
+namespace CodeAnalysis.SourceGenerators.CodeBuilding;
 
 public static class CodeBuilder
 {

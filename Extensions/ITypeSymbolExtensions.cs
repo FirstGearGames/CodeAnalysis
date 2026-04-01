@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using CodeAnalysis.Constants;
+using CodeAnalysis.Finding;
 using Microsoft.CodeAnalysis;
-using Nucleus.CodeAnalysis.SourceGenerators.Finding;
 
-namespace Nucleus.CodeAnalysis.SourceGenerators.Extensions;
+namespace CodeAnalysis.Extensions;
 
 public static class TypeSymbolExtensions
 {
