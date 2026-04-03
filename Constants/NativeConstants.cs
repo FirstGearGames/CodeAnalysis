@@ -8,7 +8,6 @@ public static class NativeConstants
     public const string FuncFullName = "System.Func";
     public const string ActionFullName = "System.Action";
     public const string BooleanFullName = "System.Boolean";
-    public const string NonNetworkedAttributeFullName = "System.NonNetworkedAttribute";
     public const string UInt64FullName = "System.UInt64";
     public const string ObjectFullName = "System.Object";
     public const string LineFeed = "\r\n";

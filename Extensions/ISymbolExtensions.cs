@@ -196,4 +196,6 @@ public static class SymbolExtensions
 
         return namedTypeSymbol is not null;
     }
+    
+
 }

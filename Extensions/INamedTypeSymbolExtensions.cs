@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS8602 // Dereference of a possibly null reference.
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -218,6 +219,39 @@ public static class NamedTypeSymbolExtensions
         }
 
         return $"{modifiersText} {partialText}{keywordText} {namedTypeSymbol.Name}";
+    }
+    
+    /// <summary>
+    /// Returns if the symbol implements IEquatable.
+    /// </summary>
+    /// <returns>True if implemented.</returns>
+    public static bool ImplementsIEquatable(this INamedTypeSymbol namedTypeSymbol)
+    {
+        string? iEquatableFullName = typeof(IEquatable<>).FullName;
+        if (iEquatableFullName is null)
+            return false;
+        
+        return namedTypeSymbol.NamedTypeSymbolImplementsInterface(iEquatableFullName);
+    }
+    
+    /// <summary>
+    /// Returns if the symbol implements operator==.
+    /// </summary>
+    /// <returns>True if implemented.</returns>
+    public static bool ImplementsOpEquality(this INamedTypeSymbol namedTypeSymbol)
+    {
+        foreach (ISymbol member in namedTypeSymbol.GetMembers(WellKnownMemberNames.EqualityOperatorName))
+        {
+            // Cast to IMethodSymbol to check the MethodKind
+            if (member is IMethodSymbol { MethodKind: MethodKind.UserDefinedOperator } method)
+            {
+                //Two parameters are expected for the operator== method.
+                if (method.Parameters.Length == 2)
+                    return true;
+            }
+        }
+
+        return false;
     }
 }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.

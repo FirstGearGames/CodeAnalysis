@@ -335,6 +335,32 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
+    /// Returns if the Symbol is a primitive Type using SpecialType.
+    /// </summary>
+    /// <param name="symbol">Symbol to check.</param>
+    /// <returns>True if primitive.</returns>
+    public static bool IsPrimitive(this ITypeSymbol symbol)
+    {
+        switch (symbol.SpecialType)
+        {
+            case SpecialType.System_Boolean:
+            case SpecialType.System_Byte:
+            case SpecialType.System_SByte:
+            case SpecialType.System_Int16:
+            case SpecialType.System_UInt16:
+            case SpecialType.System_Int32:
+            case SpecialType.System_UInt32:
+            case SpecialType.System_Int64:
+            case SpecialType.System_UInt64:
+            case SpecialType.System_Single:
+            case SpecialType.System_Double:
+            case SpecialType.System_Char:
+                return true;
+            default:
+                return false;
+        }
+    }
+    /// <summary>
     /// Returns if a TypeSymbol is encapsulated in Nullable<>. 
     /// </summary>
     /// <returns></returns>
