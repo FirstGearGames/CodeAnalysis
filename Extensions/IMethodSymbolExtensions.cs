@@ -149,4 +149,31 @@ public static class MethodSymbolExtensions
         }
         return results;
     }
+    
+    /// <summary>
+    /// Gets ISymbols which are referenced within an IMethodSymbol.
+    /// </summary>
+    public static HashSet<ISymbol> GetReferencedSymbols(this IMethodSymbol methodSymbol, SemanticModel semanticModel)
+    {
+        HashSet<ISymbol> referencedSymbols = [];
+
+        foreach (SyntaxReference reference in methodSymbol.DeclaringSyntaxReferences)
+        {
+            SyntaxNode methodNode = reference.GetSyntax();
+
+            IEnumerable<IdentifierNameSyntax> identifiers = methodNode.DescendantNodes().OfType<IdentifierNameSyntax>();
+
+            foreach (IdentifierNameSyntax identifier in identifiers)
+            {
+                SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(identifier);
+                ISymbol? symbol = symbolInfo.Symbol;
+
+                if (symbol != null)
+                    referencedSymbols.Add(symbol);
+            }
+        }
+
+        return referencedSymbols;
+    }
+    
 }
