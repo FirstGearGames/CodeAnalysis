@@ -253,5 +253,11 @@ public static class NamedTypeSymbolExtensions
 
         return false;
     }
+
+    /// <summary>
+    /// Returns if the NamedTypeSymbol can be compared using == and != operators.
+    /// </summary>
+    public static bool IsEqualityComparable(this INamedTypeSymbol namedTypeSymbol) => namedTypeSymbol.IsValueType && !namedTypeSymbol.IsClassOrStruct();
+
 }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
