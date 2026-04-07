@@ -23,11 +23,11 @@ public static class MethodSymbolExtensions
             parameters.Add(parameterName);
         }
 
-        //Lengths do not match.
+        // Lengths do not match.
         if (expectedParameterNames.Length != parameters.Count)
             return false;
 
-        //Compare each entry.
+        // Compare each entry.
         for (int i = 0; i < parameters.Count; i++)
         {
             if (!string.Equals(parameters[i], expectedParameterNames[i], StringComparison.Ordinal))
@@ -53,7 +53,7 @@ public static class MethodSymbolExtensions
 
         return results;
     }
-        
+
     public static List<Argument> GetMethodSymbolArguments(this IMethodSymbol thisValue, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
     {
         List<Argument> arguments = [];
@@ -97,6 +97,7 @@ public static class MethodSymbolExtensions
         argumentSearchResult = ArgumentSearchResult.HasArguments;
         return arguments;
     }
+
     /// <summary>
     /// Returns true if any present arguments are named.
     /// </summary>
@@ -123,10 +124,10 @@ public static class MethodSymbolExtensions
         if (methodSyntax is null)
             return results;
 
-        //Uses expression body, such as MethodName() => something;
+        // Uses expression body, such as MethodName() => something;
         if (methodSyntax.ExpressionBody is not null)
         {
-            //Get the return of the arrowExpression, which is seen as => in code.
+            // Get the return of the arrowExpression, which is seen as => in code.
             ExpressionSyntax expressionSyntax = methodSyntax.ExpressionBody.Expression;
             results.Add(expressionSyntax);
         }
@@ -137,7 +138,7 @@ public static class MethodSymbolExtensions
             if (methodSyntax.Body is null)
                 return results;
 
-            //Find all return statements.
+            // Find all return statements.
             IEnumerable<ReturnStatementSyntax> returnStatements = methodSyntax.Body.DescendantNodes().OfType<ReturnStatementSyntax>();
 
             foreach (ReturnStatementSyntax returnStatement in returnStatements)
@@ -149,31 +150,38 @@ public static class MethodSymbolExtensions
         }
         return results;
     }
-    
+
     /// <summary>
     /// Gets ISymbols which are referenced within an IMethodSymbol.
     /// </summary>
-    public static HashSet<ISymbol> GetReferencedSymbols(this IMethodSymbol methodSymbol, SemanticModel semanticModel)
+    /// <returns>True if the operation completed without error.</returns>
+    /// <remarks>True can be returned even when no ISymbols were found.</remarks>
+    public static bool TryGetReferencedSymbols(this IMethodSymbol methodSymbol, SemanticModel semanticModel, out HashSet<ISymbol>? referencedSymbols)
     {
-        HashSet<ISymbol> referencedSymbols = [];
-
-        foreach (SyntaxReference reference in methodSymbol.DeclaringSyntaxReferences)
+        if (semanticModel is null)
         {
-            SyntaxNode methodNode = reference.GetSyntax();
+            referencedSymbols = null;
+            return false;
+        }
 
-            IEnumerable<IdentifierNameSyntax> identifiers = methodNode.DescendantNodes().OfType<IdentifierNameSyntax>();
+        referencedSymbols = [];
 
-            foreach (IdentifierNameSyntax identifier in identifiers)
+        foreach (SyntaxReference syntaxReference in methodSymbol.DeclaringSyntaxReferences)
+        {
+            SyntaxNode methodSyntaxNode = syntaxReference.GetSyntax();
+            IEnumerable<IdentifierNameSyntax> identifierNameSyntaxes = methodSyntaxNode.DescendantNodes().OfType<IdentifierNameSyntax>();
+
+            foreach (IdentifierNameSyntax identifier in identifierNameSyntaxes)
             {
+                //this line is failing silently on Reader.Full.OnReturn.
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(identifier);
                 ISymbol? symbol = symbolInfo.Symbol;
 
-                if (symbol != null)
+                if (symbol is not null)
                     referencedSymbols.Add(symbol);
             }
         }
 
-        return referencedSymbols;
+        return true;
     }
-    
 }
