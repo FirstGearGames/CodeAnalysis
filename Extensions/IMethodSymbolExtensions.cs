@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CodeAnalysis.Finding;
@@ -171,10 +171,13 @@ public static class MethodSymbolExtensions
             SyntaxNode methodSyntaxNode = syntaxReference.GetSyntax();
             IEnumerable<IdentifierNameSyntax> identifierNameSyntaxes = methodSyntaxNode.DescendantNodes().OfType<IdentifierNameSyntax>();
 
+            /* There is a chance the SyntaxTree is in a different file, such as a partial file.
+             * When this is the case fetch the correct tree. */
+            SemanticModel treeSemanticModel = semanticModel.SyntaxTree == syntaxReference.SyntaxTree ? semanticModel : semanticModel.Compilation.GetSemanticModel(syntaxReference.SyntaxTree);
+
             foreach (IdentifierNameSyntax identifier in identifierNameSyntaxes)
             {
-                //this line is failing silently on Reader.Full.OnReturn.
-                SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(identifier);
+                SymbolInfo symbolInfo = treeSemanticModel.GetSymbolInfo(identifier);
                 ISymbol? symbol = symbolInfo.Symbol;
 
                 if (symbol is not null)
