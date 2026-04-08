@@ -29,7 +29,7 @@ public static class StringExtensions
             
         while (reader.ReadLine() is { } readLine)
         {
-            const string indentation = "    ";
+            const string Indentation = "    ";
 
             // 1. Trim leading/trailing whitespace from the original line
             string trimmedLine = readLine.Trim();
@@ -48,7 +48,7 @@ public static class StringExtensions
 
             // 3. Prepend the current indent level
             for (int i = 0; i < indentLevel; i++)
-                result.Append(indentation);
+                result.Append(Indentation);
 
             // 4. Append the trimmed content of the line
             result.AppendLine(trimmedLine);
