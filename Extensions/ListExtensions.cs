@@ -3,11 +3,16 @@ using System.Text;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for combining argument or string lists into source-style sequences.
+/// </summary>
 public static class ListExtensions
 {
     /// <summary>
-    /// Combines into a natural string: <str0, str1, str2 ...>
+    /// Combines the supplied arguments into a natural string in the form <c>&lt;str0, str1, str2 ...&gt;</c>.
     /// </summary>
+    /// <param name="argumentList">Arguments to combine.</param>
+    /// <returns>The combined argument string, or an empty string when no arguments are supplied.</returns>
     public static string GetCombinedArguments(this List<Argument> argumentList)
     {
         if (argumentList is null || argumentList.Count == 0)
@@ -28,8 +33,10 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Combines into a natural string: <str0, str1, str2 ...>
+    /// Combines the supplied strings into a natural string in the form <c>&lt;str0, str1, str2 ...&gt;</c>.
     /// </summary>
+    /// <param name="stringList">Strings to combine.</param>
+    /// <returns>The combined string, or an empty string when no values are supplied.</returns>
     public static string GetCombinedArguments(this List<string> stringList)
     {
         if (stringList is null || stringList.Count == 0)

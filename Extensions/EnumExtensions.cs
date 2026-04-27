@@ -3,12 +3,19 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for inspecting enum types and their values.
+/// </summary>
 public static class EnumExtensions
 {
     /// <summary>
-    /// Gets the maximum value of an enum, combined if flags or individual if not.
+    /// Returns the maximum value of an enum, combined when the enum is flagged and otherwise the largest individual value.
     /// </summary>
-    /// <remarks>A 0 value is returned if type is not an enum.</remarks>
+    /// <remarks>
+    /// A value of zero is returned when the supplied symbol is not an enum.
+    /// </remarks>
+    /// <param name="nameTypeSymbol">Named type symbol that should describe an enum.</param>
+    /// <returns>The maximum enum value as described above.</returns>
     public static long GetMaximumEnumValue(this INamedTypeSymbol nameTypeSymbol)
     {
         if (nameTypeSymbol.TypeKind != TypeKind.Enum)
@@ -51,8 +58,10 @@ public static class EnumExtensions
     }
 
     /// <summary>
-    /// Returns the highest numeric value for T.
+    /// Returns the highest numeric value declared by the enum type.
     /// </summary>
+    /// <typeparam name="T0">Enum type to inspect.</typeparam>
+    /// <returns>The highest numeric value declared by the enum.</returns>
     public static int GetMaximumValue<T0>() where T0 : Enum
     {
         Type enumType = typeof(T0);
@@ -72,8 +81,10 @@ public static class EnumExtensions
         
                 
     /// <summary>
-    /// Gets all values for an enum.
+    /// Returns all values declared by the enum type.
     /// </summary>
+    /// <typeparam name="T0">Enum type to inspect.</typeparam>
+    /// <returns>An array containing every value declared by the enum.</returns>
     public static T0[] GetValuesAllocated<T0>() where T0 : Enum
     {
         /* Optimized over LINQ, and compatible

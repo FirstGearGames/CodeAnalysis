@@ -1,5 +1,8 @@
 ﻿namespace CodeAnalysis.Finding;
 
+/// <summary>
+/// Specifies how arguments should be resolved during a search.
+/// </summary>
 public enum ArgumentSearchType
 {
     /// <summary>

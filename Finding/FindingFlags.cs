@@ -1,5 +1,8 @@
 ﻿namespace CodeAnalysis.Finding;
 
+/// <summary>
+/// Flags controlling how a finding traversal is performed.
+/// </summary>
 [System.Flags]
 public enum FindingFlags
 {

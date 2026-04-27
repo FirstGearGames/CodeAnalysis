@@ -6,11 +6,16 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for inspecting and formatting <see cref="ITypeSymbol"/> instances.
+/// </summary>
 public static class TypeSymbolExtensions
 {
     /// <summary>
-    /// Gets the full name of a TypeSymbol.
+    /// Returns the fully qualified name of the supplied type symbol.
     /// </summary>
+    /// <param name="typeSymbol">Type symbol whose full name is being generated.</param>
+    /// <returns>The fully qualified name of the type symbol.</returns>
     public static string GetTypeSymbolFullName(this ITypeSymbol typeSymbol)
     {
         if (typeSymbol is null)
@@ -23,7 +28,8 @@ public static class TypeSymbolExtensions
         if (typeSymbol.TypeKind is TypeKind.TypeParameter)
             return NativeConstants.FirstGenericParameterName;
 
-        string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
+
+        string containingNamespace = typeSymbol.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).EmptyIfNull()!;
         containingNamespace = containingNamespace.RemoveGlobalAlias();
 
         string fullyQualifiedName = string.Empty;
@@ -38,8 +44,12 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns full name with generic arguments as named types (System.Collections.Generic.List<System.String>).
+    /// Returns the full name of the type symbol with its generic arguments rendered as named types, such as <c>System.Collections.Generic.List&lt;System.String&gt;</c>.
     /// </summary>
+    /// <param name="typeSymbol">Type symbol whose full name is being generated.</param>
+    /// <param name="argumentSearchType">Search behavior to apply when resolving argument names.</param>
+    /// <param name="argumentSearchResult">Receives a status describing how arguments were resolved.</param>
+    /// <returns>The fully qualified name of the type symbol, including its arguments.</returns>
     public static string GetTypeSymbolFullNameWithArguments(this ITypeSymbol typeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
     {
         /* If is an array then just use the extension method
@@ -55,8 +65,12 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns type as a generic array, if an array (T0[], T0[][]). If not an array empty is returned.
+    /// Returns the array type formatted with its arguments, such as <c>T0[]</c> or <c>T0[][]</c>.
     /// </summary>
+    /// <param name="arrayTypeSymbol">Array type symbol whose full name is being generated.</param>
+    /// <param name="argumentSearchType">Search behavior to apply when resolving argument names.</param>
+    /// <param name="argumentSearchResult">Receives a status describing how arguments were resolved.</param>
+    /// <returns>The fully qualified name of the array type, or an empty string when it cannot be resolved.</returns>
     public static string GetArrayTypeSymbolFullNameWithArguments(this IArrayTypeSymbol arrayTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
     {
         StringBuilder stringBuilder = new();
@@ -107,9 +121,15 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns the NamedTypeSymbol full name with arguments.
+    /// Returns the named type symbol's full name with its generic arguments included.
     /// </summary>
-    /// <example>RootNamespace.Strings.StringBuffer<int></example>
+    /// <example>
+    /// <c>RootNamespace.Strings.StringBuffer&lt;int&gt;</c>.
+    /// </example>
+    /// <param name="namedTypeSymbol">Named type symbol whose full name is being generated.</param>
+    /// <param name="argumentSearchType">Search behavior to apply when resolving argument names.</param>
+    /// <param name="argumentSearchResult">Receives a status describing how arguments were resolved.</param>
+    /// <returns>The fully qualified name of the named type, including its arguments.</returns>
     public static string GetNamedTypeSymbolFullNameWithArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
     {
         //Default value until changed.
@@ -157,8 +177,12 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns arguments as a list.
+    /// Returns the generic arguments of the supplied named type as a list.
     /// </summary>
+    /// <param name="namedTypeSymbol">Named type whose arguments are being read.</param>
+    /// <param name="argumentSearchType">Search behavior to apply when resolving argument names.</param>
+    /// <param name="argumentSearchResult">Receives a status describing how arguments were resolved.</param>
+    /// <returns>A list containing every resolved argument.</returns>
     public static List<Argument> GetTypeSymbolArguments(this INamedTypeSymbol namedTypeSymbol, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
     {
         List<Argument> results = [];
@@ -201,8 +225,10 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns true if a TypeSymbol has arguments.
+    /// Returns whether the supplied type symbol declares generic arguments.
     /// </summary>
+    /// <param name="symbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is an array or generic named type.</returns>
     public static bool HasArguments(this ITypeSymbol symbol)
     {
         if (symbol is IArrayTypeSymbol)
@@ -215,8 +241,10 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns true if any present arguments are named.
+    /// Returns whether every generic argument supplied to the type is a concrete named type rather than a type parameter.
     /// </summary>
+    /// <param name="symbol">Type symbol whose arguments are being inspected.</param>
+    /// <returns>True when every argument resolves to a concrete named type.</returns>
     public static bool ArePresentArgumentsNamed(this ITypeSymbol symbol)
     {
         if (symbol is IArrayTypeSymbol arrayTypeSymbol)
@@ -236,8 +264,11 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns the short name of a symbol which includes the namespace.
+    /// Returns whether the supplied type symbol directly implements an interface with the specified fully qualified name.
     /// </summary>
+    /// <param name="symbol">Type symbol whose implemented interfaces are being inspected.</param>
+    /// <param name="interfaceFullName">Fully qualified interface name to look for.</param>
+    /// <returns>True when the type symbol directly implements the specified interface.</returns>
     public static bool TypeSymbolImplementsInterface(this ITypeSymbol symbol, string? interfaceFullName)
     {
         if (interfaceFullName is null)
@@ -252,50 +283,91 @@ public static class TypeSymbolExtensions
         return false;
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a user-defined enum, class, or struct.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a user-defined enum, class, or struct.</returns>
     public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol)
     {
         return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a user-defined class or struct.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a user-defined class or struct.</returns>
     public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
     {
         return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a user-defined struct.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a user-defined struct.</returns>
     public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
     {
         return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a user-defined class.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a user-defined class.</returns>
     public static bool IsUserDefinedClass(this ITypeSymbol typeSymbol)
     {
         return typeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a user-defined enum.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a user-defined enum.</returns>
     public static bool IsUserDefinedEnum(this ITypeSymbol typeSymbol)
     {
         return typeSymbol is { TypeKind: TypeKind.Enum, SpecialType: SpecialType.None };
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a class.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a class.</returns>
     public static bool IsClass(this ITypeSymbol typeSymbol)
     {
         return typeSymbol is { TypeKind: TypeKind.Class };
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is a struct.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a struct.</returns>
     public static bool IsStruct(this ITypeSymbol typeSymbol)
     {
         return typeSymbol is { TypeKind: TypeKind.Struct };
     }
 
+    /// <summary>
+    /// Returns whether the supplied type symbol is either a class or a struct.
+    /// </summary>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a class or struct.</returns>
     public static bool IsClassOrStruct(this ITypeSymbol typeSymbol)
     {
         return typeSymbol.IsStruct() || typeSymbol.IsClass();
     }
 
     /// <summary>
-    /// Returns if a TypeSymbol is a reference type or is declared as nullable.
+    /// Returns whether the supplied type symbol is a reference type or is declared as nullable.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol can hold a null reference.</returns>
     public static bool CanBeNull(this ITypeSymbol typeSymbol)
     {
         if (typeSymbol.IsReferenceType)
@@ -311,9 +383,11 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns if a TypeSymbol is encapsulated in Nullable<> is encapsulated in Nullable<> and the encapsulated type is an INamedTypeSymbol.
+    /// Tries to retrieve the type encapsulated by a <see cref="System.Nullable{T}"/> when the encapsulated type is an <see cref="INamedTypeSymbol"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <param name="encapsulatedTypeSymbol">Receives the encapsulated type symbol when successful.</param>
+    /// <returns>True when the encapsulated type was resolved successfully.</returns>
     public static bool TryGetNullableEncapsulatedNamedTypeSymbol(this ITypeSymbol typeSymbol, out ITypeSymbol encapsulatedTypeSymbol)
     {
         encapsulatedTypeSymbol = null;
@@ -335,10 +409,10 @@ public static class TypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns if the Symbol is a primitive Type using SpecialType.
+    /// Returns whether the supplied type symbol is a primitive type, as identified by its <see cref="SpecialType"/>.
     /// </summary>
-    /// <param name="symbol">Symbol to check.</param>
-    /// <returns>True if primitive.</returns>
+    /// <param name="symbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a primitive type.</returns>
     public static bool IsPrimitive(this ITypeSymbol symbol)
     {
         switch (symbol.SpecialType)
@@ -361,19 +435,25 @@ public static class TypeSymbolExtensions
         }
     }
     /// <summary>
-    /// Returns if a TypeSymbol is encapsulated in Nullable<>. 
+    /// Returns whether the supplied type symbol is encapsulated in <see cref="System.Nullable{T}"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="typeSymbol">Type symbol to inspect.</param>
+    /// <returns>True when the type symbol is a nullable value type.</returns>
     public static bool IsNullable(this ITypeSymbol typeSymbol) => typeSymbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
 
     /// <summary>
-    /// Returns a string as readable context (UserStruct.SomeField).
+    /// Returns the type symbol as a readable string, such as <c>UserStruct</c>.
     /// </summary>
+    /// <param name="typeSymbol">Type symbol to format.</param>
+    /// <returns>A readable representation of the type symbol.</returns>
     public static string ToReadable(this ITypeSymbol typeSymbol) => ToReadable(typeSymbol, fieldSymbol: null);
 
     /// <summary>
-    /// Returns a string as readable context (UserStruct.SomeField).
+    /// Returns the type symbol and an optional field symbol as a readable string, such as <c>UserStruct.SomeField</c>.
     /// </summary>
+    /// <param name="typeSymbol">Type symbol to format.</param>
+    /// <param name="fieldSymbol">Optional field symbol to append to the result.</param>
+    /// <returns>A readable representation of the type symbol and optional field.</returns>
     public static string ToReadable(this ITypeSymbol typeSymbol, IFieldSymbol fieldSymbol)
     {
         StringBuilder stringBuilder = new();

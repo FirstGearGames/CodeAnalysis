@@ -1,13 +1,16 @@
 namespace CodeAnalysis.Finding;
 
+/// <summary>
+/// Provides constants used when joining namespace and type names during code analysis.
+/// </summary>
 public static class Constants
 {
     /// <summary>
-    /// Character to use when joining namespaces for Names.
+    /// The character used when joining namespaces for source-level names.
     /// </summary>
     public const string NamespaceNameJoiningCharacter = ".";
     /// <summary>
-    /// Character to use when joining namespaces for MetaNames.
+    /// The character used when joining namespaces for metadata names.
     /// </summary>
     public const string NamespaceMetadataNameJoiningCharacter = "+";
 

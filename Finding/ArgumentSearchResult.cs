@@ -1,6 +1,9 @@
 ﻿namespace CodeAnalysis.Finding;
 
 
+/// <summary>
+/// Identifies the outcome of searching for the arguments of a type or method.
+/// </summary>
 [System.Flags]
 public enum ArgumentSearchResult
 {

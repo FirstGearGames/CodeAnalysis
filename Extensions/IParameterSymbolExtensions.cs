@@ -6,12 +6,16 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for working with <see cref="IParameterSymbol"/> instances.
+/// </summary>
 public static class ParameterSymbolExtensions
 {
     /// <summary>
-    /// Returns ParameterSymbols as a MethodParameter collection.
+    /// Returns the supplied parameter symbols converted to a <see cref="MethodParameter"/> collection.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="parameterSymbols">Parameter symbols to convert.</param>
+    /// <returns>A list containing one <see cref="MethodParameter"/> per supplied symbol.</returns>
     public static List<MethodParameter> GetMethodParameters(this IEnumerable<IParameterSymbol> parameterSymbols)
     {
         List<MethodParameter> methodParameters = new();
@@ -22,6 +26,11 @@ public static class ParameterSymbolExtensions
         return methodParameters;
     }
         
+    /// <summary>
+    /// Returns the explicit default value of the parameter formatted as a literal expression.
+    /// </summary>
+    /// <param name="thisValue">Parameter symbol whose default value is being formatted.</param>
+    /// <returns>The default value formatted as a literal expression, or an empty string when no default is declared.</returns>
     public static string OptionalValueToString(this IParameterSymbol thisValue)
     {
         if (!thisValue.HasExplicitDefaultValue)
@@ -50,6 +59,18 @@ public static class ParameterSymbolExtensions
         };
     }
 
+    /// <summary>
+    /// Returns whether the supplied parameter has the same type full name as another parameter.
+    /// </summary>
+    /// <param name="parameterSymbol">Parameter being compared.</param>
+    /// <param name="otherParameterSymbol">Parameter to compare against.</param>
+    /// <returns>True when both parameters share the same type full name.</returns>
     public static bool TypeFullNameEquals(this IParameterSymbol parameterSymbol, IParameterSymbol otherParameterSymbol) => parameterSymbol.TypeFullNameEquals(otherParameterSymbol.Type.GetTypeSymbolFullName());
+    /// <summary>
+    /// Returns whether the supplied parameter has the specified type full name.
+    /// </summary>
+    /// <param name="parameterSymbol">Parameter being compared.</param>
+    /// <param name="otherTypeFullName">Type full name to compare against.</param>
+    /// <returns>True when the parameter type matches the supplied name.</returns>
     public static bool TypeFullNameEquals(this IParameterSymbol parameterSymbol, string? otherTypeFullName) => parameterSymbol.Type.GetTypeSymbolFullName().Equals(otherTypeFullName);
 }

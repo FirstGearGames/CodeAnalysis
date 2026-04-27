@@ -5,6 +5,9 @@ using System.Threading;
 
 namespace CodeAnalysis.Logging;
 
+/// <summary>
+/// Provides a static logger that buffers messages and writes them to per-suffix log files.
+/// </summary>
 public static class CodeAnalysisLogger
 {
     /// <summary>
@@ -29,14 +32,34 @@ public static class CodeAnalysisLogger
     }
 
     /// <summary>
-    /// Sets the output path. The .txt should be removed.
+    /// Sets the output path prefix used when log files are written.
     /// </summary>
+    /// <remarks>
+    /// The <c>.txt</c> extension should not be included in the supplied path.
+    /// </remarks>
+    /// <param name="outputFilePath">Path prefix to use when writing log files.</param>
     public static void SetOutputPath(string outputFilePath) => _outputPathPrefix = outputFilePath;
 
+    /// <summary>
+    /// Buffers an information-level message for later writing.
+    /// </summary>
+    /// <param name="message">Message to buffer.</param>
     public static void LogInformation(string message) => AddMessage("", $"Information: {message}");
+    /// <summary>
+    /// Buffers a warning-level message for later writing.
+    /// </summary>
+    /// <param name="message">Message to buffer.</param>
     public static void LogWarning(string message) => AddMessage("", $"Warning: {message}");
+    /// <summary>
+    /// Buffers an error-level message for later writing.
+    /// </summary>
+    /// <param name="message">Message to buffer.</param>
     public static void LogError(string message) => AddMessage("", $"Error: {message}");
 
+    /// <summary>
+    /// Buffers a block of source code surrounded by blank lines for later writing.
+    /// </summary>
+    /// <param name="message">Source text to buffer.</param>
     public static void LogCode(string message)
     {
         AddMessage("", "");
@@ -44,6 +67,11 @@ public static class CodeAnalysisLogger
         AddMessage("", "");
     }
 
+    /// <summary>
+    /// Buffers a block of source code surrounded by blank lines for later writing under the supplied file suffix.
+    /// </summary>
+    /// <param name="fileSuffix">Suffix appended to the output path when writing the buffer.</param>
+    /// <param name="message">Source text to buffer.</param>
     public static void LogCode(string fileSuffix, string message)
     {
         AddMessage(fileSuffix, "");
@@ -51,6 +79,9 @@ public static class CodeAnalysisLogger
         AddMessage(fileSuffix, "");
     }
 
+    /// <summary>
+    /// Writes every buffered message to its corresponding log file and clears the buffers.
+    /// </summary>
     public static void WriteToFile()
     {
         #pragma warning disable RS1035

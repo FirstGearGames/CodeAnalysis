@@ -4,18 +4,28 @@ using System.Text;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for transforming and inspecting strings used during code generation.
+/// </summary>
 public static class StringExtensions
 {
     /// <summary>
-    /// Value representing when an index is not found or specified.
+    /// The sentinel value indicating that an index is not found or has not been specified.
     /// </summary>
     public const int UnsetIndex = -1;
 
     /// <summary>
-    /// Formats a string with indents using opening and closing braces and the determining character.
+    /// Returns the supplied value, or an empty string when it is null.
     /// </summary>
-    /// <param name="thisValue"></param>
-    /// <returns></returns>
+    /// <param name="value">Value to inspect.</param>
+    /// <returns>The supplied value, or an empty string when it is null.</returns>
+    public static string EmptyIfNull(this string? value) => value ?? string.Empty;
+
+    /// <summary>
+    /// Formats a string with indents driven by opening and closing braces.
+    /// </summary>
+    /// <param name="thisValue">String to reformat.</param>
+    /// <returns>The reformatted string with brace-driven indentation.</returns>
     public static string IndentByBrace(this string thisValue)
     {
         if (string.IsNullOrWhiteSpace(thisValue))
@@ -63,6 +73,11 @@ public static class StringExtensions
         return result.ToString();
     }
 
+    /// <summary>
+    /// Removes a leading <c>global::</c> or <c>&lt;global namespace&gt;</c> prefix from the supplied value when present.
+    /// </summary>
+    /// <param name="value">Value to inspect.</param>
+    /// <returns>The value with any global alias prefix removed.</returns>
     public static string RemoveGlobalAlias(this string value)
     {
         if (value.StartsWith("global::"))
@@ -73,8 +88,10 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Converts a camelCase strings to PascalCase. Non-letter and non-numeric prefixes are removed.
+    /// Converts the supplied camelCase string to PascalCase, removing any non-letter and non-numeric prefix.
     /// </summary>
+    /// <param name="value">String to convert.</param>
+    /// <returns>The PascalCase representation of the supplied string.</returns>
     public static string CamelCaseToPascalCase(this string value)
     {
         int index = value.GetFirstLetterOrDigitIndex();
@@ -97,10 +114,17 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Converts a pascal case string to member case with an optional prefix.
+    /// Converts the supplied PascalCase string to camelCase, optionally prepending a prefix.
     /// </summary>
-    /// <example>With a prefix of '_' value 'HelloWorld' is returned as '_helloWorld'.</example>
-    /// <remarks>Prefix is only added if missing.</remarks>
+    /// <remarks>
+    /// The prefix is only added when it is not already present at the start of the value.
+    /// </remarks>
+    /// <example>
+    /// With a prefix of <c>_</c> the value <c>HelloWorld</c> is returned as <c>_helloWorld</c>.
+    /// </example>
+    /// <param name="value">String to convert.</param>
+    /// <param name="prefix">Prefix to prepend when not already present.</param>
+    /// <returns>The camelCase representation of the supplied string.</returns>
     public static string PascalCaseToCamelCase(this string value, string prefix)
     {
         int index = value.GetFirstLetterOrDigitIndex();
@@ -151,8 +175,10 @@ public static class StringExtensions
 
 
     /// <summary>
-    /// Returns index of the first letter or number in a string.
+    /// Returns the index of the first letter or digit in the supplied string.
     /// </summary>
+    /// <param name="value">String to inspect.</param>
+    /// <returns>The zero-based index of the first letter or digit, or <see cref="UnsetIndex"/> when none is found.</returns>
     public static int GetFirstLetterOrDigitIndex(this string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -168,10 +194,10 @@ public static class StringExtensions
     }
         
     /// <summary>
-    /// Makes names of various types safe for use as file names.
+    /// Returns the supplied value with all non-alphanumeric characters replaced by underscores so that it can be safely used as a file name.
     /// </summary>
     /// <param name="value">Value to make safe.</param>
-    /// <returns>Value with non-alphaNumeric characters replaced with '_'.</returns>
+    /// <returns>The supplied value with non-alphanumeric characters replaced by underscores.</returns>
     public static string MakeFileSafeName(this string value)
     {
         StringBuilder stringBuilder = new();

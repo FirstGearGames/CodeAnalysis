@@ -7,12 +7,17 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for inspecting <see cref="IMethodSymbol"/> instances.
+/// </summary>
 public static class MethodSymbolExtensions
 {
     /// <summary>
-    /// Returns true if method parameters match expected parameters.
+    /// Returns whether the parameters of the method match the supplied expected parameter type names.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="methodSymbol">Method whose parameters are being compared.</param>
+    /// <param name="expectedParameterNames">Expected parameter type names, in order.</param>
+    /// <returns>True when each parameter type name matches the expected sequence in order.</returns>
     public static bool AreParametersMatching(this IMethodSymbol methodSymbol, params string[] expectedParameterNames)
     {
         List<string> parameters = new();
@@ -38,8 +43,11 @@ public static class MethodSymbolExtensions
     }
 
     /// <summary>
-    /// Gets all types returned within the body of a method.
+    /// Returns every type returned by an expression within the body of the method.
     /// </summary>
+    /// <param name="methodSymbol">Method whose returned expressions should be inspected.</param>
+    /// <param name="semanticModel">Semantic model used to resolve types.</param>
+    /// <returns>A list containing the type symbol of every returned expression.</returns>
     public static List<ITypeSymbol> GetReturnedTypeSymbols(this IMethodSymbol methodSymbol, SemanticModel semanticModel)
     {
         List<ITypeSymbol> results = new();
@@ -54,6 +62,13 @@ public static class MethodSymbolExtensions
         return results;
     }
 
+    /// <summary>
+    /// Returns the type arguments declared by the method, formatted according to the requested search behavior.
+    /// </summary>
+    /// <param name="thisValue">Method whose type arguments are being read.</param>
+    /// <param name="argumentSearchType">Search behavior to apply when resolving argument names.</param>
+    /// <param name="argumentSearchResult">Receives a status describing whether arguments were found, missing, or could not be resolved.</param>
+    /// <returns>A list of arguments resolved from the method's type arguments.</returns>
     public static List<Argument> GetMethodSymbolArguments(this IMethodSymbol thisValue, ArgumentSearchType argumentSearchType, out ArgumentSearchResult argumentSearchResult)
     {
         List<Argument> arguments = [];
@@ -99,8 +114,10 @@ public static class MethodSymbolExtensions
     }
 
     /// <summary>
-    /// Returns true if any present arguments are named.
+    /// Returns whether every type argument supplied to the method is a concrete named type rather than a type parameter.
     /// </summary>
+    /// <param name="thisValue">Method whose type arguments are being inspected.</param>
+    /// <returns>True when every type argument resolves to a concrete named type.</returns>
     public static bool ArePresentArgumentsNamed(this IMethodSymbol thisValue)
     {
         foreach (ITypeSymbol typeSymbol in thisValue.TypeArguments)
@@ -113,8 +130,10 @@ public static class MethodSymbolExtensions
     }
 
     /// <summary>
-    /// Gets all ExpressionSyntax returned within the body of a method.
+    /// Returns every <see cref="ExpressionSyntax"/> returned from the body of the method.
     /// </summary>
+    /// <param name="methodSymbol">Method whose returned expressions should be inspected.</param>
+    /// <returns>A list containing every returned expression syntax found in the method body.</returns>
     public static List<ExpressionSyntax> GetReturnedExpressionSyntaxes(this IMethodSymbol methodSymbol)
     {
         List<ExpressionSyntax> results = new();
@@ -152,10 +171,15 @@ public static class MethodSymbolExtensions
     }
 
     /// <summary>
-    /// Gets ISymbols which are referenced within an IMethodSymbol.
+    /// Tries to collect every <see cref="ISymbol"/> referenced from within the body of the method.
     /// </summary>
-    /// <returns>True if the operation completed without error.</returns>
-    /// <remarks>True can be returned even when no ISymbols were found.</remarks>
+    /// <remarks>
+    /// True may be returned even when no symbols were found.
+    /// </remarks>
+    /// <param name="methodSymbol">Method whose referenced symbols should be collected.</param>
+    /// <param name="semanticModel">Semantic model used to resolve identifiers.</param>
+    /// <param name="referencedSymbols">Receives the set of symbols referenced by the method, or null when the operation could not proceed.</param>
+    /// <returns>True when the operation completed without error.</returns>
     public static bool TryGetReferencedSymbols(this IMethodSymbol methodSymbol, SemanticModel semanticModel, out HashSet<ISymbol>? referencedSymbols)
     {
         if (semanticModel is null)

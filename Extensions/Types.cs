@@ -1,7 +1,10 @@
 ﻿
 namespace CodeAnalysis.Extensions;
 
-public enum SearchScope 
+/// <summary>
+/// Specifies the scope to use when searching the type hierarchy.
+/// </summary>
+public enum SearchScope
 {
     /// <summary>
     /// Matches only the specified type.

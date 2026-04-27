@@ -10,13 +10,21 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for inspecting and generating source from <see cref="INamedTypeSymbol"/> instances.
+/// </summary>
 public static class NamedTypeSymbolExtensions
 {
     /// <summary>
-    /// Sets the namespace and class signature.
+    /// Tries to generate the namespace and class declaration text for the supplied class symbol.
     /// </summary>
-    /// <returns>True if information was set successfully.</returns>
-    /// <example>Generated class signature example: public partial MyClass<Type> : BaseClass, Interface</example>
+    /// <example>
+    /// Generated class signature example: public partial MyClass&lt;Type&gt; : BaseClass, Interface.
+    /// </example>
+    /// <param name="classSymbol">Class symbol whose declaration is being generated.</param>
+    /// <param name="fullNamespace">Receives the fully qualified namespace, or null when one cannot be resolved.</param>
+    /// <param name="classDeclaration">Receives the generated class declaration text, or null when generation fails.</param>
+    /// <returns>True when both outputs were populated successfully.</returns>
     public static bool TryGenerateClassSignature(this INamedTypeSymbol classSymbol, out string? fullNamespace, out string? classDeclaration)
     {
         fullNamespace = null;
@@ -71,8 +79,11 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Gets IFieldSymbols within a symbol.
+    /// Returns the field symbols declared on the supplied named type, optionally filtered by accessibility.
     /// </summary>
+    /// <param name="namedTypeSymbol">Named type whose fields are being read.</param>
+    /// <param name="requiredAccessibility">When supplied, restricts results to fields with the specified accessibility.</param>
+    /// <returns>A list containing every matching field symbol.</returns>
     public static List<IFieldSymbol> GetFieldSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility)
     {
         List<IFieldSymbol> validSymbols = new();
@@ -90,8 +101,11 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Gets IMethodSymbols within an INamedTypeSymbols.
+    /// Returns the method symbols declared on the supplied named type, optionally filtered by accessibility.
     /// </summary>
+    /// <param name="namedTypeSymbol">Named type whose methods are being read.</param>
+    /// <param name="requiredAccessibility">When supplied, restricts results to methods with the specified accessibility.</param>
+    /// <returns>A list containing every matching method symbol.</returns>
     public static List<IMethodSymbol> GetMethodSymbols(this INamedTypeSymbol namedTypeSymbol, Accessibility? requiredAccessibility)
     {
         List<IMethodSymbol> validSymbols = new();
@@ -109,8 +123,11 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns the short name of a symbol which includes the namespace.
+    /// Returns whether the supplied named type implements an interface with the specified fully qualified name.
     /// </summary>
+    /// <param name="symbol">Named type whose implemented interfaces are being inspected.</param>
+    /// <param name="interfaceFullName">Fully qualified interface name to look for.</param>
+    /// <returns>True when the named type implements the specified interface.</returns>
     public static bool NamedTypeSymbolImplementsInterface(this INamedTypeSymbol symbol, string? interfaceFullName)
     {
         if (interfaceFullName is null)
@@ -126,8 +143,11 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// True if symbol inherits base class anywhere along hierarchy.
+    /// Returns whether the supplied symbol inherits from the specified base class anywhere along its hierarchy.
     /// </summary>
+    /// <param name="symbol">Named type whose ancestry is being inspected.</param>
+    /// <param name="classFullName">Fully qualified name of the base class to look for.</param>
+    /// <returns>True when the symbol inherits from the specified base class.</returns>
     public static bool InheritsClass(this INamedTypeSymbol symbol, string classFullName)
     {
         while (symbol.BaseType is { } baseSymbol)
@@ -142,8 +162,12 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns a method containing matching parameter names.
+    /// Returns the method matching the specified name and parameter type names.
     /// </summary>
+    /// <param name="symbol">Named type whose methods are being searched.</param>
+    /// <param name="methodName">Name of the method to find.</param>
+    /// <param name="parameterNames">Expected parameter type names, in order.</param>
+    /// <returns>The matching method symbol, or null when no match exists.</returns>
     public static IMethodSymbol? GetMethod(this INamedTypeSymbol symbol, string methodName, params string[] parameterNames)
     {
         IEnumerable<IMethodSymbol> methodSymbols = symbol.GetMembers(methodName).OfType<IMethodSymbol>();
@@ -158,13 +182,17 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns if a type has public accessibility.
+    /// Returns whether the supplied type is declared with public accessibility.
     /// </summary>
+    /// <param name="namedTypeSymbol">Named type whose accessibility is being inspected.</param>
+    /// <returns>True when the type is declared public.</returns>
     public static bool HasPublicAccessibility(this INamedTypeSymbol namedTypeSymbol) => namedTypeSymbol.DeclaredAccessibility is Accessibility.Public;
 
     /// <summary>
-    /// Returns if a type has public accessibility.
+    /// Returns whether the supplied type is declared with the partial modifier.
     /// </summary>
+    /// <param name="namedTypeSymbol">Named type whose modifiers are being inspected.</param>
+    /// <returns>True when the type is declared partial.</returns>
     public static bool HasPartialModifier(this INamedTypeSymbol namedTypeSymbol)
     {
         if (namedTypeSymbol is null)
@@ -189,10 +217,10 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns a types header as a string. (Eg: public partial class MyClass).
+    /// Returns the type header as a string, such as <c>public partial class MyClass</c>.
     /// </summary>
-    /// <param name = "classSymbol"></param>
-    /// <returns></returns>
+    /// <param name="namedTypeSymbol">Named type whose header is being generated.</param>
+    /// <returns>The generated type header text, or an empty string when the type kind is unsupported.</returns>
     public static string GetClassOrStructHeader(this INamedTypeSymbol namedTypeSymbol)
     {
         string keywordText;
@@ -222,9 +250,10 @@ public static class NamedTypeSymbolExtensions
     }
     
     /// <summary>
-    /// Returns if the symbol implements IEquatable.
+    /// Returns whether the supplied symbol implements <see cref="IEquatable{T}"/>.
     /// </summary>
-    /// <returns>True if implemented.</returns>
+    /// <param name="namedTypeSymbol">Named type whose interfaces are being inspected.</param>
+    /// <returns>True when the symbol implements <see cref="IEquatable{T}"/>.</returns>
     public static bool ImplementsIEquatable(this INamedTypeSymbol namedTypeSymbol)
     {
         string? iEquatableFullName = typeof(IEquatable<>).FullName;
@@ -235,9 +264,10 @@ public static class NamedTypeSymbolExtensions
     }
     
     /// <summary>
-    /// Returns if the symbol implements operator==.
+    /// Returns whether the supplied symbol declares a user-defined equality operator.
     /// </summary>
-    /// <returns>True if implemented.</returns>
+    /// <param name="namedTypeSymbol">Named type whose members are being inspected.</param>
+    /// <returns>True when the symbol declares an equality operator.</returns>
     public static bool ImplementsOpEquality(this INamedTypeSymbol namedTypeSymbol)
     {
         foreach (ISymbol member in namedTypeSymbol.GetMembers(WellKnownMemberNames.EqualityOperatorName))
@@ -255,8 +285,10 @@ public static class NamedTypeSymbolExtensions
     }
 
     /// <summary>
-    /// Returns if the NamedTypeSymbol can be compared using == and != operators.
+    /// Returns whether the supplied named type can be compared using the <c>==</c> and <c>!=</c> operators.
     /// </summary>
+    /// <param name="namedTypeSymbol">Named type whose semantics are being inspected.</param>
+    /// <returns>True when the type can be compared with built-in equality operators.</returns>
     public static bool IsEqualityComparable(this INamedTypeSymbol namedTypeSymbol) => namedTypeSymbol.IsValueType && !namedTypeSymbol.IsClassOrStruct();
 
 }

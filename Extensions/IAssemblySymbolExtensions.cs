@@ -4,11 +4,16 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeAnalysis.Extensions;
 
+/// <summary>
+/// Extension methods for traversing the symbol hierarchy of an <see cref="IAssemblySymbol"/>.
+/// </summary>
 public static class AssemblySymbolExtensions
 {
     /// <summary>
-    /// Recursively gets INamespaceSymbols within an assembly.
+    /// Recursively returns every <see cref="INamespaceSymbol"/> contained within the assembly.
     /// </summary>
+    /// <param name="assemblySymbol">Assembly symbol to traverse.</param>
+    /// <returns>A list containing every namespace declared in the assembly.</returns>
     public static List<INamespaceSymbol> RecursivelyGetNamespaceSymbols(this IAssemblySymbol assemblySymbol)
     {
         if (assemblySymbol is null)
@@ -30,8 +35,10 @@ public static class AssemblySymbolExtensions
     }
 
     /// <summary>
-    /// Recursively gets INamedTypeSymbols within an assembly.
+    /// Recursively returns every <see cref="INamedTypeSymbol"/> contained within the assembly.
     /// </summary>
+    /// <param name="assemblySymbol">Assembly symbol to traverse.</param>
+    /// <returns>A list containing every named type declared in the assembly.</returns>
     public static List<INamedTypeSymbol> RecursivelyGetNamedTypeSymbols(this IAssemblySymbol assemblySymbol)
     {
         List<INamespaceSymbol> allNamespaces = assemblySymbol.RecursivelyGetNamespaceSymbols();
@@ -48,8 +55,11 @@ public static class AssemblySymbolExtensions
     }
 
     /// <summary>
-    /// Recursively gets IMethodSymbols within an assembly.
+    /// Recursively returns every <see cref="IMethodSymbol"/> contained within the assembly.
     /// </summary>
+    /// <param name="assemblySymbol">Assembly symbol to traverse.</param>
+    /// <param name="requiredAccessibility">When supplied, restricts results to methods with the specified accessibility.</param>
+    /// <returns>A list containing every method declared in the assembly that satisfies the supplied accessibility filter.</returns>
     public static List<IMethodSymbol> RecursivelyGetMethodSymbols(this IAssemblySymbol assemblySymbol, Accessibility? requiredAccessibility = null)
     {
         List<INamedTypeSymbol> namedTypeSymbols = assemblySymbol.RecursivelyGetNamedTypeSymbols();
