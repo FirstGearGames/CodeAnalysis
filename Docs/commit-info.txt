@@ -1,0 +1,3 @@
+Skip TFM compat check on CodeBoost analyzer ProjectReference
+
+- fix: `CodeAnalysis.csproj` adds `SkipGetTargetFrameworkProperties="true"` to the `ProjectReference` for `CodeBoost.CodeAnalysis.Analyzers`. SDK 9.0.307 enforces TFM compatibility on `ProjectReference` even when `ReferenceOutputAssembly="false"`, which broke `Rebuild Solution` because this project targets `netstandard2.0` while the analyzer project targets `netstandard2.1`. The reference is analyzer-only with no runtime assembly load, so skipping the check is safe.

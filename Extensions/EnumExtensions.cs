@@ -21,7 +21,7 @@ public static class EnumExtensions
         if (nameTypeSymbol.TypeKind != TypeKind.Enum)
             return 0;
 
-        bool isFlagsEnum = nameTypeSymbol.HasAttribute(SearchScope.Exact, typeof(System.FlagsAttribute), out _);
+        bool isFlagsEnum = nameTypeSymbol.HasAttribute(SearchScope.Exact, typeof(FlagsAttribute), out _);
 
         long largestMemberValue = long.MinValue;
         long asFlagsValue = 0;

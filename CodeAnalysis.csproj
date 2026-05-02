@@ -26,7 +26,8 @@
     <ItemGroup>
         <ProjectReference Include="..\CodeBoost\CodeBoost.CodeAnalysis.Analyzers\CodeBoost.CodeAnalysis.Analyzers.csproj"
                           OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false"/>
+                          ReferenceOutputAssembly="false"
+                          SkipGetTargetFrameworkProperties="true"/>
     </ItemGroup>
 
     <PropertyGroup>
