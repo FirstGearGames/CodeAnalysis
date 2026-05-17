@@ -10,7 +10,7 @@ namespace CodeBoost.Extensions
 	    /// Converts a UInt32 to an Int32 using ZigZag encoding.
 	    /// </summary>
 	    /// <param name="value">Value to convert.</param>
-	    public static int ConvertToInt32(this uint value) => default;
+	    public static int ToInt32(this uint value) => default;
 	    /// <summary>
 	    /// Converts a UInt32 to a Single without error checking.
 	    /// </summary>

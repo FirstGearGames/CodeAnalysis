@@ -15,7 +15,7 @@ namespace CodeBoost.Extensions
 	    /// Converts a UInt64 to an Int64 using ZigZag encoding.
 	    /// </summary>
 	    /// <param name="value">Value to convert.</param>
-	    public static long ConvertToInt64(this ulong value) => default;
+	    public static long ToInt64(this ulong value) => default;
 	    /// <summary>
 	    /// Returns if a flags whole value has part within it.
 	    /// </summary>
