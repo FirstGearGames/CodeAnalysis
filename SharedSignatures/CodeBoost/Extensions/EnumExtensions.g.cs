@@ -10,13 +10,31 @@ namespace CodeBoost.Extensions
  public static class EnumExtensions
 	{
 	    /// <summary>
+	    /// Returns the enum type name and value as a string.
+	    /// </summary>
+	    /// <example>MyEnum.Two</example>
+	    public static string ToTypeNameAndValueString<T0>(this T0 enumValue) where T0 : Enum
+	    {
+		    return $"{typeof(T0).Name}.{enumValue}";
+	    }
+
+	    /// <summary>
+	    /// Returns the enum full type name and value as a string.
+	    /// </summary>
+	    /// <example>Namespace.MyEnum.Two</example>
+	    public static string ToTypeFullNameAndValueString<T0>(this T0 enumValue) where T0 : Enum
+	    {
+		    return $"{typeof(T0).FullName}.{enumValue}";
+	    }
+
+	    /// <summary>
 	    /// Returns the enum name and value as a string.
 	    /// </summary>
 	    /// <example>MyEnum.Two</example>
 	    public static string ToTypeAndValueString<T0>(this T0 enumValue, bool useFullName) where T0 : Enum
 	    {
 		    Type type = typeof(T0);
-		    
+
 		    string name = useFullName ? type.FullName : type.Name;
 		    return $"{name}.{enumValue}";
 	    }
