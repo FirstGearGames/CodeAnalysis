@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 namespace CodeBoost.Performance
@@ -10,23 +10,30 @@ namespace CodeBoost.Performance
 	    where T0 : IPoolResettable, new()
 	{
 	    /// <summary>
-	    /// Retrieves an instance of T.
+	    /// Retrieves an instance of List.
 	    /// </summary>
 	    public static List<T0> Rent() => default;
 	    /// <summary>
-	    /// Stores an instance of T0 and sets the original reference to default.
-	    /// Method will not execute if value is null.
+	    /// Resets the List, returns it to the pool, and nullifies the reference.
 	    /// </summary>
 	    /// <param name = "value"> Value to return. </param>
-	    public static void ReturnAndNullifyReference(ref List<T0> value, PoolReturnType collectionReturnType)
+	    public static void ReturnAndNullifyReference(ref List<T0> value)
 	    {
 	    }
-	
+
 	    /// <summary>
-	    /// Stores an instance of T.
+	    /// Resets the List and returns it to the pool.
 	    /// </summary>
 	    /// <param name = "value"> Value to return. </param>
-	    public static void Return(List<T0>? value, PoolReturnType collectionReturnType)
+	    public static void Return(List<T0> value)
+	    {
+	    }
+
+	    /// <summary>
+	    /// Resets the List without returning it to the pool.
+	    /// </summary>
+	    /// <param name = "value"> Value to reset. </param>
+	    public static void Reset(List<T0> value)
 	    {
 	    }
 	}

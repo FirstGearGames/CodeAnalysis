@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 namespace CodeBoost.Performance
@@ -14,16 +14,23 @@ namespace CodeBoost.Performance
 	    /// </summary>
 	    public static HashSet<T0> Rent() => default;
 	    /// <summary>
-	    /// Stores an instance of HashSet and sets the original reference to null.
+	    /// Resets the HashSet, returns it to the pool, and nullifies the reference.
 	    /// </summary>
-	    public static void ReturnAndNullifyReference(ref HashSet<T0>? value, PoolReturnType collectionReturnType)
+	    public static void ReturnAndNullifyReference(ref HashSet<T0> value)
 	    {
 	    }
-	
+
 	    /// <summary>
-	    /// Stores an instance of HashSet.
+	    /// Resets the HashSet and returns it to the pool.
 	    /// </summary>
-	    public static void Return(HashSet<T0>? value, PoolReturnType collectionReturnType)
+	    public static void Return(HashSet<T0> value)
+	    {
+	    }
+
+	    /// <summary>
+	    /// Resets the HashSet without returning it to the pool.
+	    /// </summary>
+	    public static void Reset(HashSet<T0> value)
 	    {
 	    }
 	}

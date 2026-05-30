@@ -6,6 +6,28 @@ namespace CodeAnalysis.Extensions;
 public static class EnumExtensions
 {
     /// <summary>
+    /// Returns the enum name and value as a string.
+    /// </summary>
+    /// <example>MyEnum.Two</example>
+    public static string ToTypeFullNameAndValueString<T0>(this T0 enumValue) where T0 : Enum
+    {
+        Type type = typeof(T0);
+
+        return $"{type.FullName}.{enumValue}";
+    }
+
+    /// <summary>
+    /// Returns the enum name and value as a string.
+    /// </summary>
+    /// <example>MyEnum.Two</example>
+    public static string ToTypeNameAndValueString<T0>(this T0 enumValue) where T0 : Enum
+    {
+        Type type = typeof(T0);
+
+        return $"{type.Name}.{enumValue}";
+    }
+    
+    /// <summary>
     /// Gets the maximum value of an enum, combined if flags or individual if not.
     /// </summary>
     /// <remarks>A 0 value is returned if type is not an enum.</remarks>
