@@ -9,18 +9,30 @@ namespace CodeBoost.Extensions
 {
  public static class EnumExtensions
 	{
-	    /// <summary>
-	    /// Returns the enum name and value as a string.
-	    /// </summary>
-	    /// <example>MyEnum.Two</example>
-	    public static string ToTypeAndValueString<T0>(this T0 enumValue, bool useFullName) where T0 : Enum
-	    {
-		    Type type = typeof(T0);
-		    
-		    string name = useFullName ? type.FullName : type.Name;
-		    return $"{name}.{enumValue}";
-	    }
-	    
+		/// <summary>
+		/// Returns the enum name and value as a string.
+		/// </summary>
+		/// <example>MyEnum.Two</example>
+		[PreserveLogic]
+		public static string ToTypeFullNameAndValueString<T0>(this T0 enumValue) where T0 : Enum
+		{
+			Type type = typeof(T0);
+
+			return $"{type.FullName}.{enumValue}";
+		}
+
+		/// <summary>
+		/// Returns the enum name and value as a string.
+		/// </summary>
+		/// <example>MyEnum.Two</example>
+		[PreserveLogic]
+		public static string ToTypeNameAndValueString<T0>(this T0 enumValue) where T0 : Enum
+		{
+			Type type = typeof(T0);
+
+			return $"{type.Name}.{enumValue}";
+		}
+
 	    /// <summary>
 	    /// Gets the lowest and highest values for an enum of underlying type.
 	    /// </summary>

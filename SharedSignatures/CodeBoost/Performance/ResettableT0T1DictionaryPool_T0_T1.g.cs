@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 namespace CodeBoost.Performance
@@ -14,16 +14,23 @@ namespace CodeBoost.Performance
 	    /// </summary>
 	    public static Dictionary<T0, T1> Rent() => default;
 	    /// <summary>
-	    /// Stores an instance of Dictionary and sets the original reference to null.
+	    /// Resets the Dictionary, returns it to the pool, and nullifies the reference.
 	    /// </summary>
-	    public static void ReturnAndNullifyReference(ref Dictionary<T0, T1>? value, PoolReturnType collectionReturnType)
+	    public static void ReturnAndNullifyReference(ref Dictionary<T0, T1> value)
 	    {
 	    }
-	
+
 	    /// <summary>
-	    /// Stores an instance of Dictionary.
+	    /// Resets the Dictionary and returns it to the pool.
 	    /// </summary>
-	    public static void Return(Dictionary<T0, T1>? value, PoolReturnType collectionReturnType)
+	    public static void Return(Dictionary<T0, T1> value)
+	    {
+	    }
+
+	    /// <summary>
+	    /// Resets the Dictionary without returning it to the pool.
+	    /// </summary>
+	    public static void Reset(Dictionary<T0, T1> value)
 	    {
 	    }
 	}
