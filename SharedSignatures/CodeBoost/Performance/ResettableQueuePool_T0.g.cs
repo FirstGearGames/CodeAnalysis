@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 namespace CodeBoost.Performance
@@ -14,16 +14,23 @@ namespace CodeBoost.Performance
 	    /// </summary>
 	    public static Queue<T0> Rent() => default;
 	    /// <summary>
-	    /// Stores an instance of Queue and sets the original reference to null.
+	    /// Resets the Queue, returns it to the pool, and nullifies the reference.
 	    /// </summary>
-	    public static void ReturnAndNullifyReference(ref Queue<T0>? value, PoolReturnType collectionReturnType)
+	    public static void ReturnAndNullifyReference(ref Queue<T0> value)
 	    {
 	    }
-	
+
 	    /// <summary>
-	    /// Stores an instance of Queue.
+	    /// Resets the Queue and returns it to the pool.
 	    /// </summary>
-	    public static void Return(Queue<T0>? value, PoolReturnType collectionReturnType)
+	    public static void Return(Queue<T0> value)
+	    {
+	    }
+
+	    /// <summary>
+	    /// Resets the Queue without returning it to the pool.
+	    /// </summary>
+	    public static void Reset(Queue<T0> value)
 	    {
 	    }
 	}

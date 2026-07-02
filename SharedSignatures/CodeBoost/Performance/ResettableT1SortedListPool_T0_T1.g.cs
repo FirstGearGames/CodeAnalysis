@@ -1,29 +1,36 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 namespace CodeBoost.Performance
 {
  /// <summary>
-	/// A pool for a Dictionary which is resettable.
+	/// A pool for a SortedList which is resettable.
 	/// </summary>
 	public static class ResettableT1SortedListPool<T0, T1>
 	    where T1 : IPoolResettable, new()
 	{
 	    /// <summary>
-	    /// Retrieves an instance of Dictionary.
+	    /// Retrieves an instance of SortedList.
 	    /// </summary>
 	    public static SortedList<T0, T1> Rent() => default;
 	    /// <summary>
-	    /// Stores an instance of Dictionary and sets the original reference to null.
+	    /// Resets the SortedList, returns it to the pool, and nullifies the reference.
 	    /// </summary>
-	    public static void ReturnAndNullifyReference(ref SortedList<T0, T1> value, PoolReturnType collectionReturnType)
+	    public static void ReturnAndNullifyReference(ref SortedList<T0, T1> value)
 	    {
 	    }
-	
+
 	    /// <summary>
-	    /// Stores an instance of Dictionary.
+	    /// Resets the SortedList and returns it to the pool.
 	    /// </summary>
-	    public static void Return(SortedList<T0, T1> value, PoolReturnType collectionReturnType)
+	    public static void Return(SortedList<T0, T1> value)
+	    {
+	    }
+
+	    /// <summary>
+	    /// Resets the SortedList without returning it to the pool.
+	    /// </summary>
+	    public static void Reset(SortedList<T0, T1> value)
 	    {
 	    }
 	}
