@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace CodeBoost.Performance
 {
- public class ThreadLocalStackWrapper<TObject>
+ public class ThreadLocalStackWrapper<T0>
 	{
 	    /// <summary>
 	    /// Stack for the ThreadLocal.
 	    /// </summary>
-	    public readonly Stack<TObject> LocalStack = [];
-	    public ThreadLocalStackWrapper(Action<Stack<TObject>> onFinalize)
+	    public readonly Stack<T0> LocalStack = [];
+	    public ThreadLocalStackWrapper(Action<Stack<T0>> onFinalize)
 	    {
 	    }
 	}

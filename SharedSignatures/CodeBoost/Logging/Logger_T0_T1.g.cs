@@ -10,7 +10,7 @@ namespace CodeBoost.Logging
  /// <summary>
 	/// A static Logger which uses the currently registered ILogger.
 	/// </summary>
-	public static class Logger<TOuter, TInner0>
+	public static class Logger<T0, T1>
 	{
 	    public static void LogInformation(string message, [CallerMemberName] string methodName = "")
 	    {

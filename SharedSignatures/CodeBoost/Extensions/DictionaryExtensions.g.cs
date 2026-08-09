@@ -10,7 +10,7 @@ namespace CodeBoost.Extensions
 	    /// Returns values as a list.
 	    /// </summary>
 	    /// <remarks>The returned list is taken from a collection pool.</remarks>
-	    public static List<TValue> ValuesToList<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+	    public static List<T1> ValuesToList<T0, T1>(this IDictionary<T0, T1> dict)
 	    {
 	        return default !;
 	    }
@@ -18,7 +18,7 @@ namespace CodeBoost.Extensions
 	    /// <summary>
 	    /// Clears a list and populates it with the values of a dictionary.
 	    /// </summary>
-	    public static void ValuesToList<TKey, TValue>(this IDictionary<TKey, TValue> dict, ref List<TValue> result)
+	    public static void ValuesToList<T0, T1>(this IDictionary<T0, T1> dict, ref List<T1> result)
 	    {
 	    }
 	
@@ -26,7 +26,7 @@ namespace CodeBoost.Extensions
 	    /// Returns keys as a list.
 	    /// </summary>
 	    /// <remarks>The returned list is taken from a collection pool.</remarks>
-	    public static List<TValue> KeysToList<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+	    public static List<T1> KeysToList<T0, T1>(this IDictionary<T0, T1> dict)
 	    {
 	        return default !;
 	    }
@@ -34,7 +34,7 @@ namespace CodeBoost.Extensions
 	    /// <summary>
 	    /// Clears a list and populates it with the keys of a dictionary.
 	    /// </summary>
-	    public static void KeysToList<TKey, TValue>(this IDictionary<TKey, TValue> dict, ref List<TKey> result)
+	    public static void KeysToList<T0, T1>(this IDictionary<T0, T1> dict, ref List<T0> result)
 	    {
 	    }
 	}
