@@ -150,8 +150,10 @@ public static class AttributeDataExtensions
     public static T0? GetNamedArgument<T0>(this AttributeData thisAttributeData, string argumentName, T0? defaultValue)
     {
         foreach (KeyValuePair<string, TypedConstant> namedArgument in thisAttributeData.NamedArguments)
+        {
             if (namedArgument.Key == argumentName)
                 return (T0)namedArgument.Value.Value;
+        }
 
         return defaultValue;
     }

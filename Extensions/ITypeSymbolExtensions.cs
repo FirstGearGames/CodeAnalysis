@@ -288,80 +288,56 @@ public static class TypeSymbolExtensions
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a user-defined enum, class, or struct.</returns>
-    public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
-    }
+    public static bool IsUserDefinedEnumClassOrStruct(this ITypeSymbol typeSymbol) => typeSymbol.IsUserDefinedEnum() || typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
 
     /// <summary>
     /// Returns whether the supplied type symbol is a user-defined class or struct.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a user-defined class or struct.</returns>
-    public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
-    }
+    public static bool IsUserDefinedClassOrStruct(this ITypeSymbol typeSymbol) => typeSymbol.IsUserDefinedClass() || typeSymbol.IsUserDefinedStruct();
 
     /// <summary>
     /// Returns whether the supplied type symbol is a user-defined struct.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a user-defined struct.</returns>
-    public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
-    }
+    public static bool IsUserDefinedStruct(this ITypeSymbol typeSymbol) => typeSymbol is { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None };
 
     /// <summary>
     /// Returns whether the supplied type symbol is a user-defined class.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a user-defined class.</returns>
-    public static bool IsUserDefinedClass(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
-    }
+    public static bool IsUserDefinedClass(this ITypeSymbol typeSymbol) => typeSymbol is { TypeKind: TypeKind.Class, SpecialType: SpecialType.None };
 
     /// <summary>
     /// Returns whether the supplied type symbol is a user-defined enum.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a user-defined enum.</returns>
-    public static bool IsUserDefinedEnum(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol is { TypeKind: TypeKind.Enum, SpecialType: SpecialType.None };
-    }
+    public static bool IsUserDefinedEnum(this ITypeSymbol typeSymbol) => typeSymbol is { TypeKind: TypeKind.Enum, SpecialType: SpecialType.None };
 
     /// <summary>
     /// Returns whether the supplied type symbol is a class.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a class.</returns>
-    public static bool IsClass(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol is { TypeKind: TypeKind.Class };
-    }
+    public static bool IsClass(this ITypeSymbol typeSymbol) => typeSymbol is { TypeKind: TypeKind.Class };
 
     /// <summary>
     /// Returns whether the supplied type symbol is a struct.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a struct.</returns>
-    public static bool IsStruct(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol is { TypeKind: TypeKind.Struct };
-    }
+    public static bool IsStruct(this ITypeSymbol typeSymbol) => typeSymbol is { TypeKind: TypeKind.Struct };
 
     /// <summary>
     /// Returns whether the supplied type symbol is either a class or a struct.
     /// </summary>
     /// <param name="typeSymbol">Type symbol to inspect.</param>
     /// <returns>True when the type symbol is a class or struct.</returns>
-    public static bool IsClassOrStruct(this ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.IsStruct() || typeSymbol.IsClass();
-    }
+    public static bool IsClassOrStruct(this ITypeSymbol typeSymbol) => typeSymbol.IsStruct() || typeSymbol.IsClass();
 
     /// <summary>
     /// Returns whether the supplied type symbol is a reference type or is declared as nullable.

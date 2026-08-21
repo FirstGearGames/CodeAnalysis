@@ -53,10 +53,7 @@ public static class SymbolExtensions
     /// </summary>
     /// <param name="symbol">Symbol whose namespace is being read.</param>
     /// <returns>The name of the containing namespace, or an empty string when none exists.</returns>
-    public static string GetNamespace(this ISymbol symbol)
-    {
-        return symbol?.ContainingNamespace?.Name.EmptyIfNull()!;
-    }
+    public static string GetNamespace(this ISymbol symbol) => symbol?.ContainingNamespace?.Name.EmptyIfNull()!;
 
     /// <summary>
     /// Returns the fully qualified name of the supplied symbol, including its containing namespace.

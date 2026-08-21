@@ -81,10 +81,7 @@ public static class StringBuilderExtensions
     /// <param name="stringBuilder">Builder to append to.</param>
     /// <param name="indentCount">Number of indentation units to prepend.</param>
     /// <param name="text">Text to append after the indentation.</param>
-    public static void Append(this StringBuilder stringBuilder, int indentCount, string text)
-    {
-        stringBuilder.Indent(indentCount).Append(text);
-    }
+    public static void Append(this StringBuilder stringBuilder, int indentCount, string text) => stringBuilder.Indent(indentCount).Append(text);
 
     /// <summary>
     /// Appends the supplied text after the requested number of indentation units, followed by a line break.
@@ -92,10 +89,7 @@ public static class StringBuilderExtensions
     /// <param name="stringBuilder">Builder to append to.</param>
     /// <param name="indentCount">Number of indentation units to prepend.</param>
     /// <param name="text">Text to append after the indentation.</param>
-    public static void AppendLine(this StringBuilder stringBuilder, int indentCount, string text)
-    {
-        stringBuilder.Indent(indentCount).AppendLine(text);
-    }
+    public static void AppendLine(this StringBuilder stringBuilder, int indentCount, string text) => stringBuilder.Indent(indentCount).AppendLine(text);
 
     /// <summary>
     /// Appends a <c>throw new Exception(...)</c> line containing the supplied message after the requested number of indentation units.

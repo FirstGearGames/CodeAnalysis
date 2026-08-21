@@ -18,10 +18,7 @@ public static class SemanticModelExtensions
     /// <param name="node">Syntax node whose symbol is being resolved.</param>
     /// <returns>The bound symbol, or null when no symbol could be resolved.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ISymbol GetSymbol(this SemanticModel semanticModel, SyntaxNode node)
-    {
-        return semanticModel.GetSymbolInfo(node).Symbol;
-    }
+    public static ISymbol GetSymbol(this SemanticModel semanticModel, SyntaxNode node) => semanticModel.GetSymbolInfo(node).Symbol;
 
     /// <summary>
     /// Returns the type symbol bound to the supplied syntax node, or null when none can be resolved.
@@ -30,10 +27,7 @@ public static class SemanticModelExtensions
     /// <param name="node">Syntax node whose type is being resolved.</param>
     /// <returns>The bound type symbol, or null when no type could be resolved.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ITypeSymbol GetTypeSymbol(this SemanticModel semanticModel, SyntaxNode node)
-    {
-        return semanticModel.GetTypeInfo(node).Type;
-    }
+    public static ITypeSymbol GetTypeSymbol(this SemanticModel semanticModel, SyntaxNode node) => semanticModel.GetTypeInfo(node).Type;
 
     /// <summary>
     /// Returns the <see cref="IFieldSymbol"/> for the first variable declared in the supplied <see cref="FieldDeclarationSyntax"/>.

@@ -38,18 +38,14 @@ public static class SyntaxNodeExtensions
         #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
         if (syntaxNode is null)
-        {
             return false;
-        }
 
         try
         {
             syntaxNode = syntaxNode.Parent;
 
             if (syntaxNode is null)
-            {
                 return false;
-            }
 
             if (syntaxNode.GetType() == typeof(T0))
             {
