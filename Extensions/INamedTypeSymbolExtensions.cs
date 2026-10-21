@@ -16,6 +16,15 @@ namespace CodeAnalysis.Extensions;
 public static class NamedTypeSymbolExtensions
 {
     /// <summary>
+    /// The metadata name of the open <see cref="IEquatable{T}"/> definition, carrying the arity suffix its symbol name leaves off.
+    /// </summary>
+    private const string IEquatableMetadataName = "IEquatable`1";
+    /// <summary>
+    /// The name of the namespace <see cref="IEquatable{T}"/> is declared in.
+    /// </summary>
+    private const string IEquatableNamespaceName = "System";
+
+    /// <summary>
     /// Tries to generate the namespace and class declaration text for the supplied class symbol.
     /// </summary>
     /// <example>
@@ -254,13 +263,18 @@ public static class NamedTypeSymbolExtensions
     /// </summary>
     /// <param name="namedTypeSymbol">Named type whose interfaces are being inspected.</param>
     /// <returns>True when the symbol implements <see cref="IEquatable{T}"/>.</returns>
+    /// <remarks>
+    /// The interface is matched on its open definition's metadata name. A name built from the symbol, as <see cref="NamedTypeSymbolImplementsInterface"/> compares, leaves off the arity suffix that <see cref="Type.FullName"/> gives a generic type, so a generic interface never matched there and every type implementing only <see cref="IEquatable{T}"/> read as having no equality of its own.
+    /// </remarks>
     public static bool ImplementsIEquatable(this INamedTypeSymbol namedTypeSymbol)
     {
-        string? iEquatableFullName = typeof(IEquatable<>).FullName;
-        if (iEquatableFullName is null)
-            return false;
-        
-        return namedTypeSymbol.NamedTypeSymbolImplementsInterface(iEquatableFullName);
+        foreach (INamedTypeSymbol interfaceNamed in namedTypeSymbol.Interfaces)
+        {
+            if (interfaceNamed.OriginalDefinition is { MetadataName: IEquatableMetadataName, ContainingNamespace: { Name: IEquatableNamespaceName, ContainingNamespace.IsGlobalNamespace: true } })
+                return true;
+        }
+
+        return false;
     }
     
     /// <summary>
